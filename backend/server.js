@@ -21,6 +21,7 @@ app.use('/api', integrationRouter);
 
 //! Webosckets Don't touch this configuration
 
+const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const { WebSocketRoutes } = require('./websockets/mainWebsocket');
 wss.on('connection', (ws, request) => {
@@ -28,7 +29,6 @@ wss.on('connection', (ws, request) => {
   WebSocketRoutes(ws, request);
 });
 
-const server = http.createServer(app);
 const PORT = process.env.PORT || 4123;
 server.listen(PORT, () => {
   console.log(`Server for webosockets and http requests is running on port ${PORT}`);
