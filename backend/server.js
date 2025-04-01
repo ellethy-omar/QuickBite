@@ -1,26 +1,35 @@
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const app = express();
-
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-//? To be removed, I just put it here just in case Retaj wants to test that the server exists.
+const run = require('./config/db');
 
-app.get("/", (req, res)=> {
-    res.status(200).json(result = {
-        statusbar: false,
-        failure: "Task failed Succuessfiily! this is an invalid route"
-    })
-});
+run().catch(console.dir);
+// Swagger configuration options
+const swaggerConfigurations = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: "QuickBite's Apis",
+      version: '1.0.0',
+    },
+  },
+  apis: ['./docs/*.js'],
+};
 
-const integrationRouter = require('./routes/integrationRouter')
+const swaggerSpec = swaggerJsdoc(swaggerConfigurations);
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+const integrationRouter = require('./routes/integrationRouter');
 app.use('/api', integrationRouter);
 
-//! Webosckets Don't touch this configuration
-
+// WebSockets setup
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const { WebSocketRoutes } = require('./websockets/mainWebsocket');
@@ -31,5 +40,5 @@ wss.on('connection', (ws, request) => {
 
 const PORT = process.env.PORT || 4123;
 server.listen(PORT, () => {
-  console.log(`Server for webosockets and http requests is running on port ${PORT}`);
+  console.log(`Server for webosckets and http requests is running on port ${PORT}`);
 });
