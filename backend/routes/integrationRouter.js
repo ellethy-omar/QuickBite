@@ -1,8 +1,8 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const { requireAuth } = require('../middleware/requireAuth');
 
 const authRoutes = require('./authRoutes');
+const cloudinaryRoutes = require('./cloudinaryRoutes');
 
 router.get("/", (req, res)=> {
     res.status(200).json(result = {
@@ -12,6 +12,7 @@ router.get("/", (req, res)=> {
 });
 
 router.use('/auth', authRoutes);
+router.use('/cloudinary', cloudinaryRoutes);
 router.use(requireAuth);
 // Rest of routes go here
 
