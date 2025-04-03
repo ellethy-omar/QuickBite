@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import 'react-native-gesture-handler';
 import { Provider, useSelector } from 'react-redux';
 import store, { RootState } from './store'; // Import the Redux store and RootState type
+import 'react-native-gesture-handler';
 
 export default function RootLayout() {
   return (

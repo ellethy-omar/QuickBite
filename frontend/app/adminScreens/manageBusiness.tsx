@@ -1,6 +1,6 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, FlatList, TextInput } from 'react-native';
-import BottomSheet from '@gorhom/bottom-sheet';
+import { Modalize } from 'react-native-modalize';
 import RestaurantContainer from '@/app/components/restaurantContainer';
 import colors from '@/app/styles/colors';
 import { RestaurantData } from '@/app/types/restaurant';
@@ -40,6 +40,12 @@ export default function ManageBusinessScreen() {
 
   const [filteredRestaurants, setFilteredRestaurants] = React.useState<RestaurantData[]>(restaurants);
 
+  const modalizeRef = useRef<Modalize>(null);
+
+  const openModal = () => {
+    modalizeRef.current?.open();
+  };
+
   const handleFilterRestaurants = (text: string) => {
     const filtered = restaurants.filter((restaurant) =>
       restaurant.name.toLowerCase().includes(text.toLowerCase())
@@ -47,9 +53,33 @@ export default function ManageBusinessScreen() {
     setFilteredRestaurants(filtered);
   };
 
-  // Bottom Sheet setup
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
+  const handleSort = (type: string) => {
+    let sortedRestaurants = [...filteredRestaurants];
+    switch (type) {
+      case 'alphabetical-asc':
+        sortedRestaurants.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'alphabetical-desc':
+        sortedRestaurants.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'rating-asc':
+        sortedRestaurants.sort((a, b) => a.rating - b.rating);
+        break;
+      case 'rating-desc':
+        sortedRestaurants.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'orders-asc':
+        sortedRestaurants.sort((a, b) => a.ordersDone - b.ordersDone);
+        break;
+      case 'orders-desc':
+        sortedRestaurants.sort((a, b) => b.ordersDone - a.ordersDone);
+        break;
+      default:
+        break;
+    }
+    setFilteredRestaurants(sortedRestaurants);
+    modalizeRef.current?.close(); // Close the modal after sorting
+  };
 
   return (
     <View style={styles.background}>
@@ -61,41 +91,16 @@ export default function ManageBusinessScreen() {
         onChangeText={(text) => handleFilterRestaurants(text)}
       />
       <View style={styles.mailContainer}>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 10,
-            paddingHorizontal: 10,
-          }}
-        >
-            <TouchableOpacity
-            style={styles.toolButton}
-            onPress={() => {
-                console.log('Button pressed');
-                console.log('BottomSheetRef:', bottomSheetRef.current);
-                bottomSheetRef.current?.expand();
-            }}
-            >
+        <View style={styles.headerContainer}>
+          <TouchableOpacity style={styles.toolButton} onPress={openModal}>
             <Text style={{ color: colors.primary, fontWeight: '700' }}>Sort by</Text>
             <IconSymbol name="chevron.down" size={18} color={colors.primary} />
-            </TouchableOpacity>
+          </TouchableOpacity>
           <Text style={styles.infoText}>Filtered Restaurants: {filteredRestaurants.length}</Text>
         </View>
-        {filteredRestaurants.length == 0 ? (
-          <Text
-            style={{
-              color: colors.primary,
-              fontSize: 16,
-              fontWeight: '700',
-              textAlign: 'center',
-              marginTop: 50,
-            }}
-          >
-            No Restaurants Found
-          </Text>
+
+        {filteredRestaurants.length === 0 ? (
+          <Text style={styles.noResultsText}>No Restaurants Found</Text>
         ) : (
           <FlatList
             data={filteredRestaurants}
@@ -106,17 +111,29 @@ export default function ManageBusinessScreen() {
         )}
       </View>
 
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1} // Start in a closed state
-        snapPoints={snapPoints}
-        backgroundStyle={styles.bottomSheetBackground}
-        >
-        <View style={styles.bottomSheetContent}>
-            <Text style={{ fontSize: 18, fontWeight: '700' }}>Bottom Sheet Content</Text>
-            <Text>Here you can add any content you want!</Text>
+      <Modalize ref={modalizeRef} modalHeight={300} snapPoint={200} modalStyle={styles.modalStyle}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Sort Options</Text>
+          <TouchableOpacity onPress={() => handleSort('alphabetical-asc')} style={styles.sortOption}>
+            <Text>Alphabetical (A-Z)</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSort('alphabetical-desc')} style={styles.sortOption}>
+            <Text>Alphabetical (Z-A)</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSort('rating-asc')} style={styles.sortOption}>
+            <Text>Rating (Low to High)</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSort('rating-desc')} style={styles.sortOption}>
+            <Text>Rating (High to Low)</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSort('orders-asc')} style={styles.sortOption}>
+            <Text>Orders Done (Low to High)</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSort('orders-desc')} style={styles.sortOption}>
+            <Text>Orders Done (High to Low)</Text>
+          </TouchableOpacity>
         </View>
-        </BottomSheet>
+      </Modalize>
     </View>
   );
 }
@@ -145,6 +162,13 @@ const styles = StyleSheet.create({
   mailContainer: {
     flex: 1,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
   toolButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -155,19 +179,30 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.secondaryText,
   },
-  bottomSheetBackground: {
+  noResultsText: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: 50,
+  },
+  modalStyle: {
     backgroundColor: '#f8f9fa',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
-  bottomSheetContent: {
+  modalContent: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 20,
   },
-  openButton: {
-    backgroundColor: colors.primary,
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  sortOption: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
 });

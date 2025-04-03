@@ -4,6 +4,7 @@ import { Tabs } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { IconSymbol, IconSymbolName } from '@/components/ui/IconSymbol';
 import colors from '@/app/styles/colors';
+import 'react-native-gesture-handler';
 
 export default function AdminScreensLayout() {
   return (
