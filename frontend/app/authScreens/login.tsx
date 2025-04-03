@@ -8,6 +8,8 @@ import { useNavigation } from 'expo-router';
 import { NavigationProp } from '@react-navigation/native';
 import background from '../../assets/images/sectionBackground.png';
 import { RootStackParamList } from '../types/rootStack';
+import { useDispatch } from 'react-redux';
+import { setRole } from '../slices/userSlice';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -16,10 +18,12 @@ export default function LoginScreen() {
   const [submitting, setSubmitting] = useState(false);
 
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!submitting) return;
-    navigation.navigate('mainScreens');
+    dispatch(setRole('admin'));
+    navigation.navigate('index');
   }, [submitting]);
 
   return (

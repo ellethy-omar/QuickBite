@@ -1,7 +1,10 @@
 const colors = {
     background: '#fff',
-    primary: '#576CD6',
-    secondary: '#293956',
+    offset: "#fbfbfb",
+    primary: '#2D336B',
+    secondary: '#c4c8e6',
+    primaryText: '#fefefe',
+    secondaryText: '#edebeb',
   };
   
   export default colors;
