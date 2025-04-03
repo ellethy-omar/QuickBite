@@ -13,6 +13,8 @@ export default function MainScreensLayout() {
             iconName = focused ? 'house.fill' : 'house';
           } else if (route.name === 'settings') {
             iconName = focused ? 'gearshape.2.fill' : 'gearshape.2';
+          } else if (route.name === 'dashboard') {
+            iconName = focused ? 'house.fill' : 'house';
           }
 
           return <IconSymbol name={iconName} size={size} color={color} />;
@@ -33,6 +35,7 @@ export default function MainScreensLayout() {
     >
       <Tabs.Screen name="home" options={{ title: 'Home' }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
+      <Tabs.Screen name="dashboard" options={{ title: 'Dashboard' }} />
     </Tabs>
   );
 }
