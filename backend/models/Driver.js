@@ -24,3 +24,6 @@ const DriverSchema = new Schema({
    createdAt:  { type: Date, default: Date.now }
 
   });
+  const Driver = mongoose.model('Driver', DriverSchema);
+  
+  module.exports = Driver;

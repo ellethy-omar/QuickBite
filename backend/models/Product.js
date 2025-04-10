@@ -13,3 +13,6 @@ const ProductSchema = new Schema({
     isAvailable: Boolean,
     image: Image //what type
   });
+
+  const Product = mongoose.model('Product', ProductSchema);
+      module.exports = Product;

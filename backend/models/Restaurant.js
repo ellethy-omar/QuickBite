@@ -78,3 +78,6 @@ const dailyHoursSchema = new Schema({
   }, {
     timestamps: true // Automatically adds createdAt and updatedAt
   });
+
+   const Restaurant = mongoose.model('Restaurant', restaurantSchema);
+        module.exports = Restaurant;

@@ -24,3 +24,6 @@ const conversationSchema = new Schema({
   }, {
     timestamps: true // Adds createdAt and updatedAt automatically
   });
+   const Chat = mongoose.model('Chat', conversationSchema);
+    
+    module.exports = Chat;
