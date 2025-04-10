@@ -208,6 +208,31 @@
  *                 user:
  *                   type: object
  *                   description: The decoded user data from the token
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: 67f829f6026f7415b5c254f0
+ *                     name:
+ *                       type: string
+ *                       example: testUser
+ *                     email:
+ *                       type: string
+ *                       example: test@gmail.com
+ *                     password:
+ *                       type: string
+ *                       example: $2b$10$BpRqUKQ6w30GBnYKs.SCU.zDJwMTLgzL9Zg8UT944dc40gTMiUv7W
+ *                     addresses:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: []
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-04-10T20:28:38.148Z
+ *                     __v:
+ *                       type: integer
+ *                       example: 0
  *       401:
  *         description: Authorization token required
  *         content:

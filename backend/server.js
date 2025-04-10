@@ -42,6 +42,10 @@ wss.on('connection', (ws, request) => {
   WebSocketRoutes(ws, request);
 });
 
+app.use((req, res) => {
+  res.status(404).json({ message: 'Invalid route' });
+});
+
 const PORT = process.env.PORT || 4123;
 server.listen(PORT, () => {
   console.log(`Server for webosckets and http requests is running on port ${PORT}`);
