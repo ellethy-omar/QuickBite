@@ -8,9 +8,13 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-const run = require('./config/db');
+const {
+  intializeMongooseConnection,
+  intializeMongoClientConnection
+} = require('./config/db');
 
-run().catch(console.dir);
+intializeMongooseConnection();
+
 // Swagger configuration options
 const swaggerConfigurations = {
   definition: {

@@ -6,7 +6,7 @@
  *     tags:
  *       - Authentication
  *     summary: Login an existing user
- *     description: AuthenX`ticate an existing user using either a username or email along with a password. Returns the user information and a JWT token if the credentials are valid.
+ *     description: Authenticate an existing user using either a username or email along with a password. Returns the user information and a JWT token if the credentials are valid.
  *     requestBody:
  *       required: true
  *       content:
@@ -37,9 +37,35 @@
  *                 user:
  *                   type: object
  *                   description: The authenticated user's data.
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: testUser
+ *                     email:
+ *                       type: string
+ *                       example: test@gmail.com
+ *                     password:
+ *                       type: string
+ *                       description: The hashed password.
+ *                       example: "$2b$10$BpRqUKQ6w30GBnYKs.SCU.zDJwMTLgzL9Zg8UT944dc40gTMiUv7W"
+ *                     _id:
+ *                       type: string
+ *                       example: "67f82916026f7415b5c254f0"
+ *                     addresses:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-04-10T20:28:38.148Z"
+ *                     __v:
+ *                       type: integer
+ *                       example: 0
  *                 token:
  *                   type: string
  *                   description: JWT token for authenticated access.
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6IjY3ZjgyOWY2MDI2Zjc0MTViNWMyNTRmMCIsImlhdCI6MTc0NDMxNjkxOCwiZXhwIjoxNzQ0NTc2MTE4fQ.qhDHvIN4axeovWd4960i27FRWte20r4eMtGlPFruuMI"
  *       400:
  *         description: Bad request - either credentials are missing or invalid.
  *         content:
@@ -51,7 +77,7 @@
  *                   type: string
  *                   example: Both username/email and password are required or Invalid credentials
  *       500:
- *         description: Server error during login.
+ *         description: Server error during login. Report to Omar
  *         content:
  *           application/json:
  *             schema:
@@ -61,6 +87,7 @@
  *                   type: string
  *                   example: Server error during login
  */
+
 
 //! REGISTER
 /**
@@ -104,10 +131,35 @@
  *                   example: User registered successfully
  *                 user:
  *                   type: object
- *                   description: The newly registered user's data.
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: 67f829f6026f7415b5c254f0
+ *                     name:
+ *                       type: string
+ *                       example: testUser
+ *                     email:
+ *                       type: string
+ *                       example: test@gmail.com
+ *                     password:
+ *                       type: string
+ *                       example: $2b$10$BpRqUKQ6w30GBnYKs.SCU.zDJwMTLgzL9Zg8UT944dc40gTMiUv7W
+ *                     addresses:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: []
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-04-10T20:28:38.148Z
+ *                     __v:
+ *                       type: integer
+ *                       example: 0
  *                 token:
  *                   type: string
  *                   description: JWT token for authenticated access.
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6IjY3ZjgyOWY2MDI2Zjc0MTViNWMyNTRmMCIsImlhdCI6MTc0NDMxNjkxOCwiZXhwIjoxNzQ0NTc2MTE4fQ.qhDHvIN4axeovWd4960i27FRWte20r4eMtGlPFruuMI
  *       400:
  *         description: Bad request - missing fields, invalid email, weak password, or user already exists.
  *         content:
@@ -129,6 +181,7 @@
  *                   type: string
  *                   example: Server error during registration
  */
+
 
 //! VERIFY
 /**
