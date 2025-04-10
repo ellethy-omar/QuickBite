@@ -6,12 +6,15 @@ const ProductSchema = new Schema({
     name: String,
     description: String,
     price: Number,
-    RestraurantId: {type: Schema.Types.ObjectId,
+    restraurantID: {type: Schema.Types.ObjectId,
       ref: 'Restaurant', 
       required: true}, // rest id should be present
     category: String,
     isAvailable: Boolean,
-    image: Image //what type
+    image: {
+      type: String,
+      default: 'default-cover.jpg'
+    }
   });
 
   const Product = mongoose.model('Product', ProductSchema);
