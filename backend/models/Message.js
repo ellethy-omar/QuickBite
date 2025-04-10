@@ -1,7 +1,7 @@
 // models/Message.js
 const mongoose = require('mongoose');
  
-const { Schema } = mongoose.Schema;
+const { Schema } = mongoose;
 
 const messageSchema = new Schema({
     chatId: {
@@ -23,8 +23,8 @@ const messageSchema = new Schema({
       type: Date,
       default: Date.now
     }
-  });
+});
 
-  const Message = mongoose.model('Message', messageSchema);
+const Message = mongoose.model('Message', messageSchema);
 
 module.exports = Message;

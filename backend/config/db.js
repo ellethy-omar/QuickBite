@@ -2,7 +2,6 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-console.log("Mongo URI:", process.env.MONGO_URI);
 const uri = process.env.MONGO_URI;
 
 if (!uri) {
@@ -10,13 +9,16 @@ if (!uri) {
 }
 
 // Mongoose connection (primary connection for your app)
-mongoose.connect(uri, {
-  useNewUrlParser: true,        // Fixed typo: was 'userNewUrlParser'
-  useUnifiedTopology: true,
-  serverApi: ServerApiVersion.v1  // Adding Stable API version
-})
-.then(() => console.log('Connected to MongoDB via Mongoose'))
-.catch(err => console.error('Mongoose connection error:', err));
+const intializeMongooseConnection = async ()=> {
+  mongoose.connect(uri, {
+    useNewUrlParser: true,        // Fixed typo: was 'userNewUrlParser'
+    useUnifiedTopology: true,
+    serverApi: ServerApiVersion.v1  // Adding Stable API version
+  })
+  .then(() => console.log('Connected to MongoDB via Mongoose'))
+  .catch(err => console.error('Mongoose connection error:', err));
+
+}
 
 // Native MongoDB driver connection (for specific operations if needed)
 const client = new MongoClient(uri, {
@@ -27,7 +29,7 @@ const client = new MongoClient(uri, {
   }
 });
 
-async function testConnection() {
+async function intializeMongoClientConnection() {
   try {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
@@ -44,10 +46,10 @@ async function testConnection() {
 
 // Only run the test connection if this file is executed directly
 if (require.main === module) {
-  testConnection().catch(console.error);
+  intializeMongoClientConnection().catch(console.error);
 }
 
 module.exports = {
-  mongooseConnection: mongoose.connection,
-  testConnection
+  intializeMongooseConnection,
+  intializeMongoClientConnection
 };
