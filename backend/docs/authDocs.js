@@ -8,7 +8,7 @@
 //! LOGIN
 /**
  * @swagger
- * /api/auth/login:
+ * /api/auth/loginUser:
  *   post:
  *     tags:
  *       - Authentication (No JWT required)
@@ -99,7 +99,7 @@
 //! REGISTER
 /**
  * @swagger
- * /api/auth/register:
+ * /api/auth/registerUser:
  *   post:
  *     tags:
  *       - Authentication (No JWT required)
@@ -188,7 +188,180 @@
  *                   type: string
  *                   example: Server error during registration
  */
+/**
+ * @swagger
+ * /api/auth/registerDriver:
+ *   post:
+ *     tags: 
+ *       - Authentication (No JWT required)
+ *     summary: Register a new driver
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Driver registered successfully
+ *       400:
+ *         description: Bad request
+ */
 
+/**
+ * @swagger
+ * /api/auth/loginDriver:
+ *   post:
+ *     tags: 
+ *       - Authentication (No JWT required)
+ *     summary: Login an existing driver
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Driver logged in successfully
+ *       401:
+ *         description: Invalid credentials
+ */
+
+/**
+ * @swagger
+ * /api/auth/registerAdmin:
+ *   post: 
+ *     tags: 
+ *       - Authentication (No JWT required)
+ *     summary: Register a new admin
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Admin registered successfully
+ *       400:
+ *         description: Bad request
+ */
+
+/**
+ * @swagger
+ * /api/auth/loginAdmin:
+ *   post:
+ *     tags: 
+ *       - Authentication (No JWT required)
+ *     summary: Login an existing admin
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Admin logged in successfully
+ *       401:
+ *         description: Invalid credentials
+ */
+
+/**
+ * @swagger
+ * /api/auth/registerRestaurant:
+ *   post:
+ *     tags: 
+ *       - Authentication (No JWT required)
+ *     summary: Register a new restaurant
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Restaurant registered successfully
+ *       400:
+ *         description: Bad request
+ */
+
+/**
+ * @swagger
+ * /api/auth/loginRestaurant:
+ *   post:
+ *     tags: 
+ *       - Authentication (No JWT required)
+ *     summary: Login an existing restaurant
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Restaurant logged in successfully
+ *       401:
+ *         description: Invalid credentials
+ */
 
 //! VERIFY
 /**

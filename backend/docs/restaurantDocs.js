@@ -39,6 +39,10 @@
  *                       format: date-time
  *       401:
  *         description: Unauthorized
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/restaurant/updateRestaurantProfile:
  *   put:
@@ -49,6 +53,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/restaurant/updateRestaurantProfilePhoto:
  *   put:
@@ -59,6 +67,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/restaurant/resetRestaurantPassword:
  *   post:
@@ -69,6 +81,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/restaurant/getRestaurantProducts:
  *   get:
@@ -79,6 +95,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/restaurant/addRestaurantProduct:
  *   post:
@@ -99,6 +119,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/restaurant/editRestaurantProduct:
  *   put:
@@ -119,4 +143,8 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  */

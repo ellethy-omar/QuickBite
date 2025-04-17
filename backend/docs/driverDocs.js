@@ -37,7 +37,11 @@
  *                       format: date-time
  *       401:
  *         description: Unauthorized, JWT missing or invalid.
- *
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ * 
  * /api/driver/updateDriverProfile:
  *   put:
  *     tags:
@@ -51,7 +55,11 @@
  *         description: Unauthorized, JWT missing or invalid.
  *       505:
  *         description: Not implemented yet.
- *
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ * 
  * /api/driver/updateDriverProfilePhoto:
  *   put:
  *     tags:
@@ -65,7 +73,10 @@
  *         description: Unauthorized, JWT missing or invalid.
  *       505:
  *         description: Not implemented yet.
- *
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  * /api/driver/restDriverPassword:
  *   post:
  *     tags:
@@ -79,7 +90,10 @@
  *         description: Unauthorized, JWT missing or invalid.
  *       505:
  *         description: Not implemented yet.
- *
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  * /api/driver/getAllOrders:
  *   get:
  *     tags:
@@ -92,8 +106,11 @@
  *       401:
  *         description: Unauthorized, JWT missing or invalid.
  *       505:
- *         description: Not implemented yet.
- *
+ *         description: Not implemented yet. 
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  * /api/driver/acceptOrder:
  *   put:
  *     tags:
@@ -107,4 +124,8 @@
  *         description: Unauthorized, JWT missing or invalid.
  *       505:
  *         description: Not implemented yet.
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  */

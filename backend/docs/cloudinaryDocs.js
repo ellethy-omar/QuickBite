@@ -148,6 +148,8 @@
  *         description: Missing required fields (imageBase64 or tags).
  *       500:
  *         description: An error occurred during the upload. Call Omar
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
  */
 
 //! GET IMAGES FOR A CERTAIN TAG
@@ -186,4 +188,6 @@
  *         description: Tag parameter is required.
  *       500:
  *         description: An error occurred while fetching images.
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
  */
