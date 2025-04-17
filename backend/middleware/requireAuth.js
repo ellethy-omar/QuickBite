@@ -12,7 +12,8 @@ const requireAuth = async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // Attach decoded data (e.g., ID) to request
+        req.user = decoded;
+        console.log(req.user);
         next();
     } catch (error) {
         console.error('JWT Verification Error:', error.message);
@@ -20,12 +21,28 @@ const requireAuth = async (req, res, next) => {
     }
 };
 
+const requireRole = (role) => (req, res, next) => {
+    if (req.user.role !== role) {
+        return res.status(469).json({ error: "Access denied, you don't have the authority to do this!" });
+    }
+    next();
+};
+
 // Generate JWT with OTP
-function generateToken(ID) {
-    return jwt.sign({ ID }, process.env.JWT_SECRET, { expiresIn: "3d" });
+function generateToken(_id, role) {
+    if(
+        role === "user" ||
+        role === "restaurant" ||
+        role === "driver" ||
+        role === "admin"
+    )
+        return jwt.sign({ _id , role }, process.env.JWT_SECRET, { expiresIn: "3d" });
+    else
+        throw new Error("Invalid role");
 }
 
 module.exports = {
     requireAuth,
+    requireRole,
     generateToken
 };

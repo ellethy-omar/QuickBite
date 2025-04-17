@@ -1,10 +1,17 @@
+/**
+ * @swagger
+ * tags:
+ *   - name: Authentication (No JWT required)
+ *     description: Endpoints related to signing up and logging in for any user type.
+ */
+
 //! LOGIN
 /**
  * @swagger
  * /api/auth/login:
  *   post:
  *     tags:
- *       - Authentication
+ *       - Authentication (No JWT required)
  *     summary: Login an existing user
  *     description: Authenticate an existing user using either a username or email along with a password. Returns the user information and a JWT token if the credentials are valid.
  *     requestBody:
@@ -77,7 +84,7 @@
  *                   type: string
  *                   example: Both username/email and password are required or Invalid credentials
  *       500:
- *         description: Server error during login. Report to Omar
+ *         description: Server error during login. Call Omar
  *         content:
  *           application/json:
  *             schema:
@@ -95,7 +102,7 @@
  * /api/auth/register:
  *   post:
  *     tags:
- *       - Authentication
+ *       - Authentication (No JWT required)
  *     summary: Register a new user
  *     description: Create a new user account by providing a username, email, and password. The endpoint validates the input (checks for missing fields, valid email, and strong password) and returns a JWT token upon successful registration.
  *     requestBody:
@@ -171,7 +178,7 @@
  *                   type: string
  *                   example: All fields are required or Invalid email address or Password is not strong enough or User already exists
  *       500:
- *         description: Server error during registration.
+ *         description: Server error during registration. Call Omar
  *         content:
  *           application/json:
  *             schema:
@@ -189,7 +196,7 @@
  * /api/auth/verify:
  *   get:
  *     tags:
- *       - Authentication
+ *       - Authentication (No JWT required)
  *     summary: Verify JWT token
  *     description: Validate the JWT provided in the Authorization header and return user details if the token is valid.
  *     security:
@@ -212,27 +219,15 @@
  *                     _id:
  *                       type: string
  *                       example: 67f829f6026f7415b5c254f0
- *                     name:
+ *                     role:
  *                       type: string
- *                       example: testUser
- *                     email:
- *                       type: string
- *                       example: test@gmail.com
- *                     password:
- *                       type: string
- *                       example: $2b$10$BpRqUKQ6w30GBnYKs.SCU.zDJwMTLgzL9Zg8UT944dc40gTMiUv7W
- *                     addresses:
- *                       type: array
- *                       items:
- *                         type: string
- *                       example: []
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       example: 2025-04-10T20:28:38.148Z
- *                     __v:
+ *                       example: user
+ *                     iat:
  *                       type: integer
- *                       example: 0
+ *                       example: 1744831147
+ *                     exp:
+ *                       type: integer
+ *                       example: 1745090347
  *       401:
  *         description: Authorization token required
  *         content:
@@ -253,4 +248,14 @@
  *                 error:
  *                   type: string
  *                   example: Invalid or expired token
+ *       469:
+ *         description: Access denied due to insufficient permissions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Access denied, you don't have the authority to do this!
  */
