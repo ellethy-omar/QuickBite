@@ -43,7 +43,7 @@ wss.on('connection', (ws, request) => {
 });
 
 app.use((req, res) => {
-  res.status(404).json({ message: 'Invalid route' });
+  res.status(404).json({ error: 'Invalid route' });
 });
 
 const PORT = process.env.PORT || 4123;

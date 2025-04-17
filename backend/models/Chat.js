@@ -1,7 +1,7 @@
 // models/Chat.js
 const mongoose = require('mongoose');
  
-const { Schema } = mongoose.Schema;
+const { Schema } = mongoose;
 
 const conversationSchema = new Schema({
     participants: [{
@@ -23,7 +23,7 @@ const conversationSchema = new Schema({
     }
   }, {
     timestamps: true // Adds createdAt and updatedAt automatically
-  });
-   const Chat = mongoose.model('Chat', conversationSchema);
-    
-    module.exports = Chat;
+});
+
+const Chat = mongoose.model('Chat', conversationSchema);
+module.exports = Chat;

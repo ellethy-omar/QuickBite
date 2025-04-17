@@ -1,29 +1,28 @@
 const mongoose = require('mongoose');
  
-const { Schema } = mongoose.Schema;
-
+const { Schema } = mongoose;
 
 // Schema for opening hours (reused for each day)
 const dailyHoursSchema = new Schema({
     open: { type: String, required: true, match: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/ },
     close: { type: String, required: true, match: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/ }
-  });
+});
   
   // Schema for contact information
-  const contactSchema = new Schema({
+const contactSchema = new Schema({
     phone: { type: String, required: true },
     email: { type: String, lowercase: true, match: [/.+\@.+\..+/, 'Please enter a valid email'] }
-  });
+});
   
   // Schema for address
-  const addressSchema = new Schema({
+const addressSchema = new Schema({
     street: { type: String, required: true },
     city: { type: String, required: true },
     area: { type: String, required: true }
-  });
+});
   
   // Schema for opening hours (contains all days)
-  const openingHoursSchema = new Schema({
+const openingHoursSchema = new Schema({
     sunday: dailyHoursSchema,
     monday: dailyHoursSchema,
     tuesday: dailyHoursSchema,
@@ -31,10 +30,10 @@ const dailyHoursSchema = new Schema({
     thursday: dailyHoursSchema,
     friday: dailyHoursSchema,
     saturday: dailyHoursSchema
-  });
+});
   
-  // Main restaurant schema
-  const restaurantSchema = new Schema({
+// Main restaurant schema
+const restaurantSchema = new Schema({
     name: { 
       type: String, 
       required: true,
@@ -77,7 +76,7 @@ const dailyHoursSchema = new Schema({
     }
   }, {
     timestamps: true // Automatically adds createdAt and updatedAt
-  });
+});
 
-   const Restaurant = mongoose.model('Restaurant', restaurantSchema);
-        module.exports = Restaurant;
+const Restaurant = mongoose.model('Restaurant', restaurantSchema);
+module.exports = Restaurant;

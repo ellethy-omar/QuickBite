@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
  
-const { Schema } = mongoose.Schema;
+const { Schema } = mongoose;
 
 const ProductSchema = new Schema({
     name: String,
@@ -15,7 +15,7 @@ const ProductSchema = new Schema({
       type: String,
       default: 'default-cover.jpg'
     }
-  });
+});
 
-  const Product = mongoose.model('Product', ProductSchema);
-      module.exports = Product;
+const Product = mongoose.model('Product', ProductSchema);
+module.exports = Product;

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
  
-const { Schema } = mongoose.Schema;
+const { Schema } = mongoose;
 
 
 const ItemSchema = new Schema({
@@ -10,7 +10,7 @@ const ItemSchema = new Schema({
     quantity: Number
   });
 
-  const OrderSchema = new Schema({
+const OrderSchema = new Schema({
     status: {
       type: String,
       enum: ['pending', 'processing', 'delivered', 'cancelled'],
@@ -87,7 +87,7 @@ OrderSchema.statics.findOrdersNeedingDelivery = async function() {
 };
 
 //find orders by user id
-orderSchema.statics.findOrdersByUserId = async function(userID) {
+OrderSchema.statics.findOrdersByUserId = async function(userID) {
   return this.find({ userID })
     .populate('restaurantID', 'name logo')
     .populate('items.productID', 'name image')
@@ -95,7 +95,7 @@ orderSchema.statics.findOrdersByUserId = async function(userID) {
 };
 
 // find orders by restaurant id 
-orderSchema.statics.findOrdersByRestaurantId = async function(restaurantID) {
+OrderSchema.statics.findOrdersByRestaurantId = async function(restaurantID) {
   return this.find({ restaurantID })
     .populate('userID', 'name addresses')
     .populate('deliveryDriverID', 'name phone')
@@ -103,7 +103,7 @@ orderSchema.statics.findOrdersByRestaurantId = async function(restaurantID) {
 };
 
 //find order by ID
-orderSchema.statics.findOrderById = async function(orderId) {
+OrderSchema.statics.findOrderById = async function(orderId) {
   return this.findById(orderId)
     .populate('restaurantID')
     .populate('userID')

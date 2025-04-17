@@ -1,10 +1,12 @@
 const User = require('../models/User');
-const bcrypt = require('bcrypt');
+// const Admin = require('../models/Admin'); // Assuming you have an Admin model
+const Driver = require('../models/Driver'); // Assuming you have a Driver model
+const Restaurant = require('../models/Restaurant');
 const validator = require('validator');
 const { generateToken } = require('../middleware/requireAuth'); // Import your JWT generator
 
 // Register a new user
-const register = async (req, res) => {
+const registerUser = async (req, res) => {
     const { username, email, password } = req.body;
   
     // Validate required fields
@@ -45,7 +47,7 @@ const register = async (req, res) => {
   
 
 // Login an existing user
-const login = async (req, res) => {
+const loginUser = async (req, res) => {
     const { usernameOrEmail, password } = req.body;
     
     // Ensure both username/email and password are provided
@@ -67,7 +69,7 @@ const login = async (req, res) => {
       }
     
       // Generate JWT for the user
-      const token = generateToken(user._id);
+      const token = generateToken(user._id, "user");
     
       res.status(200).json({
         message: 'Login successful',
@@ -78,12 +80,70 @@ const login = async (req, res) => {
       console.error('Login error:', error);
       res.status(500).json({ error: 'Server error during login' });
     }
-  };
-  
+};
+
+// Register a new Driver
+const registerDriver = async (req, res) => {
+  res.status(505).json({
+    error: "Not implmented"
+  })
+  // const token = generateToken(driver._id, "driver");
+};
+
+// Login an existing Driver
+const loginDriver = async (req, res) => {
+  res.status(505).json({
+    error: "Not implmented"
+  })
+  // const token = generateToken(driver._id, "driver");
+};
+
+// Register a new Admin
+const registerAdmin = async (req, res) => {
+  res.status(505).json({
+    error: "Not implmented"
+  })
+  // const token = generateToken(admin._id, "admin");
+};
+
+// Login an existing user
+const loginAdmin = async (req, res) => {
+  res.status(505).json({
+    error: "Not implmented"
+  })
+  // const token = generateToken(admin._id, "admin");
+};
+
+
+// Register a new Restaurant
+const registerRestaurant = async (req, res) => {
+  res.status(505).json({
+    error: "Not implmented"
+  })
+  // const token = generateToken(Restaurant._id, "Restaurant");
+};
+
+// Login an existing user
+const loginRestaurant = async (req, res) => {
+  res.status(505).json({
+    error: "Not implmented"
+  })
+  // const token = generateToken(Restaurant._id, "Restaurant");
+};
 
 const verifyToken = (req, res) => {
     res.status(200).json({ message: 'Token is valid', user: req.user });
 };
   
 
-module.exports = { register, login, verifyToken };
+module.exports = { 
+  registerUser, 
+  loginUser,
+  registerDriver,
+  loginDriver,
+  registerAdmin,
+  loginAdmin,
+  registerRestaurant,
+  loginRestaurant,
+  verifyToken
+};
