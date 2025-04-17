@@ -35,8 +35,10 @@
  *                     createdAt:
  *                       type: string
  *                       format: date-time
- *       401:
- *         description: Unauthorized
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/updateAdminProfile:
  *   put:
@@ -47,6 +49,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/updateAdminProfilePhoto:
  *   put:
@@ -57,6 +63,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/restAdminPassword:
  *   post:
@@ -67,6 +77,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/sendwarningToUser:
  *   post:
@@ -88,6 +102,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/sendWarningToDriver:
  *   post:
@@ -109,6 +127,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/sendWarningToRestaurant:
  *   post:
@@ -130,6 +152,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/banUser:
  *   put:
@@ -149,6 +175,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/banDriver:
  *   put:
@@ -168,6 +198,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/banRestaurant:
  *   put:
@@ -187,6 +221,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/unBanUser:
  *   put:
@@ -206,6 +244,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/unBanDriver:
  *   put:
@@ -225,6 +267,10 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/admin/unBanRestaurant:
  *   put:
@@ -244,4 +290,8 @@
  *     responses:
  *       505:
  *         description: Not implemented
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  */

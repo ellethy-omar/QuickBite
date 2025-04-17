@@ -17,7 +17,7 @@ const requireAuth = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('JWT Verification Error:', error.message);
-        return res.status(403).json({ error: "Invalid or expired token" });
+        return res.status(420).json({ error: "Invalid or expired token" });
     }
 };
 

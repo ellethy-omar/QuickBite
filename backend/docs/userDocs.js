@@ -57,6 +57,10 @@
  *         description: Unauthorized - JWT is missing or invalid.
  *       500:
  *         description: Server error. Call Omar
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
 
 /**
@@ -81,6 +85,10 @@
  *     responses:
  *       505:
  *         description: Not implemented yet
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
 
 /**
@@ -106,6 +114,10 @@
  *     responses:
  *       505:
  *         description: Not implemented yet
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
 
 /**
@@ -127,6 +139,10 @@
  *     responses:
  *       505:
  *         description: Not implemented yet
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
 
 /**
@@ -148,6 +164,10 @@
  *     responses:
  *       505:
  *         description: Not implemented yet
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
 
 /**
@@ -171,4 +191,8 @@
  *     responses:
  *       505:
  *         description: Not implemented yet
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError' 
  */
