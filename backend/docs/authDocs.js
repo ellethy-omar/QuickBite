@@ -74,15 +74,11 @@
  *                   description: JWT token for authenticated access.
  *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6IjY3ZjgyOWY2MDI2Zjc0MTViNWMyNTRmMCIsImlhdCI6MTc0NDMxNjkxOCwiZXhwIjoxNzQ0NTc2MTE4fQ.qhDHvIN4axeovWd4960i27FRWte20r4eMtGlPFruuMI"
  *       400:
- *         description: Bad request - either credentials are missing or invalid.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Both username/email and password are required or Invalid credentials
+ *         $ref: '#/components/InvalidCredentialsError'
+ *       403:
+ *         $ref: '#/components/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/InvalidCredentialsError'
  *       500:
  *         description: Server error during login. Call Omar
  *         content:
@@ -168,15 +164,11 @@
  *                   description: JWT token for authenticated access.
  *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6IjY3ZjgyOWY2MDI2Zjc0MTViNWMyNTRmMCIsImlhdCI6MTc0NDMxNjkxOCwiZXhwIjoxNzQ0NTc2MTE4fQ.qhDHvIN4axeovWd4960i27FRWte20r4eMtGlPFruuMI
  *       400:
- *         description: Bad request - missing fields, invalid email, weak password, or user already exists.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: All fields are required or Invalid email address or Password is not strong enough or User already exists
+ *         $ref: '#/components/InvalidCredentialsError'
+ *       403:
+ *         $ref: '#/components/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/InvalidCredentialsError'
  *       500:
  *         description: Server error during registration. Call Omar
  *         content:
@@ -204,21 +196,81 @@
  *             required:
  *               - name
  *               - email
+ *               - phone
  *               - password
  *             properties:
  *               name:
  *                 type: string
+ *                 example: Ali Mansour
  *               email:
  *                 type: string
  *                 format: email
+ *                 example: ali.driver@example.com
+ *               phone:
+ *                 type: number
+ *                 example: 1234567890
  *               password:
  *                 type: string
+ *                 format: password
+ *                 example: StrongPassw0rd!
+ *               vehicle:
+ *                 type: object
+ *                 properties:
+ *                   type:
+ *                     type: string
+ *                     example: car
+ *                   plateNumber:
+ *                     type: string
+ *                     example: ABC-1234
  *     responses:
  *       201:
  *         description: Driver registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Driver registered successfully
+ *                 driver:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: 6801fb9eab8d7be033776eb1
+ *                     name:
+ *                       type: string
+ *                       example: Ali Mansour
+ *                     email:
+ *                       type: string
+ *                       example: ali.driver@example.com
+ *                     phone:
+ *                       type: number
+ *                       example: 1234567890
+ *                     password:
+ *                       type: string
+ *                       example: $2b$10$FihHAAoUZ5EbvztJ6dTiV.thIAa/P4/yzLlR6QnpvHCHFxgF044LG
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-04-18T07:13:34.929Z
+ *                     __v:
+ *                       type: number
+ *                       example: 0
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: Bad request
+ *         $ref: '#/components/InvalidCredentialsError'
+ *       403:
+ *         $ref: '#/components/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/InvalidCredentialsError'
+ *       500:
+ *         description: Server error during registration
  */
+
 
 /**
  * @swagger
@@ -234,19 +286,65 @@
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - emailOrPhone
  *               - password
  *             properties:
- *               email:
+ *               emailOrPhone:
  *                 type: string
+ *                 example: ali.driver@example.com
  *               password:
  *                 type: string
+ *                 format: password
+ *                 example: StrongPassw0rd!
  *     responses:
  *       200:
- *         description: Driver logged in successfully
- *       401:
- *         description: Invalid credentials
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 driver:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: 6801fb9eab8d7be033776eb1
+ *                     name:
+ *                       type: string
+ *                       example: Ali Mansour
+ *                     email:
+ *                       type: string
+ *                       example: ali.driver@example.com
+ *                     phone:
+ *                       type: number
+ *                       example: 1234567890
+ *                     password:
+ *                       type: string
+ *                       example: $2b$10$FihHAAoUZ5EbvztJ6dTiV.thIAa/P4/yzLlR6QnpvHCHFxgF044LG
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-04-18T07:13:34.929Z
+ *                     __v:
+ *                       type: number
+ *                       example: 0
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         $ref: '#/components/InvalidCredentialsError'
+ *       403:
+ *         $ref: '#/components/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/InvalidCredentialsError'
+ *       500:
+ *         description: Server error during login
  */
+
 
 /**
  * @swagger
@@ -300,8 +398,12 @@
  *     responses:
  *       200:
  *         description: Admin logged in successfully
- *       401:
- *         description: Invalid credentials
+ *       400:
+ *         $ref: '#/components/InvalidCredentialsError'
+ *       403:
+ *         $ref: '#/components/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/InvalidCredentialsError'
  */
 
 /**
@@ -319,20 +421,194 @@
  *             type: object
  *             required:
  *               - name
- *               - email
- *               - password
+ *               - description
+ *               - cuisineType
+ *               - address
+ *               - contact
+ *               - openingHours
  *             properties:
  *               name:
  *                 type: string
- *               email:
+ *               description:
  *                 type: string
- *               password:
- *                 type: string
+ *               cuisineType:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               address:
+ *                 type: object
+ *                 properties:
+ *                   street:
+ *                     type: string
+ *                   city:
+ *                     type: string
+ *                   area:
+ *                     type: string
+ *               contact:
+ *                 type: object
+ *                 required:
+ *                   - email
+ *                   - phone
+ *                   - password
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                   phone:
+ *                     type: string
+ *                   password:
+ *                     type: string
+ *               openingHours:
+ *                 type: object
+ *                 properties:
+ *                   sunday:
+ *                     type: object
+ *                     properties:
+ *                       open:
+ *                         type: string
+ *                       close:
+ *                         type: string
+ *                   monday:
+ *                     type: object
+ *                     properties:
+ *                       open:
+ *                         type: string
+ *                       close:
+ *                         type: string
+ *                   tuesday:
+ *                     type: object
+ *                     properties:
+ *                       open:
+ *                         type: string
+ *                       close:
+ *                         type: string
+ *                   wednesday:
+ *                     type: object
+ *                     properties:
+ *                       open:
+ *                         type: string
+ *                       close:
+ *                         type: string
+ *                   thursday:
+ *                     type: object
+ *                     properties:
+ *                       open:
+ *                         type: string
+ *                       close:
+ *                         type: string
+ *                   friday:
+ *                     type: object
+ *                     properties:
+ *                       open:
+ *                         type: string
+ *                       close:
+ *                         type: string
+ *                   saturday:
+ *                     type: object
+ *                     properties:
+ *                       open:
+ *                         type: string
+ *                       close:
+ *                         type: string
  *     responses:
  *       201:
  *         description: Restaurant registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Restaurant registered successfully
+ *                 restaurant:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: Pizza Palace
+ *                     description:
+ *                       type: string
+ *                       example: Best pizza in town
+ *                     cuisineType:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: [ "Italian", "Pizza" ]
+ *                     address:
+ *                       type: object
+ *                       properties:
+ *                         street:
+ *                           type: string
+ *                           example: 123 Main St
+ *                         city:
+ *                           type: string
+ *                           example: Cairo
+ *                         area:
+ *                           type: string
+ *                           example: Downtown
+ *                     contact:
+ *                       type: object
+ *                       properties:
+ *                         phone:
+ *                           type: string
+ *                           example: 01012345678
+ *                         email:
+ *                           type: string
+ *                           example: contact@pizzapalace.com
+ *                         password:
+ *                           type: string
+ *                           example: "$2b$10$rIKa2FOOYLmnVzfjttYjP.6wfFh/Wh125KsPh.EabKMGDmBBuAASG"
+ *                     openingHours:
+ *                       type: object
+ *                       properties:
+ *                         sunday:
+ *                           type: object
+ *                           properties:
+ *                             open:
+ *                               type: string
+ *                               example: "10:00"
+ *                             close:
+ *                               type: string
+ *                               example: "22:00"
+ *                         monday:
+ *                           type: object
+ *                           properties:
+ *                             open:
+ *                               type: string
+ *                               example: "10:00"
+ *                             close:
+ *                               type: string
+ *                               example: "22:00"
+ *                         # ... similar for the rest of the days
+ *                     isActive:
+ *                       type: boolean
+ *                       example: true
+ *                     logo:
+ *                       type: string
+ *                       example: "default-logo.jpg"
+ *                     coverImage:
+ *                       type: string
+ *                       example: "default-cover.jpg"
+ *                     _id:
+ *                       type: string
+ *                       example: "680200ac46d93565c3eca540"
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-04-18T07:35:08.753Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-04-18T07:35:08.753Z"
+ *                 token:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODAyMDBhYzQ2ZDkzNTY1YzNlY2E1NDAiLCJyb2xlIjoicmVzdGF1cmFudCIsImlhdCI6MTc0NDk2MTcwOCwiZXhwIjoxNzQ1MjIwOTA4fQ.kNKr7onVB5F2ddvYDJQzaQbpGbCAN1CCYOo5A8yfPos"
  *       400:
- *         description: Bad request
+ *         $ref: '#/components/InvalidCredentialsError'
+ *       403:
+ *         $ref: '#/components/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/InvalidCredentialsError'
  */
 
 /**
@@ -349,18 +625,116 @@
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - emailOrPhone
  *               - password
  *             properties:
- *               email:
+ *               emailOrPhone:
  *                 type: string
+ *                 example: contact@pizzapalace.com
  *               password:
  *                 type: string
+ *                 example: P@ssw0rdStrong!
  *     responses:
  *       200:
  *         description: Restaurant logged in successfully
- *       401:
- *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 restaurant:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: 680200ac46d93565c3eca540
+ *                     name:
+ *                       type: string
+ *                       example: Pizza Palace
+ *                     description:
+ *                       type: string
+ *                       example: Best pizza in town
+ *                     cuisineType:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: [ "Italian", "Pizza" ]
+ *                     rating:
+ *                       type: number
+ *                       example: 0
+ *                     address:
+ *                       type: object
+ *                       properties:
+ *                         street:
+ *                           type: string
+ *                           example: 123 Main St
+ *                         city:
+ *                           type: string
+ *                           example: Cairo
+ *                         area:
+ *                           type: string
+ *                           example: Downtown
+ *                         _id:
+ *                           type: string
+ *                           example: 680200ac46d93565c3eca541
+ *                     contact:
+ *                       type: object
+ *                       properties:
+ *                         phone:
+ *                           type: string
+ *                           example: 01012345678
+ *                         email:
+ *                           type: string
+ *                           example: contact@pizzapalace.com
+ *                         password:
+ *                           type: string
+ *                           example: $2b$10$rIKa2FOOYLmnVzfjttYjP.6wfFh/Wh125KsPh.EabKMGDmBBuAASG
+ *                         _id:
+ *                           type: string
+ *                           example: 680200ac46d93565c3eca542
+ *                     openingHours:
+ *                       type: object
+ *                       example:
+ *                         sunday: { open: "10:00", close: "22:00", _id: "680200ac46d93565c3eca544" }
+ *                         monday: { open: "10:00", close: "22:00", _id: "680200ac46d93565c3eca545" }
+ *                         tuesday: { open: "10:00", close: "22:00", _id: "680200ac46d93565c3eca546" }
+ *                         wednesday: { open: "10:00", close: "22:00", _id: "680200ac46d93565c3eca547" }
+ *                         thursday: { open: "10:00", close: "22:00", _id: "680200ac46d93565c3eca548" }
+ *                         friday: { open: "10:00", close: "23:00", _id: "680200ac46d93565c3eca549" }
+ *                         saturday: { open: "10:00", close: "23:00", _id: "680200ac46d93565c3eca54a" }
+ *                         _id: 680200ac46d93565c3eca543
+ *                     isActive:
+ *                       type: boolean
+ *                       example: true
+ *                     logo:
+ *                       type: string
+ *                       example: default-logo.jpg
+ *                     coverImage:
+ *                       type: string
+ *                       example: default-cover.jpg
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-04-18T07:35:08.753Z
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: 2025-04-18T07:35:08.753Z
+ *                     __v:
+ *                       type: number
+ *                       example: 0
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         $ref: '#/components/InvalidCredentialsError'
+ *       403:
+ *         $ref: '#/components/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/InvalidCredentialsError'
  */
 
 //! VERIFY

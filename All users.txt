@@ -1,0 +1,66 @@
+normal user:
+// register
+{
+  "username": "test",
+  "email": "test@gmail.com",
+  "password": "testTest123!"
+}
+// login
+{
+  "usernameOrEmail": "test",
+  "password": "testTest123!"
+}
+
+Driver:
+// register
+{
+  "name": "Ali Mansour",
+  "email": "ali.driver@example.com",
+  "phone": 1234567890,
+  "password": "Str0ngP@ssword!",
+  "vehicle": {
+    "type": "Car",
+    "plateNumber": "ABC-1234",
+    "color": "Black"
+  }
+}
+
+//login
+{
+  "emailOrPhone": 1234567890,
+  "password": "Str0ngP@ssword!"
+}
+
+Restaurant:
+// register
+{
+  "name": "Pizza Palace",
+  "description": "Best pizza in town",
+  "cuisineType": ["Italian", "Pizza"],
+  "address": {
+    "street": "123 Main St",
+    "city": "Cairo",
+    "area": "Downtown"
+  },
+  "contact": {
+    "email": "contact@pizzapalace.com",
+    "phone": "01012345678",
+    "password": "P@ssw0rdStrong!"
+  },
+  "openingHours": {
+    "sunday": { "open": "10:00", "close": "22:00" },
+    "monday": { "open": "10:00", "close": "22:00" },
+    "tuesday": { "open": "10:00", "close": "22:00" },
+    "wednesday": { "open": "10:00", "close": "22:00" },
+    "thursday": { "open": "10:00", "close": "22:00" },
+    "friday": { "open": "10:00", "close": "23:00" },
+    "saturday": { "open": "10:00", "close": "23:00" }
+  }
+}
+
+//login
+{
+  "emailOrPhone": "contact@pizzapalace.com",
+  "password": "P@ssw0rdStrong!"
+}
+
