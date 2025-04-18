@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
- 
+const bcrypt = require('bcrypt');
 const { Schema } = mongoose;
 
 // Schema for opening hours (reused for each day)
@@ -11,7 +11,8 @@ const dailyHoursSchema = new Schema({
   // Schema for contact information
 const contactSchema = new Schema({
     phone: { type: String, required: true },
-    email: { type: String, lowercase: true, match: [/.+\@.+\..+/, 'Please enter a valid email'] }
+    email: { type: String, lowercase: true, match: [/.+\@.+\..+/, 'Please enter a valid email'] },
+    password: { type: String, required: true }
 });
   
   // Schema for address
@@ -77,6 +78,32 @@ const restaurantSchema = new Schema({
   }, {
     timestamps: true // Automatically adds createdAt and updatedAt
 });
+
+restaurantSchema.statics.restaurantExists = async function (email, phone) {
+  return await this.findOne({ $or: [{ "contact.email": email }, { "contact.phone": phone }] });
+};
+
+restaurantSchema.statics.createRestaurant = async function (data) {
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(data.contact.password, salt);
+  
+  // Clone to avoid mutating original input
+  const dataCopy = JSON.parse(JSON.stringify(data));
+  dataCopy.contact.password = hashedPassword;
+
+  return await this.create(dataCopy);
+};
+
+
+restaurantSchema.statics.findByEmailOrPhone = async function (identifier) {
+  return await this.findOne({
+    $or: [{ "contact.email": identifier }, { "contact.phone": identifier }]
+  });
+};
+
+restaurantSchema.methods.isPasswordMatch = async function (password) {
+  return await bcrypt.compare(password, this.contact.password);
+};
 
 const Restaurant = mongoose.model('Restaurant', restaurantSchema);
 module.exports = Restaurant;
