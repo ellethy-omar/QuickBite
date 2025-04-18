@@ -1,29 +1,29 @@
 const mongoose = require('mongoose');
- 
-const { Schema } = mongoose.Schema;
-
+const bcrypt = require('bcrypt');
+const { Schema } = mongoose;
 
 // Schema for opening hours (reused for each day)
 const dailyHoursSchema = new Schema({
     open: { type: String, required: true, match: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/ },
     close: { type: String, required: true, match: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/ }
-  });
+});
   
   // Schema for contact information
-  const contactSchema = new Schema({
+const contactSchema = new Schema({
     phone: { type: String, required: true },
-    email: { type: String, lowercase: true, match: [/.+\@.+\..+/, 'Please enter a valid email'] }
-  });
+    email: { type: String, lowercase: true, match: [/.+\@.+\..+/, 'Please enter a valid email'] },
+    password: { type: String, required: true }
+});
   
   // Schema for address
-  const addressSchema = new Schema({
+const addressSchema = new Schema({
     street: { type: String, required: true },
     city: { type: String, required: true },
     area: { type: String, required: true }
-  });
+});
   
   // Schema for opening hours (contains all days)
-  const openingHoursSchema = new Schema({
+const openingHoursSchema = new Schema({
     sunday: dailyHoursSchema,
     monday: dailyHoursSchema,
     tuesday: dailyHoursSchema,
@@ -31,10 +31,10 @@ const dailyHoursSchema = new Schema({
     thursday: dailyHoursSchema,
     friday: dailyHoursSchema,
     saturday: dailyHoursSchema
-  });
+});
   
-  // Main restaurant schema
-  const restaurantSchema = new Schema({
+// Main restaurant schema
+const restaurantSchema = new Schema({
     name: { 
       type: String, 
       required: true,
@@ -77,7 +77,33 @@ const dailyHoursSchema = new Schema({
     }
   }, {
     timestamps: true // Automatically adds createdAt and updatedAt
-  });
+});
 
-   const Restaurant = mongoose.model('Restaurant', restaurantSchema);
-        module.exports = Restaurant;
+restaurantSchema.statics.restaurantExists = async function (email, phone) {
+  return await this.findOne({ $or: [{ "contact.email": email }, { "contact.phone": phone }] });
+};
+
+restaurantSchema.statics.createRestaurant = async function (data) {
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(data.contact.password, salt);
+  
+  // Clone to avoid mutating original input
+  const dataCopy = JSON.parse(JSON.stringify(data));
+  dataCopy.contact.password = hashedPassword;
+
+  return await this.create(dataCopy);
+};
+
+
+restaurantSchema.statics.findByEmailOrPhone = async function (identifier) {
+  return await this.findOne({
+    $or: [{ "contact.email": identifier }, { "contact.phone": identifier }]
+  });
+};
+
+restaurantSchema.methods.isPasswordMatch = async function (password) {
+  return await bcrypt.compare(password, this.contact.password);
+};
+
+const Restaurant = mongoose.model('Restaurant', restaurantSchema);
+module.exports = Restaurant;
