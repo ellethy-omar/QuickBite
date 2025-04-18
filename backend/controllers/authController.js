@@ -101,7 +101,7 @@ const registerDriver = async (req, res) => {
   try {
     const existingDriver = await Driver.driverExists(email, phone);
     if (existingDriver) {
-      return res.status(403).json({ error: 'Driver already exists' });
+      return res.status(410).json({ error: 'Driver already exists' });
     }
 
     const newDriver = await Driver.createDriver({ name, email, phone, password, vehicle });
@@ -189,7 +189,7 @@ const registerRestaurant = async (req, res) => {
   try {
     const existing = await Restaurant.restaurantExists(contact.email, contact.phone);
     if (existing) {
-      return res.status(400).json({ error: 'Restaurant already exists' });
+      return res.status(410).json({ error: 'Restaurant already exists' });
     }
 
     const newRestaurant = await Restaurant.createRestaurant({
