@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image } from 'react-native';
 import colors from '@/app/styles/colors';
 
 // This would typically come from your API or state management
@@ -7,8 +7,10 @@ const initialUserData = {
   name: 'xKimozZ',
   email: 'xkimozz@example.com',
   phone: '2021234567',
+  profilePicture: 'https://randomuser.me/api/portraits/men/32.jpg', // Sample image URL from API
   addresses: [
     {
+      id: '1',
       street: 'Main St.',
       city: 'Cairo',
       area: 'Downtown',
@@ -17,6 +19,28 @@ const initialUserData = {
       floor: '3rd Floor',
       apartment: 'Apt 301',
       isDefault: true
+    },
+    {
+      id: '2',
+      street: 'Business Ave.',
+      city: 'Cairo',
+      area: 'New Cairo',
+      label: 'Work',
+      building: 'Office Tower',
+      floor: '15th Floor',
+      apartment: 'Suite 1502',
+      isDefault: false
+    },
+    {
+      id: '3',
+      street: 'Family Rd.',
+      city: 'Alexandria',
+      area: 'Montazah',
+      label: 'Parents',
+      building: 'Villa 27',
+      floor: 'Ground Floor',
+      apartment: '',
+      isDefault: false
     }
   ],
   createdAt: '2025-04-18T08:45:30.000Z'
@@ -24,12 +48,32 @@ const initialUserData = {
 
 export default function ProfileSettingsScreen() {
   const [userData, setUserData] = useState(initialUserData);
+  const [expandedAddresses, setExpandedAddresses] = useState(false);
   
   // Helper function to update user data fields
   const updateField = (field: string, value: string) => {
     setUserData({
       ...userData,
       [field]: value
+    });
+  };
+
+  // Placeholder for image selection - this will be replaced with API integration
+  const handleProfilePictureSelect = () => {
+    console.log('Select profile picture');
+    // In the future, this will trigger the API to provide a new profile image URL
+  };
+
+  // Set an address as default
+  const setDefaultAddress = (id: string) => {
+    const updatedAddresses = userData.addresses.map(address => ({
+      ...address,
+      isDefault: address.id === id
+    }));
+
+    setUserData({
+      ...userData,
+      addresses: updatedAddresses
     });
   };
 
@@ -41,6 +85,28 @@ export default function ProfileSettingsScreen() {
 
   return (
     <ScrollView style={styles.container}>
+      {/* Profile Picture Section */}
+      <View style={styles.profilePictureContainer}>
+        {userData.profilePicture ? (
+          <Image 
+            source={{ uri: userData.profilePicture }} 
+            style={styles.profilePicture} 
+          />
+        ) : (
+          <View style={styles.profilePicturePlaceholder}>
+            <Text style={styles.profilePicturePlaceholderText}>
+              {userData.name ? userData.name.charAt(0).toUpperCase() : 'U'}
+            </Text>
+          </View>
+        )}
+        <TouchableOpacity 
+          style={styles.changePhotoButton}
+          onPress={handleProfilePictureSelect}
+        >
+          <Text style={styles.changePhotoText}>Change Photo</Text>
+        </TouchableOpacity>
+      </View>
+      
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Personal Information</Text>
         
@@ -79,26 +145,48 @@ export default function ProfileSettingsScreen() {
       
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Default Address</Text>
-          <TouchableOpacity>
-            <Text style={styles.manageButton}>Manage All</Text>
+          <Text style={styles.sectionTitle}>Delivery Addresses</Text>
+          <TouchableOpacity onPress={() => setExpandedAddresses(!expandedAddresses)}>
+            <Text style={styles.manageButton}>{expandedAddresses ? 'Collapse' : 'Show All'}</Text>
           </TouchableOpacity>
         </View>
         
-        {userData.addresses && userData.addresses.length > 0 && (
-          <View style={styles.addressCard}>
-            <Text style={styles.addressLabel}>{userData.addresses[0].label}</Text>
-            <Text style={styles.addressText}>
-              {userData.addresses[0].building}, {userData.addresses[0].floor}
-            </Text>
-            <Text style={styles.addressText}>
-              {userData.addresses[0].apartment}, {userData.addresses[0].street}
-            </Text>
-            <Text style={styles.addressText}>
-              {userData.addresses[0].area}, {userData.addresses[0].city}
-            </Text>
-          </View>
-        )}
+        {userData.addresses && userData.addresses.map((address, index) => {
+          // Always show default address or all addresses if expanded
+          if (address.isDefault || expandedAddresses) {
+            return (
+              <View key={address.id} style={[styles.addressCard, index > 0 && styles.marginTop]}>
+                <View style={styles.addressHeader}>
+                  <Text style={styles.addressLabel}>{address.label}</Text>
+                  {address.isDefault ? (
+                    <View style={styles.defaultBadge}>
+                      <Text style={styles.defaultBadgeText}>Default</Text>
+                    </View>
+                  ) : (
+                    <TouchableOpacity onPress={() => setDefaultAddress(address.id)}>
+                      <Text style={styles.setDefaultText}>Set as Default</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                
+                <Text style={styles.addressText}>
+                  {address.building}{address.floor ? `, ${address.floor}` : ''}
+                </Text>
+                <Text style={styles.addressText}>
+                  {address.apartment ? `${address.apartment}, ` : ''}{address.street}
+                </Text>
+                <Text style={styles.addressText}>
+                  {address.area}, {address.city}
+                </Text>
+              </View>
+            );
+          }
+          return null;
+        })}
+
+        <TouchableOpacity style={styles.addAddressButton}>
+          <Text style={styles.addAddressText}>+ Add New Address</Text>
+        </TouchableOpacity>
       </View>
       
       <View style={styles.section}>
@@ -118,6 +206,53 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     padding: 16,
   },
+  // Profile picture styles
+  profilePictureContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  profilePicture: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#f9f9f9',
+    borderWidth: 2,
+    borderColor: '#fff',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  profilePicturePlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.primary + '30', // semi-transparent primary color
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  profilePicturePlaceholderText: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: colors.primary,
+  },
+  changePhotoButton: {
+    marginTop: 8,
+  },
+  changePhotoText: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Section styles
   section: {
     marginBottom: 24,
     backgroundColor: '#fff',
@@ -141,6 +276,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 16,
   },
+  // Form field styles
   fieldContainer: {
     marginBottom: 16,
   },
@@ -159,6 +295,7 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     fontSize: 16,
   },
+  // Address styles
   addressCard: {
     padding: 12,
     backgroundColor: '#f9f9f9',
@@ -166,10 +303,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eee',
   },
+  marginTop: {
+    marginTop: 12,
+  },
+  addressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   addressLabel: {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 8,
     color: colors.text,
   },
   addressText: {
@@ -177,6 +322,35 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 4,
   },
+  defaultBadge: {
+    backgroundColor: colors.primary + '20',
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  defaultBadgeText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  setDefaultText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  addAddressButton: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  addAddressText: {
+    color: colors.primary,
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  // Misc styles
   infoText: {
     fontSize: 14,
     color: '#888',
