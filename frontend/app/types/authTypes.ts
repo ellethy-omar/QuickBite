@@ -4,6 +4,7 @@ export interface UserFormData {
     phone: string;
     password: string;
     confirmPassword: string;
+    address: string;
 }
 
 export interface RestaurantFormData {
