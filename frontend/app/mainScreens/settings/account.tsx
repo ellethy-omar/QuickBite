@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import colors from '@/app/styles/colors';
 
 export default function AccountSettingsScreen() {
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-  
   return (
     <ScrollView style={styles.container}>
       <View style={styles.section}>
@@ -14,17 +10,14 @@ export default function AccountSettingsScreen() {
         
         <View style={styles.optionRow}>
           <View>
-            <Text style={styles.optionTitle}>Two-Factor Authentication</Text>
-            <Text style={styles.optionDescription}>Enable additional security for your account</Text>
+            <Text style={styles.optionTitle}>Change Email</Text>
+            <Text style={styles.optionDescription}>Update your account email</Text>
           </View>
-          <Switch
-            value={twoFactorEnabled}
-            onValueChange={setTwoFactorEnabled}
-            trackColor={{ false: '#767577', true: colors.primary }}
-            thumbColor={'#f4f3f4'}
-          />
+          <TouchableOpacity>
+            <Text style={styles.changeButton}>Update</Text>
+          </TouchableOpacity>
         </View>
-        
+
         <View style={styles.optionRow}>
           <View>
             <Text style={styles.optionTitle}>Change Password</Text>
@@ -37,37 +30,27 @@ export default function AccountSettingsScreen() {
       </View>
       
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>App Preferences</Text>
+        <Text style={styles.sectionTitle}>Payment Methods</Text>
         
-        <View style={styles.optionRow}>
+        <TouchableOpacity style={styles.optionRow}>
           <View>
-            <Text style={styles.optionTitle}>Email Notifications</Text>
-            <Text style={styles.optionDescription}>Receive important updates via email</Text>
+            <Text style={styles.optionTitle}>Manage Payment Methods</Text>
+            <Text style={styles.optionDescription}>Add or remove payment options</Text>
           </View>
-          <Switch
-            value={emailNotifications}
-            onValueChange={setEmailNotifications}
-            trackColor={{ false: '#767577', true: colors.primary }}
-            thumbColor={'#f4f3f4'}
-          />
-        </View>
-        
-        <View style={styles.optionRow}>
-          <View>
-            <Text style={styles.optionTitle}>Dark Mode</Text>
-            <Text style={styles.optionDescription}>Use dark theme throughout the app</Text>
-          </View>
-          <Switch
-            value={darkMode}
-            onValueChange={setDarkMode}
-            trackColor={{ false: '#767577', true: colors.primary }}
-            thumbColor={'#f4f3f4'}
-          />
-        </View>
+          <Text style={styles.arrow}>→</Text>
+        </TouchableOpacity>
       </View>
       
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Privacy</Text>
+        <Text style={styles.sectionTitle}>Legal</Text>
+        
+        <TouchableOpacity style={styles.optionRow}>
+          <View>
+            <Text style={styles.optionTitle}>Terms of Service</Text>
+            <Text style={styles.optionDescription}>View our terms and conditions</Text>
+          </View>
+          <Text style={styles.arrow}>→</Text>
+        </TouchableOpacity>
         
         <TouchableOpacity style={styles.optionRow}>
           <View>
@@ -76,18 +59,10 @@ export default function AccountSettingsScreen() {
           </View>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.optionRow}>
-          <View>
-            <Text style={styles.optionTitle}>Terms of Service</Text>
-            <Text style={styles.optionDescription}>View our terms of service</Text>
-          </View>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
       </View>
       
-      <TouchableOpacity style={styles.dangerButton}>
-        <Text style={styles.dangerButtonText}>Log Out</Text>
+      <TouchableOpacity style={styles.logoutButton}>
+        <Text style={styles.logoutButtonText}>Log Out</Text>
       </TouchableOpacity>
       
       <TouchableOpacity>
@@ -147,14 +122,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.primary,
   },
-  dangerButton: {
+  // Updated button styles for logout
+  logoutButton: {
     backgroundColor: colors.primary,
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
     marginBottom: 16,
   },
-  dangerButtonText: {
+  logoutButtonText: {
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
