@@ -66,7 +66,7 @@
  *     tags:
  *       - Authentication (No JWT required)
  *     summary: Register a new user
- *     description: Create a new user account by providing a username, email, and password. The endpoint validates the input (checks for missing fields, valid email, and strong password) and returns a JWT token upon successful registration.
+ *     description: Create a new user account by providing a username, email, password, phone, and address information. The endpoint validates the input (checks for required fields, valid email, and strong password) and returns a JWT token upon successful registration.
  *     requestBody:
  *       required: true
  *       content:
@@ -87,6 +87,36 @@
  *               password:
  *                 type: string
  *                 description: The user's password.
+ *               phone:
+ *                 type: string
+ *                 description: The user's phone number.
+ *               addresses:
+ *                 type: array
+ *                 description: A list of address objects for the user.
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     label:
+ *                       type: string
+ *                       example: Home
+ *                     area:
+ *                       type: string
+ *                       example: Downtown
+ *                     street:
+ *                       type: string
+ *                       example: Main St
+ *                     building:
+ *                       type: string
+ *                       example: Building A
+ *                     floor:
+ *                       type: string
+ *                       example: 3
+ *                     apartment:
+ *                       type: string
+ *                       example: 302
+ *                     isDefault:
+ *                       type: boolean
+ *                       example: true
  *     responses:
  *       201:
  *         description: User registered successfully.

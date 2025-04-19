@@ -42,15 +42,17 @@ userSchema.statics.userExists = async function (username, email) {
   return await this.findOne({ $or: [{ name: username }, { email }] });
 };
 
-// Static method to create a user
-userSchema.statics.createUser = async function ({ username, email, password }) {
+userSchema.statics.createUser = async function ({ username, email, password, phone, addresses }) {
   const newUser = new this({
     name: username,
     email,
-    password
+    password,
+    phone,
+    addresses
   });
   return await newUser.save();
 };
+
 
 userSchema.statics.findByEmail = async function(email) {
   return this.findOne({ email }).select('+password');

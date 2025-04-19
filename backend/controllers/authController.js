@@ -7,8 +7,8 @@ const { generateToken } = require('../middleware/requireAuth'); // Import your J
 
 // Register a new user
 const registerUser = async (req, res) => {
-    const { username, email, password } = req.body;
-  
+    const { username, email, password, phone, addresses } = req.body;
+
     // Validate required fields
     if (!username || !email || !password) {
       return res.status(403).json({ error: 'All fields are required' });
@@ -29,14 +29,20 @@ const registerUser = async (req, res) => {
         return res.status(403).json({ error: 'User already exists' });
       }
   
-      const savedUser = await User.createUser({ username, email, password });
+      const savedUser = await User.createUser({ username, email, password, phone, addresses });
   
       // Generate JWT for the new user (assuming generateToken is defined and imported)
       const token = generateToken(savedUser._id, "user");
   
       res.status(201).json({
         message: 'User registered successfully',
-        user: savedUser,
+        user: {
+          _id: savedUser._id,
+          name: savedUser.name,
+          email: savedUser.email,
+          phone: savedUser.phone,
+          addresses: savedUser.addresses
+        },
         token
       });
     } catch (error) {
