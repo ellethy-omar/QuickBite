@@ -13,7 +13,7 @@ import colors from '../styles/colors';
 
 export default function SignupScreen() {
     const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: {apartment: "", street: '', area: '', building: '', floor: ''} });
-    const [restaurantFormData, setRestaurantFormData] = useState<RestaurantFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', cuisines: [], address: '', description: '', image: '' });
+    const [restaurantFormData, setRestaurantFormData] = useState<RestaurantFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', cuisines: [], address: '', description: '', image: '', openingHours: { Monday: { open: '', close: '' }, Tuesday: { open: '', close: '' }, Wednesday: { open: '', close: '' }, Thursday: { open: '', close: '' }, Friday: { open: '', close: '' }, Saturday: { open: '', close: '' }, Sunday: { open: '', close: '' } } });
     const [currentSection, setCurrentSection] = useState(0);
     const [submitting, setSubmitting] = useState(false);
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -52,8 +52,19 @@ export default function SignupScreen() {
             }
             await UserSignupRoute(userFormData);
             navigation.navigate('authScreens/login');
-          } else {
-            return;
+          } else if(currentSection === 1) {
+            console.log('Restaurant signup data:', restaurantFormData);
+            if(restaurantFormData.password !== restaurantFormData.confirmPassword) {
+              alert('Passwords do not match!');
+              return;
+            } else if(restaurantFormData.name === '' || restaurantFormData.email === '' || restaurantFormData.phone === '' || restaurantFormData.password === '' || restaurantFormData.confirmPassword === '') {
+              alert('Please fill all fields!');
+              return;
+            } else if(restaurantFormData.openingHours.Monday.open === '' || restaurantFormData.openingHours.Monday.close === '' || restaurantFormData.openingHours.Tuesday.open === '' || restaurantFormData.openingHours.Tuesday.close === '' || restaurantFormData.openingHours.Wednesday.open === '' || restaurantFormData.openingHours.Wednesday.close === '' || restaurantFormData.openingHours.Thursday.open === '' || restaurantFormData.openingHours.Thursday.close === '' || restaurantFormData.openingHours.Friday.open === '' || restaurantFormData.openingHours.Friday.close === '' || restaurantFormData.openingHours.Saturday.open === '' || restaurantFormData.openingHours.Saturday.close === '' || restaurantFormData.openingHours.Sunday.open === '' || restaurantFormData.openingHours.Sunday.close === '') {
+              alert('Please fill all opening and closing hours throughout the week!');
+              return;
+            }
+            
           }
         } catch (error) {
           console.error('Error during signup:', error);
