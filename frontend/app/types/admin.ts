@@ -6,3 +6,10 @@ export interface AdminData {
     image: string,
     phone: string,
 }
+
+export interface DriverMailData {
+    id: string,
+    title: string,
+    content: string,
+    name: string,
+}

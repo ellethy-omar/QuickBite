@@ -17,7 +17,7 @@ export default function AdminScreensLayout() {
             if (route.name === 'dashboard') {
               iconName = focused ? 'house.fill' : 'house';
             } else if (route.name === 'manageBusiness') {
-              iconName = focused ? 'briefcase.fill' : 'briefcase';
+              iconName = focused ? "fork.knife.circle.fill" : "fork.knife.circle";
             }
             return <IconSymbol name={iconName} size={size} color={color} />;
           },
@@ -35,7 +35,7 @@ export default function AdminScreensLayout() {
           tabBarInactiveTintColor: 'gray',
         })}
       >
-        <Tabs.Screen name="manageBusiness" options={{ title: 'Manage Business' }} />
+        <Tabs.Screen name="manageBusiness" options={{ title: 'Restaurants' }} />
         <Tabs.Screen name="dashboard" options={{ title: 'Dashboard' }} />
       </Tabs>
     </GestureHandlerRootView>

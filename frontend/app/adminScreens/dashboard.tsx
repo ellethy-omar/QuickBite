@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Text, StyleSheet, View, Image, TouchableOpacity, FlatList, TextInput } from 'react-native';
-import { AdminData } from '@/app/types/admin';
+import { AdminData, DriverMailData } from '@/app/types/admin';
 import DriverMail from '@/app/components/driverMail';
 import colors from '@/app/styles/colors';
+import { Modalize } from 'react-native-modalize';
 
 export default function DashboardScreen() {
     const [user, setUser] = useState<AdminData|null>({
@@ -13,7 +14,7 @@ export default function DashboardScreen() {
         phone: '1234567890',
         handledRequests: 43
     });
-    const [driverMails, setDriverMails] = useState([
+    const [driverMails, setDriverMails] = useState<DriverMailData[]>([
         {
             id: '1',
             title: 'Driver Request',
@@ -75,7 +76,20 @@ export default function DashboardScreen() {
             name: 'Olivia Martinez',
         }
     ]);
+
     const [filteredMails, setFilteredMails] = useState(driverMails);
+    const mailReplyModalRef = useRef<Modalize>(null);
+    const [modalData, setModalData] = useState<DriverMailData| null>(null);
+
+    useEffect(() => {
+        if (modalData) {
+            if (mailReplyModalRef.current) {
+                mailReplyModalRef.current.open();
+            }
+        } else {
+            mailReplyModalRef.current?.close();
+        }
+    }, [modalData]);
 
     const handleFilterMails = (text: string) => {
         if(text === "") {
@@ -112,11 +126,26 @@ export default function DashboardScreen() {
             <FlatList
                 data={filteredMails}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <DriverMail driverData={item} />}
+                renderItem={({ item }) => <DriverMail driverData={item} setMailData={setModalData} />}
                 contentContainerStyle={{ gap: 10 }} // Add spacing between items
             />)}
             </View>
-
+            
+            <Modalize ref={mailReplyModalRef} adjustToContentHeight modalStyle={styles.modalStyle}>
+            <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Reply to {modalData?.name}'s Mail</Text>
+                <Text style={styles.modalText}>{modalData?.content}</Text>
+                <TextInput placeholder='Type your reply here...' style={{borderWidth: 1, height: 100, borderColor: colors.secondary, borderRadius: 10, padding: 10, backgroundColor: colors.secondaryText}} multiline={true} numberOfLines={4} />
+                <View style={{display: 'flex', flexDirection: 'row', gap: 10, justifyContent: 'center', marginTop: 10}}>
+                    <TouchableOpacity onPress={() => setModalData(null)} style={{paddingHorizontal: 15, paddingVertical: 6, backgroundColor: colors.secondary, borderRadius: 50 }}>
+                        <Text style={{fontSize: 14, fontWeight: '600', color: colors.primary }}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => console.log('Send Reply')} style={{paddingHorizontal: 15, paddingVertical: 6, backgroundColor: colors.primary, borderRadius: 50 }}>
+                        <Text style={{ color: colors.secondaryText, fontSize: 14, fontWeight: '600' }}>Send</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+            </Modalize>
         </View>
     )
 }
@@ -176,5 +205,29 @@ const styles = StyleSheet.create({
         gap: 10,
         backgroundColor: colors.background,
         overflow: 'hidden',
+    },
+    modalStyle: {
+        backgroundColor: '#f8f9fa',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    modalContent: {
+        flex: 1,
+        padding: 20,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        marginBottom: 10,
+    },
+    modalText: {
+        fontSize: 13,
+        marginBottom: 10,
+        color: colors.primary,
+    },
+    sortOption: {
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
     },
 });
