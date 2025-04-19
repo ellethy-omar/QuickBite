@@ -4,7 +4,13 @@ export interface UserFormData {
     phone: string;
     password: string;
     confirmPassword: string;
-    address: string;
+    address: {
+        area: string;
+        street: string;
+        building: string;
+        floor: string;
+        apartment: string;
+    };
 }
 
 export interface RestaurantFormData {

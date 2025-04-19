@@ -3,12 +3,35 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserState {
   role: 'admin' | 'user' | null;
-  isAuthenticated: boolean;
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+  addresses: [{
+      area: string;
+      street: string;
+      building: string;
+      floor: string;
+      apartment: string;
+  }];
+
 }
 
 const initialState: UserState = {
   role: null,
-  isAuthenticated: false,
+  name: '',
+  email: '',
+  phone: '',
+  password: '',
+  confirmPassword: '',
+  addresses: [{
+      area: '',
+      street: '',
+      building: '',
+      floor: '',
+      apartment: ''
+  }],
 };
 
 const userSlice = createSlice({
@@ -17,14 +40,20 @@ const userSlice = createSlice({
   reducers: {
     setRole: (state, action: PayloadAction<'admin' | 'user'>) => {
       state.role = action.payload;
-      state.isAuthenticated = true;
+    },
+    setUserDetails: (state, action: PayloadAction<UserState>) => {
+      state.name = action.payload.name;
+      state.email = action.payload.email;
+      state.phone = action.payload.phone;
+      state.password = action.payload.password;
+      state.confirmPassword = action.payload.confirmPassword;
+      state.addresses = action.payload.addresses;
     },
     logout: (state) => {
       state.role = null;
-      state.isAuthenticated = false;
     },
   },
 });
 
-export const { setRole, logout } = userSlice.actions;
+export const { setRole, logout, setUserDetails } = userSlice.actions;
 export default userSlice.reducer;
