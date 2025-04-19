@@ -8,11 +8,11 @@ import UserSignup from './sections/userSignup';
 import RestaurantSignup from './sections/restaurantSignup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
-import { UserLogin } from '../endpoints/authEndpoints';
+import { UserSignupRoute } from '../endpoints/authEndpoints';
 import colors from '../styles/colors';
 
 export default function SignupScreen() {
-    const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: '' });
+    const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: {apartment: "", street: '', area: '', building: '', floor: ''} });
     const [restaurantFormData, setRestaurantFormData] = useState<RestaurantFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', cuisines: [], address: '', description: '', image: '' });
     const [currentSection, setCurrentSection] = useState(0);
     const [submitting, setSubmitting] = useState(false);
@@ -50,7 +50,7 @@ export default function SignupScreen() {
               alert('Please fill all fields!');
               return;
             }
-            //await UserLogin(userFormData);
+            await UserSignupRoute(userFormData);
             navigation.navigate('authScreens/login');
           } else {
             return;

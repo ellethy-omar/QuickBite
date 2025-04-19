@@ -1,6 +1,6 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import Svg, { Defs, Rect } from 'react-native-svg';
 import { LinearGradient, Stop } from 'react-native-svg';
 import { useState } from 'react';
@@ -8,22 +8,54 @@ import { useNavigation } from 'expo-router';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/rootStack';
 import { useDispatch } from 'react-redux';
-import { setRole } from '../slices/userSlice';
+import * as SecureStore from 'expo-secure-store';
+import { setRole, setUserDetails } from '../slices/userSlice';
 import colors from '../styles/colors';
+import { LoginUserRoute } from '../endpoints/authEndpoints';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
+  const [accType, setAccType] = useState(0);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!submitting) return;
-    dispatch(setRole('admin'));
-    navigation.navigate('index');
+
+    const handleLogin = async () => {
+      try {
+        if (email === '' || password === '') {
+          alert('Please fill all fields!');
+          return;
+        }
+
+        if(accType === 0) {
+          const response = await LoginUserRoute(email, password);
+          console.log('Login response:', response?.data);
+          if (response?.data?.token) {
+            await SecureStore.setItemAsync('jwtToken', response.data.token);
+          }
+          alert('Login successful!');
+          dispatch(setRole('admin'));
+          dispatch(setUserDetails(response?.data.user));
+        } else if(accType === 1) {
+        }
+        navigation.navigate('index');
+      } catch (error) {
+        if (error instanceof Error && 'response' in error && (error as any).response?.status === 404) {
+          alert('Invalid credentials!');
+        } else {
+          alert('Server error! Please try again later.');
+        }
+      } finally {
+        setSubmitting(false);
+      }
+    }
+
+    handleLogin();
   }, [submitting]);
 
   return (
@@ -32,7 +64,7 @@ export default function LoginScreen() {
           <Text style={styles.subText}>Login to continue</Text>
             <View style={styles.inputContainer}>
               <IconSymbol name="person.fill" size={16} color={colors.primary} style={{ marginTop: 6 }} />
-              <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Email" value={email} onChangeText={(text) => setEmail(text)} />
+              <TextInput style={styles.input} placeholderTextColor="gray" placeholder={accType == 0 ? "Email or Username" : "Email or Phone Number"} value={email} onChangeText={(text) => setEmail(text)} />
             </View>
             <View style={styles.inputContainer}>
               <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 6 }} />
@@ -62,6 +94,19 @@ export default function LoginScreen() {
                 </View>
                 </TouchableOpacity>
               <Text style={{ color: colors.primary, textAlign: 'center', marginTop: 10 }}>Don't have an account?{' '}<Text style={{ color: colors.primary, fontWeight: '700', textDecorationLine: 'underline' }} onPress={() => navigation.navigate('authScreens/signup')}>Sign Up</Text></Text>
+            </View>
+
+            <Text style={{ color: colors.primary, fontSize: 14, marginTop: 30, fontWeight: '500', textAlign: 'center' }}>Select your account type</Text>
+            <View style={{ width: '100%', gap: 10, justifyContent: 'center', display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
+              <TouchableOpacity onPress={() => setAccType(0)} style={{ width: 100, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor:  accType == 0 ? colors.primary : 'white'}}>
+                <Text style={{ color: accType == 0 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15 }}>User</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setAccType(1)} style={{ width: 100, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor: accType == 1 ? colors.primary : 'white'}}>
+                <Text style={{ color: accType == 1 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15 }}>Restaurant</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setAccType(2)} style={{ width: 100, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor: accType == 2 ? colors.primary : 'white'}}>
+                <Text style={{ color: accType == 2 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15 }}>Driver</Text>
+              </TouchableOpacity>
             </View>
         </View>
   );
@@ -95,7 +140,7 @@ const styles = StyleSheet.create({
     gap: 10,
     borderWidth: 0.5,
     borderColor: colors.primary,
-    backgroundColor: '#e1e1e1',
+    backgroundColor: '#fff',
     borderRadius: 50,
     width: '80%',
     paddingHorizontal: 10,

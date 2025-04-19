@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  FlatList,
   Keyboard,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
@@ -133,7 +132,7 @@ export default function RestaurantSignup({
                     <TouchableOpacity
                       key={cuisine}
                       style={{
-                        backgroundColor: restaurantFormData.cuisines.includes(cuisine) ? colors.primary : '#e1e1e1',
+                        backgroundColor: restaurantFormData.cuisines.includes(cuisine) ? colors.primary : '#fff',
                         padding: 6,
                         paddingHorizontal: 8,
                         borderRadius: 10,
@@ -160,7 +159,7 @@ export default function RestaurantSignup({
                           width: 11,
                           height: 11,
                           borderRadius: 7,
-                          backgroundColor: 'white',
+                          backgroundColor: restaurantFormData.cuisines.includes(cuisine) ? 'white' : colors.primary,
                           justifyContent: 'center',
                           alignItems: 'center',
                         }}
@@ -215,7 +214,7 @@ const styles = StyleSheet.create({
     gap: 10,
     borderWidth: 0.5,
     borderColor: colors.primary,
-    backgroundColor: '#e1e1e1',
+    backgroundColor: '#fff',
     borderRadius: 50,
     width: '80%',
     paddingHorizontal: 10,
@@ -234,7 +233,7 @@ const styles = StyleSheet.create({
     gap: 10,
     borderWidth: 0.5,
     borderColor: colors.primary,
-    backgroundColor: '#e1e1e1',
+    backgroundColor: '#fff',
     borderRadius: 10,
     width: '80%',
     paddingHorizontal: 10,

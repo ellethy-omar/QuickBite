@@ -18,17 +18,16 @@ function LayoutWithRole() {
 
   // Access the user's role and authentication status from the Redux store
   const role = useSelector((state: RootState) => state.user.role);
-  const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace('/');
-    } else if (role === 'admin') {
-      router.replace('/adminScreens'); // Redirect to admin layout
-    } else if (role === 'user') {
-      router.replace('/mainScreens'); // Redirect to main layout
-    }
-  }, [role, isAuthenticated]);
+  if (role === 'admin') {
+    router.replace('/adminScreens'); // Redirect to admin layout
+  } else if (role === 'user') {
+    router.replace('/mainScreens'); // Redirect to main layout
+  } else {
+    router.replace('/');
+  }
+  }, [role]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
