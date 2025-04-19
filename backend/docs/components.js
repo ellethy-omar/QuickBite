@@ -316,10 +316,6 @@
  *         phone:
  *           type: string
  *           example: "2021234567"
- *         password:
- *           type: string
- *           required: true
- *           example: "$2b$10$abcdefg1234567890hashedPassword"
  *         addresses:
  *           type: array
  *           items:
