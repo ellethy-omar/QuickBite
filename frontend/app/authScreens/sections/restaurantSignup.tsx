@@ -23,14 +23,18 @@ export default function RestaurantSignup({
   setRestaurantFormData: React.Dispatch<React.SetStateAction<RestaurantFormData>>;
 }) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{ width: '100%', justifyContent: 'center', alignItems: 'center'}}
+        style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}
       >
         <Text style={styles.subText}>Register your business</Text>
+
+        {/* Step 1: Credentials */}
         {currentStep === 0 && (
           <View>
             <Text style={styles.stepTitle}>Step 1: Enter your restaurant's credentials</Text>
@@ -61,31 +65,49 @@ export default function RestaurantSignup({
             <View style={styles.inputContainer}>
               <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
               <TextInput
-                style={styles.input}
+                style={{ width: '80%' }}
                 placeholderTextColor="gray"
                 placeholder="Password"
-                secureTextEntry
+                secureTextEntry={!showPassword}
                 value={restaurantFormData.password}
                 onChangeText={(text) =>
                   setRestaurantFormData({ ...restaurantFormData, password: text })
                 }
               />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <IconSymbol
+                  name={!showPassword ? 'eye.fill' : 'eye.slash.fill'}
+                  size={18}
+                  color={colors.primary}
+                  style={{ marginTop: 6 }}
+                />
+              </TouchableOpacity>
             </View>
             <View style={styles.inputContainer}>
               <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
               <TextInput
-                style={styles.input}
+                style={{ width: '80%' }}
                 placeholderTextColor="gray"
                 placeholder="Confirm Password"
-                secureTextEntry
+                secureTextEntry={!showConfirmPassword}
                 value={restaurantFormData.confirmPassword}
                 onChangeText={(text) =>
                   setRestaurantFormData({ ...restaurantFormData, confirmPassword: text })
                 }
               />
+              <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                <IconSymbol
+                  name={!showConfirmPassword ? 'eye.fill' : 'eye.slash.fill'}
+                  size={18}
+                  color={colors.primary}
+                  style={{ marginTop: 6 }}
+                />
+              </TouchableOpacity>
             </View>
           </View>
         )}
+
+        {/* Step 2: Business Info */}
         {currentStep === 1 && (
           <View>
             <Text style={styles.stepTitle}>Step 2: Enter your restaurant's data</Text>
@@ -128,54 +150,145 @@ export default function RestaurantSignup({
             </View>
             <Text style={styles.cuisineText}>Select your restaurant's cuisines</Text>
             <View style={{ width: '80%', marginTop: 10, flexDirection: 'row', flexWrap: 'wrap', rowGap: 5, columnGap: 3 }}>
-                {cuisineList.map((cuisine) => (
-                    <TouchableOpacity
-                      key={cuisine}
-                      style={{
-                        backgroundColor: restaurantFormData.cuisines.includes(cuisine) ? colors.primary : '#fff',
-                        padding: 6,
-                        paddingHorizontal: 8,
-                        borderRadius: 10,
-                        alignItems: 'center',
-                        flexDirection: 'row',
-                        gap: 8,
-                      }}
-                      onPress={() => {
-                        if (restaurantFormData.cuisines.includes(cuisine)) {
-                          setRestaurantFormData({
-                            ...restaurantFormData,
-                            cuisines: restaurantFormData.cuisines.filter((c) => c !== cuisine),
-                          });
-                        } else {
-                          setRestaurantFormData({
-                            ...restaurantFormData,
-                            cuisines: [...restaurantFormData.cuisines, cuisine],
-                          });
-                        }
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 11,
-                          height: 11,
-                          borderRadius: 7,
-                          backgroundColor: restaurantFormData.cuisines.includes(cuisine) ? 'white' : colors.primary,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
-                        {restaurantFormData.cuisines.includes(cuisine) && (
-                          <IconSymbol name="checkmark" size={10} color={colors.primary} />
-                        )}
-                      </View>
-                      <Text style={{ color: restaurantFormData.cuisines.includes(cuisine) ? 'white' : 'black', fontSize: 12 }}>
-                        {cuisine}
-                      </Text>
-                    </TouchableOpacity>
-                ))}
+              {cuisineList.map((cuisine) => (
+                <TouchableOpacity
+                  key={cuisine}
+                  style={{
+                    backgroundColor: restaurantFormData.cuisines.includes(cuisine)
+                      ? colors.primary
+                      : '#fff',
+                    padding: 6,
+                    paddingHorizontal: 8,
+                    borderRadius: 10,
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    gap: 8,
+                  }}
+                  onPress={() => {
+                    if (restaurantFormData.cuisines.includes(cuisine)) {
+                      setRestaurantFormData({
+                        ...restaurantFormData,
+                        cuisines: restaurantFormData.cuisines.filter((c) => c !== cuisine),
+                      });
+                    } else {
+                      setRestaurantFormData({
+                        ...restaurantFormData,
+                        cuisines: [...restaurantFormData.cuisines, cuisine],
+                      });
+                    }
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 11,
+                      height: 11,
+                      borderRadius: 7,
+                      backgroundColor: restaurantFormData.cuisines.includes(cuisine)
+                        ? 'white'
+                        : colors.primary,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {restaurantFormData.cuisines.includes(cuisine) && (
+                      <IconSymbol name="checkmark" size={10} color={colors.primary} />
+                    )}
+                  </View>
+                  <Text
+                    style={{
+                      color: restaurantFormData.cuisines.includes(cuisine) ? 'white' : 'black',
+                      fontSize: 12,
+                    }}
+                  >
+                    {cuisine}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
         )}
+
+{currentStep === 2 && (
+  <View>
+    <Text style={styles.stepTitle}>Step 3: Set your restaurant's opening hours</Text>
+    {(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const).map((day) => (
+      <View key={day} style={[styles.inputContainer, { marginVertical: -12, alignItems: 'center' }]}>
+        <Text style={{ width: '25%', fontSize: 14, color: colors.primary }}>{day}</Text>
+        {/* Open Time */}
+        <TextInput
+          placeholder="Opening"
+          placeholderTextColor="gray"
+          value={restaurantFormData.openingHours[day]?.open || ''}
+          style={[styles.input, { width: '35%' }]}
+          keyboardType="numeric"
+          maxLength={5}
+          onChangeText={(text) => {
+            let digits = text.replace(/[^\d]/g, '');
+
+            if (digits.length > 4) digits = digits.slice(0, 4);
+            let formatted = digits;
+
+            if (digits.length >= 3) {
+              formatted = `${digits.slice(0, 2)}:${digits.slice(2)}`;
+            }
+
+            const isValid = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(formatted) || formatted.length < 5;
+
+            if (isValid) {
+              setRestaurantFormData((prev) => ({
+                ...prev,
+                openingHours: {
+                  ...prev.openingHours,
+                  [day]: {
+                    ...prev.openingHours[day],
+                    open: formatted,
+                  },
+                },
+              }));
+            }
+          }}
+        />
+
+        {/* Close Time */}
+        <TextInput
+          placeholder="Closing"
+          placeholderTextColor="gray"
+          value={restaurantFormData.openingHours[day]?.close || ''}
+          style={[styles.input, { width: '35%' }]}
+          keyboardType="numeric"
+          maxLength={5}
+          onChangeText={(text) => {
+            let digits = text.replace(/[^\d]/g, '');
+
+            if (digits.length > 4) digits = digits.slice(0, 4);
+            let formatted = digits;
+
+            if (digits.length >= 3) {
+              formatted = `${digits.slice(0, 2)}:${digits.slice(2)}`;
+            }
+
+            const isValid = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(formatted) || formatted.length < 5;
+
+            if (isValid) {
+              setRestaurantFormData((prev) => ({
+                ...prev,
+                openingHours: {
+                  ...prev.openingHours,
+                  [day]: {
+                    ...prev.openingHours[day],
+                    close: formatted,
+                  },
+                },
+              }));
+            }
+          }}
+        />
+      </View>
+    ))}
+  </View>
+)}
+
+        {/* Navigation Buttons */}
         <View
           style={{
             width: '100%',
@@ -188,14 +301,14 @@ export default function RestaurantSignup({
         >
           <TouchableOpacity
             style={styles.stepButton}
-            onPress={() => setCurrentStep(0)}
+            onPress={() => setCurrentStep(Math.max(0, currentStep - 1))}
           >
             <IconSymbol name="chevron.left" size={15} color="white" />
             <Text style={{ color: 'white', fontSize: 14 }}>Back</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.stepButton}
-            onPress={() => setCurrentStep(1)}
+            onPress={() => setCurrentStep(Math.min(2, currentStep + 1))}
           >
             <Text style={{ color: 'white', fontSize: 14 }}>Next</Text>
             <IconSymbol name="chevron.right" size={15} color="white" />

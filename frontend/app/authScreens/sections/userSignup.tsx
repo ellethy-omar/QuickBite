@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, TextInput, StyleSheet, Text, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { UserFormData } from '@/app/types/authTypes';
 import colors from '@/app/styles/colors';
 
 export default function UserSignup ({userFormData, setUserFormData}: {userFormData: UserFormData, setUserFormData: React.Dispatch<React.SetStateAction<UserFormData>>}) {
     const [currentStep, setCurrentStep] = useState(0);
-
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    
     return (
-        <View style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} keyboardVerticalOffset={20}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <>
             <Text style={styles.subText}>Create your account</Text>
             {currentStep === 0 && (
             <>
@@ -19,11 +23,17 @@ export default function UserSignup ({userFormData, setUserFormData}: {userFormDa
             </View>
             <View style={styles.inputContainer}>
                 <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
-                <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Password" secureTextEntry value={userFormData.password} onChangeText={(text) => setUserFormData({...userFormData, password: text})} />
+                <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Password" secureTextEntry={showPassword} value={userFormData.password} onChangeText={(text) => setUserFormData({...userFormData, password: text})} />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <IconSymbol name={!showPassword ? "eye.fill" : "eye.slash.fill"} size={18} color={colors.primary}style={{ marginTop: 6 }}/>
+                </TouchableOpacity>            
             </View>
             <View style={styles.inputContainer}>
                 <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
-                <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Confirm Password" secureTextEntry value={userFormData.confirmPassword} onChangeText={(text) =>setUserFormData({...userFormData, confirmPassword: text})} />
+                <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Confirm Password" secureTextEntry={!showConfirmPassword} value={userFormData.confirmPassword} onChangeText={(text) =>setUserFormData({...userFormData, confirmPassword: text})} />
+                <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <IconSymbol name={!showConfirmPassword ? "eye.fill" : "eye.slash.fill"} size={18} color={colors.primary}style={{ marginTop: 6 }}/>
+                </TouchableOpacity>
             </View>
             <View style={styles.inputContainer}>
                 <IconSymbol name="mail.fill" size={16} color={colors.primary} style={{ marginTop: 6 }} />
@@ -62,19 +72,20 @@ export default function UserSignup ({userFormData, setUserFormData}: {userFormDa
                         <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Apartment No." value={userFormData.address.apartment} onChangeText={(text) => setUserFormData({...userFormData, address: {...userFormData.address, apartment: text}})} />
                     </View>
                 </View>
-                </>
-            )}
-            <View style={{ width: '100%', marginTop: 30, display: 'flex', flexDirection: "row", justifyContent: 'center', gap: 20, alignItems: 'center' }}>
-                <TouchableOpacity style={{display: 'flex', gap: 4, flexDirection: "row", alignItems: 'center', backgroundColor: colors.primary, paddingVertical: 7, paddingHorizontal: 10, borderRadius: 100}} onPress={() => setCurrentStep(0)}>
-                    <IconSymbol name="chevron.left" size={15} color='white'/>
-                    <Text style={{color: 'white', fontSize: 14}}>Back</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{display: 'flex', flexDirection: "row", gap: 4, alignItems: 'center', backgroundColor: colors.primary, paddingVertical: 7, paddingHorizontal: 10, borderRadius: 100}} onPress={() => setCurrentStep(1)}>
-                    <Text style={{color: 'white', fontSize: 14}}>Next</Text>
-                    <IconSymbol name="chevron.right" size={15} color='white'/>
-                </TouchableOpacity>
-            </View>
-        </View>
+                </>)}
+                <View style={{marginTop: 30, display: 'flex', flexDirection: "row", justifyContent: 'center', gap: 20, alignItems: 'center' }}>
+                    <TouchableOpacity style={{display: 'flex', gap: 4, flexDirection: "row", alignItems: 'center', backgroundColor: colors.primary, paddingVertical: 7, paddingHorizontal: 10, borderRadius: 100}} onPress={() => setCurrentStep(0)}>
+                        <IconSymbol name="chevron.left" size={15} color='white'/>
+                        <Text style={{color: 'white', fontSize: 14}}>Back</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{display: 'flex', flexDirection: "row", gap: 4, alignItems: 'center', backgroundColor: colors.primary, paddingVertical: 7, paddingHorizontal: 10, borderRadius: 100}} onPress={() => setCurrentStep(1)}>
+                        <Text style={{color: 'white', fontSize: 14}}>Next</Text>
+                        <IconSymbol name="chevron.right" size={15} color='white'/>
+                    </TouchableOpacity>
+                </View>
+            </>
+        </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     )
 }
 
