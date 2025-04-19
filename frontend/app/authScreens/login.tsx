@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import { setRole, setUserDetails } from '../slices/userSlice';
 import colors from '../styles/colors';
-import { LoginUserRoute, LoginRestaurantRoute } from '../endpoints/authEndpoints';
+import { LoginUserRoute, LoginRestaurantRoute, LoginDriverRoute } from '../endpoints/authEndpoints';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -47,11 +47,18 @@ export default function LoginScreen() {
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
-          console.log("dones");
           alert('Login successful!');
           dispatch(setRole('admin'));
-        }
-        navigation.navigate('index');
+        } else {
+          const response = await LoginDriverRoute(email, password);
+          if (response?.data?.token) {
+            await SecureStore.setItemAsync('jwtToken', response.data.token);
+          }
+          alert('Login successful!');
+          dispatch(setRole('admin')); 
+       }
+
+      navigation.navigate('index');
       } catch (error) {
         if (error instanceof Error && 'response' in error && (error as any).response?.status === 404) {
           alert('Invalid credentials!');

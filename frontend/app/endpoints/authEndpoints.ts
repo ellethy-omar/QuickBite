@@ -52,6 +52,21 @@ export const LoginRestaurantRoute = async (name: string, password: string) => {
         throw error;
     }
 }
+
+export const LoginDriverRoute = async (name: string, password: string) => {
+    const reqBody = {
+        emailOrPhone: name,
+        password: password,
+    }
+    try {
+        const response = await apiClient.post('/api/auth/loginDriver', reqBody);
+        return response;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
 export const LoginUserRoute = async (name: string, password: string) => {
     const reqBody = {
         usernameOrEmail: name,
