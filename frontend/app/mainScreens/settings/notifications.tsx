@@ -56,36 +56,6 @@ export default function NotificationsSettingsScreen() {
       </View>
       
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Email Notifications</Text>
-        
-        <View style={styles.optionRow}>
-          <View>
-            <Text style={styles.optionTitle}>New Restaurants</Text>
-            <Text style={styles.optionDescription}>Be first to know about new restaurants</Text>
-          </View>
-          <Switch
-            value={newRestaurants}
-            onValueChange={setNewRestaurants}
-            trackColor={{ false: '#767577', true: colors.primary }}
-            thumbColor={'#f4f3f4'}
-          />
-        </View>
-        
-        <View style={styles.optionRow}>
-          <View>
-            <Text style={styles.optionTitle}>Account Activity</Text>
-            <Text style={styles.optionDescription}>Login alerts and important updates</Text>
-          </View>
-          <Switch
-            value={accountActivity}
-            onValueChange={setAccountActivity}
-            trackColor={{ false: '#767577', true: colors.primary }}
-            thumbColor={'#f4f3f4'}
-          />
-        </View>
-      </View>
-      
-      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notification Timing</Text>
         
         <View style={styles.optionRow}>
