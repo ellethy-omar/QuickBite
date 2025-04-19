@@ -1,9 +1,26 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
-console.log("Mongo URI:", process.env.MONGO_URI);
+const mongoose = require('mongoose');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
 const uri = process.env.MONGO_URI;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+if (!uri) {
+  throw new Error('MongoDB connection URI is not defined in environment variables');
+}
+
+// Mongoose connection (primary connection for your app)
+const intializeMongooseConnection = async ()=> {
+  mongoose.connect(uri, {
+    useNewUrlParser: true,        // Fixed typo: was 'userNewUrlParser'
+    useUnifiedTopology: true,
+    serverApi: ServerApiVersion.v1  // Adding Stable API version
+  })
+  .then(() => console.log('Connected to MongoDB via Mongoose'))
+  .catch(err => console.error('Mongoose connection error:', err));
+
+}
+
+// Native MongoDB driver connection (for specific operations if needed)
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -12,23 +29,27 @@ const client = new MongoClient(uri, {
   }
 });
 
-async function run() {
+async function intializeMongoClientConnection() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
-    
+    return true;
+  } catch (err) {
+    console.error("Connection test failed:", err);
+    return false;
   } finally {
-    // Ensures that the client will close when you finish/error
-    console.log("You successfully connected to MongoDB onlone cluster! closing connection");
     await client.close();
-    
+    console.log("Test connection closed");
   }
 }
-// goosemugger
-// 0dPDsekdQhGji6nT
-run().catch(console.dir);
 
-module.exports = run
+// Only run the test connection if this file is executed directly
+if (require.main === module) {
+  intializeMongoClientConnection().catch(console.error);
+}
+
+module.exports = {
+  intializeMongooseConnection,
+  intializeMongoClientConnection
+};

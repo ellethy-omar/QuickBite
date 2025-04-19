@@ -16,7 +16,6 @@ const WebSocketRoutes = (ws, request) => {
     const urlObj = new URL(request.url, `http://${request.headers.host}`);
     const path = urlObj.pathname;
     const token = urlObj.searchParams.get("token");
-    const conversationId = urlObj.searchParams.get("conversationId");
 
     // Protect routes: require a valid token for all protected paths (e.g., /chat)
     if (!token) {
