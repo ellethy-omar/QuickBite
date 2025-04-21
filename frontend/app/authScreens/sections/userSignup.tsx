@@ -50,6 +50,10 @@ export default function UserSignup ({userFormData, setUserFormData}: {userFormDa
                 </View>
                 <View style={styles.inputContainer}>
                     <IconSymbol name="location.fill" size={16} color={colors.primary} style={{ marginTop: 7 }} />
+                    <TextInput style={{width: '90%'}} placeholderTextColor="gray" placeholder="Address label (Home/Work/etc...)" value={userFormData.address.label} onChangeText={(text) => setUserFormData({...userFormData, address: {...userFormData.address, label: text}})} />
+                </View>
+                <View style={styles.inputContainer}>
+                    <IconSymbol name="location.fill" size={16} color={colors.primary} style={{ marginTop: 7 }} />
                     <TextInput style={{width: '90%'}} placeholderTextColor="gray" placeholder="Governorate/state" value={userFormData.address.area} onChangeText={(text) => setUserFormData({...userFormData, address: {...userFormData.address, area: text}})} />
                 </View>
                 <View style={{width: '80%', marginTop: 20, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>

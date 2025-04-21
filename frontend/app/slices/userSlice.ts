@@ -9,11 +9,13 @@ interface UserState {
   password: string;
   confirmPassword: string;
   addresses: [{
+      label: string;
       area: string;
       street: string;
       building: string;
       floor: string;
       apartment: string;
+      isDefault: boolean;
   }];
 
 }
@@ -30,7 +32,9 @@ const initialState: UserState = {
       street: '',
       building: '',
       floor: '',
-      apartment: ''
+      apartment: '',
+      label: '',
+      isDefault: true,
   }],
 };
 
