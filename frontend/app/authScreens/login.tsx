@@ -40,7 +40,7 @@ export default function LoginScreen() {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
           alert('Login successful!');
-          dispatch(setRole('admin'));
+          dispatch(setRole('user'));
           dispatch(setUserDetails(response?.data.user));
         } else if (accType === 1) {
           const response = await LoginRestaurantRoute(email, password);
