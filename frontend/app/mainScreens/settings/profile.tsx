@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import colors from '@/app/styles/colors';
 
 // This would typically come from your API or state management
@@ -49,7 +49,20 @@ const initialUserData = {
 export default function ProfileSettingsScreen() {
   const [userData, setUserData] = useState(initialUserData);
   const [expandedAddresses, setExpandedAddresses] = useState(false);
-  
+  const [isEditing, setIsEditing] = useState(false);
+  const [editAddressId, setEditAddressId] = useState<string | null>(null);
+  const [isAddingAddress, setIsAddingAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState({
+    label: '',
+    street: '',
+    city: '',
+    area: '',
+    building: '',
+    floor: '',
+    apartment: '',
+    isDefault: false
+  });
+
   // Helper function to update user data fields
   const updateField = (field: string, value: string) => {
     setUserData({
@@ -75,6 +88,90 @@ export default function ProfileSettingsScreen() {
       ...userData,
       addresses: updatedAddresses
     });
+  };
+
+  // Add or edit address function
+  const handleAddOrEditAddress = () => {
+    // Validate form fields
+    if (!newAddress.label || !newAddress.street || !newAddress.city || !newAddress.area) {
+      Alert.alert('Error', 'All required fields (label, street, city, area) must be filled.');
+      return;
+    }
+
+    if (isEditing && editAddressId) {
+      // Edit existing address
+      const updatedAddresses = userData.addresses.map(address =>
+        address.id === editAddressId ? { ...newAddress, id: editAddressId } : address
+      );
+      setUserData({
+        ...userData,
+        addresses: updatedAddresses
+      });
+    } else {
+      // Add new address
+      const newAddressWithId = {
+        ...newAddress,
+        id: (userData.addresses.length + 1).toString()
+      };
+      setUserData({
+        ...userData,
+        addresses: [...userData.addresses, newAddressWithId]
+      });
+    }
+
+    setIsAddingAddress(false);
+    setIsEditing(false);
+    setEditAddressId(null);
+    setNewAddress({
+      label: '',
+      street: '',
+      city: '',
+      area: '',
+      building: '',
+      floor: '',
+      apartment: '',
+      isDefault: false
+    });
+  };
+
+  // Delete address function
+  const handleDeleteAddress = (id: string) => {
+    Alert.alert(
+      'Confirm Deletion',
+      'Are you sure you want to delete this address?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            const updatedAddresses = userData.addresses.filter(address => address.id !== id);
+
+            // If the deleted address was the default, set a new default
+            const wasDefault = userData.addresses.find(address => address.id === id)?.isDefault;
+            if (wasDefault && updatedAddresses.length > 0) {
+              updatedAddresses[0].isDefault = true; // Set the first remaining address as default
+            }
+
+            setUserData({
+              ...userData,
+              addresses: updatedAddresses
+            });
+          },
+        },
+      ]
+    );
+  };
+
+  // Start editing an address
+  const handleEditAddress = (address: typeof newAddress) => {
+    setNewAddress(address);
+    setEditAddressId(address.id);
+    setIsAddingAddress(true);
+    setIsEditing(true);
   };
 
   // Save changes function (would connect to your backend)
@@ -178,17 +275,112 @@ export default function ProfileSettingsScreen() {
                 <Text style={styles.addressText}>
                   {address.area}, {address.city}
                 </Text>
+                <View style={styles.addressActions}>
+                  <TouchableOpacity 
+                    style={styles.editButton} 
+                    onPress={() => handleEditAddress(address)}
+                  >
+                    <Text style={styles.editButtonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[
+                      styles.deleteButton, 
+                      (userData.addresses.length === 1 || address.isDefault) && styles.disabledButton
+                    ]} 
+                    onPress={() => handleDeleteAddress(address.id)}
+                    disabled={userData.addresses.length === 1 || address.isDefault}
+                  >
+                    <Text style={styles.deleteButtonText}>
+                      {address.isDefault ? 'Undeletable' : 'Delete'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             );
           }
           return null;
         })}
+      </View>
 
-        <TouchableOpacity style={styles.addAddressButton}>
+      {!isAddingAddress ? (
+        <TouchableOpacity style={styles.addAddressButton} onPress={() => setIsAddingAddress(true)}>
           <Text style={styles.addAddressText}>+ Add New Address</Text>
         </TouchableOpacity>
-      </View>
-      
+      ) : (
+        <View style={styles.newAddressForm}>
+          <TextInput 
+            style={styles.smallInput} 
+            placeholder="Label (e.g., Home)" 
+            value={newAddress.label}
+            onChangeText={(value) => setNewAddress({ ...newAddress, label: value })}
+          />
+          <TextInput 
+            style={styles.smallInput} 
+            placeholder="Street" 
+            value={newAddress.street}
+            onChangeText={(value) => setNewAddress({ ...newAddress, street: value })}
+          />
+          <TextInput 
+            style={styles.smallInput} 
+            placeholder="City" 
+            value={newAddress.city}
+            onChangeText={(value) => setNewAddress({ ...newAddress, city: value })}
+          />
+          <TextInput 
+            style={styles.smallInput} 
+            placeholder="Area" 
+            value={newAddress.area}
+            onChangeText={(value) => setNewAddress({ ...newAddress, area: value })}
+          />
+          <TextInput 
+            style={styles.smallInput} 
+            placeholder="Building" 
+            value={newAddress.building}
+            onChangeText={(value) => setNewAddress({ ...newAddress, building: value })}
+          />
+          <TextInput 
+            style={styles.smallInput} 
+            placeholder="Floor" 
+            value={newAddress.floor}
+            onChangeText={(value) => setNewAddress({ ...newAddress, floor: value })}
+          />
+          <TextInput 
+            style={styles.smallInput} 
+            placeholder="Apartment" 
+            value={newAddress.apartment}
+            onChangeText={(value) => setNewAddress({ ...newAddress, apartment: value })}
+          />
+          <View style={styles.formActions}>
+            <TouchableOpacity 
+              style={styles.addAddressButton} 
+              onPress={handleAddOrEditAddress}
+            >
+              <Text style={styles.addAddressText}>{isEditing ? 'Confirm Edit' : 'Add'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.cancelButton} 
+              onPress={() => {
+                setIsAddingAddress(false);
+                setIsEditing(false);
+                setEditAddressId(null);
+                setNewAddress({
+                  label: '',
+                  street: '',
+                  city: '',
+                  area: '',
+                  building: '',
+                  floor: '',
+                  apartment: '',
+                  isDefault: false
+                });
+              }}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
       <View style={styles.section}>
         <Text style={styles.infoText}>Account created on: {new Date(userData.createdAt).toLocaleDateString()}</Text>
       </View>
@@ -254,7 +446,7 @@ const styles = StyleSheet.create({
   },
   // Section styles
   section: {
-    marginBottom: 24,
+    marginBlock: 24,
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 16,
@@ -274,7 +466,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 16,
   },
   // Form field styles
   fieldContainer: {
@@ -294,6 +485,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eee',
     fontSize: 16,
+    marginBottom: 12,
   },
   // Address styles
   addressCard: {
@@ -302,51 +494,92 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#eee',
-  },
-  marginTop: {
-    marginTop: 12,
+    marginBottom: 12,
   },
   addressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
   },
   addressLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: colors.text,
   },
   addressText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#555',
-    marginBottom: 4,
   },
-  defaultBadge: {
-    backgroundColor: colors.primary + '20',
-    paddingVertical: 2,
-    paddingHorizontal: 8,
+  addressActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  editButton: {
+    backgroundColor: colors.primary,
+    padding: 8,
     borderRadius: 4,
+    alignItems: 'center',
+    marginRight: 8,
   },
-  defaultBadgeText: {
-    color: colors.primary,
+  editButtonText: {
+    color: '#fff',
     fontSize: 12,
     fontWeight: '500',
   },
-  setDefaultText: {
-    color: colors.primary,
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 8,
+    borderRadius: 4,
+    alignItems: 'center',
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },
+  deleteButtonText: {
+    color: '#fff',
     fontSize: 12,
     fontWeight: '500',
   },
   addAddressButton: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.primary,
     borderRadius: 8,
-    padding: 14,
+    padding: 10,
     alignItems: 'center',
-    marginTop: 12,
+    marginVertical: 8,
   },
   addAddressText: {
-    color: colors.primary,
+    color: '#fff',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  newAddressForm: {
+    marginTop: 12,
+  },
+  smallInput: {
+    backgroundColor: '#f9f9f9',
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#eee',
+    fontSize: 12,
+    marginBottom: 8,
+  },
+  formActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 8,
+  },
+  cancelButton: {
+    backgroundColor: 'red',
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  cancelButtonText: {
+    color: '#fff',
     fontWeight: '500',
     fontSize: 14,
   },
