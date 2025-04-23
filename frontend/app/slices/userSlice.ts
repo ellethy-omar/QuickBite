@@ -2,7 +2,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserState {
-  role: 'admin' | 'user' | null;
+  role: 'admin' | 'user' | 'restaurant' | 'driver'| null;
   name: string;
   email: string;
   phone: string;
@@ -38,7 +38,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setRole: (state, action: PayloadAction<'admin' | 'user'>) => {
+    setRole: (state, action: PayloadAction<'admin' | 'user' | 'restaurant' | 'driver'>) => {
       state.role = action.payload;
     },
     setUserDetails: (state, action: PayloadAction<UserState>) => {

@@ -12,6 +12,8 @@ import * as SecureStore from 'expo-secure-store';
 import { setRole, setUserDetails } from '../slices/userSlice';
 import colors from '../styles/colors';
 import { LoginUserRoute, LoginRestaurantRoute, LoginDriverRoute } from '../endpoints/authEndpoints';
+import { useNotification } from '../context/notificationContext';
+
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -22,6 +24,7 @@ export default function LoginScreen() {
   const [accType, setAccType] = useState(0);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const dispatch = useDispatch();
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     if (!submitting) return;
@@ -39,31 +42,39 @@ export default function LoginScreen() {
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
-          alert('Login successful!');
-          dispatch(setRole('admin'));
+          showNotification('Login successful!', 'success');
+          dispatch(setRole('user'));
           dispatch(setUserDetails(response?.data.user));
-        } else if (accType === 1) {
+          setTimeout(() => {
+            navigation.navigate('adminScreens');
+            }, 1000);
+          } else if (accType === 1) {
           const response = await LoginRestaurantRoute(email, password);
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
-          alert('Login successful!');
-          dispatch(setRole('admin'));
-        } else {
+          showNotification('Login successful!', 'success');
+          dispatch(setRole('restaurant'));
+          setTimeout(() => {
+            navigation.navigate('adminScreens');
+            }, 1000);
+        } else if (accType == 2){
+          console.log('Driver login');
           const response = await LoginDriverRoute(email, password);
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
           alert('Login successful!');
-          dispatch(setRole('admin')); 
+          dispatch(setRole('driver')); 
+          setTimeout(() => {
+            navigation.navigate('adminScreens');
+            }, 1000);
        }
-
-      navigation.navigate('index');
       } catch (error) {
         if (error instanceof Error && 'response' in error && (error as any).response?.status === 404) {
-          alert('Invalid credentials!');
+          showNotification('Invalid credentials, please check your data and try again', 'error');
         } else {
-          alert('Server error! Please try again later.');
+          showNotification('An error occurred, please try again later', 'error');
         }
       } finally {
         setSubmitting(false);
@@ -79,14 +90,14 @@ export default function LoginScreen() {
       <Text style={styles.welcomeText}>Welcome Back</Text>
         <Text style={styles.subText}>Login to continue</Text>
           <View style={styles.inputContainer}>
-            <IconSymbol name="person.fill" size={16} color={colors.primary} style={{ marginTop: 6 }} />
+            <IconSymbol name="person.fill" size={16} color={colors.primary}  />
             <TextInput style={styles.input} placeholderTextColor="gray" placeholder={accType == 0 ? "Email or Username" : "Email or Phone Number"} value={email} onChangeText={(text) => setEmail(text)} />
           </View>
           <View style={styles.inputContainer}>
-            <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 6 }} />
+            <IconSymbol name="lock.fill" size={16} color={colors.primary}  />
             <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Password" secureTextEntry={!showPassword} value={password} onChangeText={(text) => setPassword(text)}/>
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <IconSymbol name={!showPassword ? "eye.fill" : "eye.slash.fill"} size={18} color={colors.primary}style={{ marginTop: 6 }}/>
+            <IconSymbol name={!showPassword ? "eye.fill" : "eye.slash.fill"} size={18} color={colors.primary}/>
             </TouchableOpacity>
           </View>
           <View style={{ width: '78%', flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, alignItems: 'center' }}>
@@ -159,6 +170,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     borderWidth: 0.5,
+    alignItems: 'center',
     borderColor: colors.primary,
     backgroundColor: '#fff',
     borderRadius: 50,

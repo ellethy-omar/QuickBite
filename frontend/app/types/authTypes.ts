@@ -20,7 +20,11 @@ export interface RestaurantFormData {
     password: string;
     confirmPassword: string;
     cuisines: string[];
-    address: string;
+    address: {
+        area: string;
+        street: string;
+        city: string;
+    };
     description: string;
     image: string;
     openingHours: {
@@ -32,4 +36,15 @@ export interface RestaurantFormData {
         Saturday: { open: string; close: string };
         Sunday: { open: string; close: string };
     }
+}
+
+export interface DriverFormData {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+    confirmPassword: string;
+    vehicleType: string;
+    vehicleModel: string;
+    vehiclePlateNumber: string;
 }

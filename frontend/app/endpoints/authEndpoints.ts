@@ -21,11 +21,13 @@ export const UserSignupRoute = async (userData: UserFormData) => {
 export const RestaurantSignupRoute = async (restaurantData: RestaurantFormData) => {
     const reqBody = {
         name: restaurantData.name,
-        password: restaurantData.password,
-        email: restaurantData.email,
-        phone: restaurantData.phone,
-        cuisines: restaurantData.cuisines,
+        cuisineType: restaurantData.cuisines,
         address: restaurantData.address,
+        contact: {
+            email: restaurantData.email,
+            phone: restaurantData.phone,
+            password: restaurantData.password,
+        },
         description: restaurantData.description,
         image: restaurantData.image,
         openingHours: restaurantData.openingHours
@@ -39,6 +41,26 @@ export const RestaurantSignupRoute = async (restaurantData: RestaurantFormData) 
     }
 }
 
+export const DriverSignupRoute = async (driverData: any) => {
+    const reqBody = {
+        name: driverData.name,
+        password: driverData.password,
+        email: driverData.email,
+        phone: driverData.phone,
+        vehicle: {
+            type: driverData.vehicleType,
+            //model: driverData.vehicleModel,
+            plateNumber: driverData.vehiclePlateNumber,
+        }
+    }
+    try {
+        const response = await apiClient.post('/api/auth/registerDriver', reqBody);
+        return response;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
 export const LoginRestaurantRoute = async (name: string, password: string) => {
     const reqBody = {
         emailOrPhone: name,
