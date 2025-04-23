@@ -46,7 +46,7 @@ export default function LoginScreen() {
           dispatch(setRole('user'));
           dispatch(setUserDetails(response?.data.user));
           setTimeout(() => {
-            navigation.navigate('adminScreens');
+            navigation.navigate('mainScreens');
             }, 1000);
           } else if (accType === 1) {
           const response = await LoginRestaurantRoute(email, password);
