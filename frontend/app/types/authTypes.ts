@@ -5,11 +5,13 @@ export interface UserFormData {
     password: string;
     confirmPassword: string;
     address: {
+        label: string;
         area: string;
         street: string;
         building: string;
         floor: string;
         apartment: string;
+        isDefault: boolean;
     };
 }
 
