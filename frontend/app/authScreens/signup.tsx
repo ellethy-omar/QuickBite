@@ -12,7 +12,7 @@ import { UserSignupRoute } from '../endpoints/authEndpoints';
 import colors from '../styles/colors';
 
 export default function SignupScreen() {
-    const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: {apartment: "", street: '', area: '', building: '', floor: ''} });
+    const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: {label: '', apartment: '', street: '', area: '', building: '', floor: '', isDefault: true} });
     const [restaurantFormData, setRestaurantFormData] = useState<RestaurantFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', cuisines: [], address: '', description: '', image: '', openingHours: { Monday: { open: '', close: '' }, Tuesday: { open: '', close: '' }, Wednesday: { open: '', close: '' }, Thursday: { open: '', close: '' }, Friday: { open: '', close: '' }, Saturday: { open: '', close: '' }, Sunday: { open: '', close: '' } } });
     const [currentSection, setCurrentSection] = useState(0);
     const [submitting, setSubmitting] = useState(false);
