@@ -39,7 +39,7 @@ export default function RestaurantSignup({
           <View>
             <Text style={styles.stepTitle}>Step 1: Enter your restaurant's credentials</Text>
             <View style={styles.inputContainer}>
-              <IconSymbol name="person.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
+              <IconSymbol name="person.fill" size={16} color={colors.primary} />
               <TextInput
                 style={styles.input}
                 placeholderTextColor="gray"
@@ -51,19 +51,7 @@ export default function RestaurantSignup({
               />
             </View>
             <View style={styles.inputContainer}>
-              <IconSymbol name="mail.fill" size={16} color={colors.primary} style={{ marginTop: 6 }} />
-              <TextInput
-                style={styles.input}
-                placeholderTextColor="gray"
-                placeholder="Business Email"
-                value={restaurantFormData.email}
-                onChangeText={(text) =>
-                  setRestaurantFormData({ ...restaurantFormData, email: text })
-                }
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
+              <IconSymbol name="lock.fill" size={16} color={colors.primary} />
               <TextInput
                 style={{ width: '80%' }}
                 placeholderTextColor="gray"
@@ -79,12 +67,11 @@ export default function RestaurantSignup({
                   name={!showPassword ? 'eye.fill' : 'eye.slash.fill'}
                   size={18}
                   color={colors.primary}
-                  style={{ marginTop: 6 }}
                 />
               </TouchableOpacity>
             </View>
             <View style={styles.inputContainer}>
-              <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
+              <IconSymbol name="lock.fill" size={16} color={colors.primary} />
               <TextInput
                 style={{ width: '80%' }}
                 placeholderTextColor="gray"
@@ -100,7 +87,6 @@ export default function RestaurantSignup({
                   name={!showConfirmPassword ? 'eye.fill' : 'eye.slash.fill'}
                   size={18}
                   color={colors.primary}
-                  style={{ marginTop: 6 }}
                 />
               </TouchableOpacity>
             </View>
@@ -110,100 +96,28 @@ export default function RestaurantSignup({
         {/* Step 2: Business Info */}
         {currentStep === 1 && (
           <View>
-            <Text style={styles.stepTitle}>Step 2: Enter your restaurant's data</Text>
+            <Text style={styles.stepTitle}>Step 2: Enter your restaurant's contacts</Text>
             <View style={styles.inputContainer}>
-              <IconSymbol name="phone.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
-              <TextInput
-                style={styles.input}
-                placeholderTextColor="gray"
-                placeholder="Phone Number"
-                value={restaurantFormData.phone}
-                onChangeText={(text) =>
-                  setRestaurantFormData({ ...restaurantFormData, phone: text })
-                }
-              />
+              <IconSymbol name="mail.fill" size={16} color={colors.primary} />
+              <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Business Email" value={restaurantFormData.email} onChangeText={(text) => setRestaurantFormData({ ...restaurantFormData, email: text })} />
             </View>
             <View style={styles.inputContainer}>
-              <IconSymbol name="location.fill" size={16} color={colors.primary} style={{ marginTop: 7 }} />
-              <TextInput
-                style={styles.input}
-                placeholderTextColor="gray"
-                placeholder="Address"
-                value={restaurantFormData.address}
-                onChangeText={(text) =>
-                  setRestaurantFormData({ ...restaurantFormData, address: text })
-                }
-              />
+              <IconSymbol name="phone.fill" size={16} color={colors.primary} />
+              <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Phone Number" value={restaurantFormData.phone} onChangeText={(text) =>setRestaurantFormData({ ...restaurantFormData, phone: text }) } />
             </View>
-            <View style={styles.inputContainerSquare}>
-              <IconSymbol name="info.circle.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
-              <TextInput
-                style={[styles.input, { height: '100%', textAlignVertical: 'top' }]}
-                placeholderTextColor="gray"
-                placeholder="Description"
-                value={restaurantFormData.description}
-                onChangeText={(text) =>
-                  setRestaurantFormData({ ...restaurantFormData, description: text })
-                }
-                multiline={true}
-              />
+            <View style={styles.inputContainer}>
+                <IconSymbol name="location.fill" size={16} color={colors.primary} />
+                <TextInput style={{width: '90%'}} placeholderTextColor="gray" placeholder="Governorate/state" value={restaurantFormData.address.area} onChangeText={(text) => setRestaurantFormData({...restaurantFormData, address: {...restaurantFormData.address, area: text}})} />
             </View>
-            <Text style={styles.cuisineText}>Select your restaurant's cuisines</Text>
-            <View style={{ width: '80%', marginTop: 10, flexDirection: 'row', flexWrap: 'wrap', rowGap: 5, columnGap: 3 }}>
-              {cuisineList.map((cuisine) => (
-                <TouchableOpacity
-                  key={cuisine}
-                  style={{
-                    backgroundColor: restaurantFormData.cuisines.includes(cuisine)
-                      ? colors.primary
-                      : '#fff',
-                    padding: 6,
-                    paddingHorizontal: 8,
-                    borderRadius: 10,
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    gap: 8,
-                  }}
-                  onPress={() => {
-                    if (restaurantFormData.cuisines.includes(cuisine)) {
-                      setRestaurantFormData({
-                        ...restaurantFormData,
-                        cuisines: restaurantFormData.cuisines.filter((c) => c !== cuisine),
-                      });
-                    } else {
-                      setRestaurantFormData({
-                        ...restaurantFormData,
-                        cuisines: [...restaurantFormData.cuisines, cuisine],
-                      });
-                    }
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 11,
-                      height: 11,
-                      borderRadius: 7,
-                      backgroundColor: restaurantFormData.cuisines.includes(cuisine)
-                        ? 'white'
-                        : colors.primary,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {restaurantFormData.cuisines.includes(cuisine) && (
-                      <IconSymbol name="checkmark" size={10} color={colors.primary} />
-                    )}
-                  </View>
-                  <Text
-                    style={{
-                      color: restaurantFormData.cuisines.includes(cuisine) ? 'white' : 'black',
-                      fontSize: 12,
-                    }}
-                  >
-                    {cuisine}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+            <View style={{width: '80%', marginTop: 20, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <View style={styles.inputContainerMinor}>
+                    <IconSymbol name="signpost.right.fill" size={16} color={colors.primary} />
+                    <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Street" value={restaurantFormData.address.street} onChangeText={(text) => setRestaurantFormData({...restaurantFormData, address: {...restaurantFormData.address, street: text}})} />
+                </View>
+                <View style={styles.inputContainerMinor}>
+                    <IconSymbol name="house.fill" size={16} color={colors.primary} />
+                    <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="City" value={restaurantFormData.address.city} onChangeText={(text) => setRestaurantFormData({...restaurantFormData, address: {...restaurantFormData.address, city: text}})} />
+                </View>
             </View>
           </View>
         )}
@@ -287,6 +201,59 @@ export default function RestaurantSignup({
     ))}
   </View>
 )}
+{currentStep === 3 && (
+  <View>
+  <Text style={styles.stepTitle}>Step 4: Set your restaurant's specialties</Text>
+  <View style={styles.inputContainerSquare}>
+    <IconSymbol name="info.circle.fill" size={16} color={colors.primary} />
+    <TextInput style={[styles.input, { height: '100%', textAlignVertical: 'top' }]} placeholderTextColor="gray" placeholder="Description" value={restaurantFormData.description} onChangeText={(text) =>setRestaurantFormData({ ...restaurantFormData, description: text })} multiline={true}/>
+  </View>
+  <Text style={styles.cuisineText}>Select your restaurant's cuisines</Text>
+    <View style={{ width: '80%', marginTop: 10, flexDirection: 'row', flexWrap: 'wrap', rowGap: 5, columnGap: 3 }}>
+      {cuisineList.map((cuisine) => (
+        <TouchableOpacity key={cuisine} style={{ backgroundColor: restaurantFormData.cuisines.includes(cuisine) ? colors.primary : '#fff', padding: 6, paddingHorizontal: 8, borderRadius: 10, alignItems: 'center', flexDirection: 'row', gap: 8,}}
+          onPress={() => {
+            if (restaurantFormData.cuisines.includes(cuisine)) {
+              setRestaurantFormData({
+                ...restaurantFormData,
+                cuisines: restaurantFormData.cuisines.filter((c) => c !== cuisine),
+              });
+            } else {
+              setRestaurantFormData({
+                ...restaurantFormData,
+                cuisines: [...restaurantFormData.cuisines, cuisine],
+              });
+            }
+          }}>
+          <View
+            style={{
+              width: 11,
+              height: 11,
+              borderRadius: 7,
+              backgroundColor: restaurantFormData.cuisines.includes(cuisine)
+                ? 'white'
+                : colors.primary,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {restaurantFormData.cuisines.includes(cuisine) && (
+              <IconSymbol name="checkmark" size={10} color={colors.primary} />
+            )}
+          </View>
+          <Text
+            style={{
+              color: restaurantFormData.cuisines.includes(cuisine) ? 'white' : 'black',
+              fontSize: 12,
+            }}
+          >
+            {cuisine}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  </View>
+)}
 
         {/* Navigation Buttons */}
         <View
@@ -308,7 +275,7 @@ export default function RestaurantSignup({
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.stepButton}
-            onPress={() => setCurrentStep(Math.min(2, currentStep + 1))}
+            onPress={() => setCurrentStep(Math.min(3, currentStep + 1))}
           >
             <Text style={{ color: 'white', fontSize: 14 }}>Next</Text>
             <IconSymbol name="chevron.right" size={15} color="white" />
@@ -330,6 +297,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 50,
     width: '80%',
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    paddingVertical: 5,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  inputContainerMinor: {
+    height: 40,
+    flexDirection: 'row',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+    borderWidth: 0.5,
+    borderColor: colors.primary,
+    backgroundColor: '#fff',
+    borderRadius: 50,
+    width: '48%',
     paddingHorizontal: 10,
     paddingVertical: 5,
     shadowColor: colors.primary,

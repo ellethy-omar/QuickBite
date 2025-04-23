@@ -18,25 +18,25 @@ export default function UserSignup ({userFormData, setUserFormData}: {userFormDa
             <>
             <Text style={styles.stepTitle}>Step 1: Enter your credentials</Text>
             <View style={styles.inputContainer}>
-                <IconSymbol name="person.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
+                <IconSymbol name="person.fill" size={16} color={colors.primary}/>
                 <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Full Name" value={userFormData.name} onChangeText={(text) => setUserFormData({...userFormData, name: text})} />
             </View>
             <View style={styles.inputContainer}>
-                <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
+                <IconSymbol name="lock.fill" size={16} color={colors.primary}  />
                 <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Password" secureTextEntry={showPassword} value={userFormData.password} onChangeText={(text) => setUserFormData({...userFormData, password: text})} />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <IconSymbol name={!showPassword ? "eye.fill" : "eye.slash.fill"} size={18} color={colors.primary}style={{ marginTop: 6 }}/>
+                    <IconSymbol name={!showPassword ? "eye.fill" : "eye.slash.fill"} size={18} color={colors.primary}/>
                 </TouchableOpacity>            
             </View>
             <View style={styles.inputContainer}>
-                <IconSymbol name="lock.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
+                <IconSymbol name="lock.fill" size={16} color={colors.primary}  />
                 <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Confirm Password" secureTextEntry={!showConfirmPassword} value={userFormData.confirmPassword} onChangeText={(text) =>setUserFormData({...userFormData, confirmPassword: text})} />
                 <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    <IconSymbol name={!showConfirmPassword ? "eye.fill" : "eye.slash.fill"} size={18} color={colors.primary}style={{ marginTop: 6 }}/>
+                    <IconSymbol name={!showConfirmPassword ? "eye.fill" : "eye.slash.fill"} size={18} color={colors.primary}/>
                 </TouchableOpacity>
             </View>
             <View style={styles.inputContainer}>
-                <IconSymbol name="mail.fill" size={16} color={colors.primary} style={{ marginTop: 6 }} />
+                <IconSymbol name="mail.fill" size={16} color={colors.primary}  />
                 <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Email" value={userFormData.email} onChangeText={(text) => setUserFormData({...userFormData, email: text})} />
             </View>
             </>
@@ -45,34 +45,30 @@ export default function UserSignup ({userFormData, setUserFormData}: {userFormDa
                 <>
                 <Text style={styles.stepTitle}>Step 2: Enter your Contact details</Text>
                 <View style={styles.inputContainer}>
-                    <IconSymbol name="phone.fill" size={16} color={colors.primary} style={{ marginTop: 5 }} />
+                    <IconSymbol name="phone.fill" size={16} color={colors.primary}  />
                     <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Phone Number" value={userFormData.phone} onChangeText={(text) => setUserFormData({...userFormData, phone: text})} />
                 </View>
                 <View style={styles.inputContainer}>
-                    <IconSymbol name="location.fill" size={16} color={colors.primary} style={{ marginTop: 7 }} />
-                    <TextInput style={{width: '90%'}} placeholderTextColor="gray" placeholder="Address label (Home/Work/etc...)" value={userFormData.address.label} onChangeText={(text) => setUserFormData({...userFormData, address: {...userFormData.address, label: text}})} />
-                </View>
-                <View style={styles.inputContainer}>
-                    <IconSymbol name="location.fill" size={16} color={colors.primary} style={{ marginTop: 7 }} />
+                    <IconSymbol name="location.fill" size={16} color={colors.primary}  />
                     <TextInput style={{width: '90%'}} placeholderTextColor="gray" placeholder="Governorate/state" value={userFormData.address.area} onChangeText={(text) => setUserFormData({...userFormData, address: {...userFormData.address, area: text}})} />
                 </View>
                 <View style={{width: '80%', marginTop: 20, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                     <View style={styles.inputContainerMinor}>
-                        <IconSymbol name="signpost.right.fill" size={16} color={colors.primary} style={{ marginTop: 7 }} />
+                        <IconSymbol name="signpost.right.fill" size={16} color={colors.primary} />
                         <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Street" value={userFormData.address.street} onChangeText={(text) => setUserFormData({...userFormData, address: {...userFormData.address, street: text}})} />
                     </View>
                     <View style={styles.inputContainerMinor}>
-                        <IconSymbol name="house.fill" size={16} color={colors.primary} style={{ marginTop: 7 }} />
+                        <IconSymbol name="house.fill" size={16} color={colors.primary} />
                         <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Building" value={userFormData.address.building} onChangeText={(text) => setUserFormData({...userFormData, address: {...userFormData.address, building: text}})} />
                     </View>
                 </View>
                 <View style={{width: '80%', marginTop: 20, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                     <View style={styles.inputContainerMinor}>
-                        <IconSymbol name="building.2.fill" size={16} color={colors.primary} style={{ marginTop: 7 }} />
+                        <IconSymbol name="building.2.fill" size={16} color={colors.primary} />
                         <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Floor" value={userFormData.address.floor} onChangeText={(text) => setUserFormData({...userFormData, address: {...userFormData.address, floor: text}})} />
                     </View>
                     <View style={styles.inputContainerMinor}>
-                        <IconSymbol name="numbers.rectangle.fill" size={16} color={colors.primary} style={{ marginTop: 7 }} />
+                        <IconSymbol name="numbers.rectangle.fill" size={16} color={colors.primary} />
                         <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Apartment No." value={userFormData.address.apartment} onChangeText={(text) => setUserFormData({...userFormData, address: {...userFormData.address, apartment: text}})} />
                     </View>
                 </View>
@@ -105,8 +101,9 @@ const styles = StyleSheet.create({
         borderColor: colors.primary,
         backgroundColor: '#fff',
         borderRadius: 50,
+        alignItems: 'center',
         width: '80%',
-        paddingHorizontal: 10,
+        paddingHorizontal: 10,        
         paddingVertical: 5,
         shadowColor: colors.primary,
         shadowOffset: { width: 0, height: 1 },
@@ -120,6 +117,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'center',
         gap: 10,
+        alignItems: 'center',
         borderWidth: 0.5,
         borderColor: colors.primary,
         backgroundColor: '#fff',

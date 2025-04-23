@@ -1,34 +1,21 @@
-import { Stack, useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
+import { Stack } from 'expo-router';
+import React from 'react';
 import 'react-native-gesture-handler';
-import { Provider, useSelector } from 'react-redux';
-import store, { RootState } from './store'; // Import the Redux store and RootState type
-import 'react-native-gesture-handler';
+import { Provider } from 'react-redux';
+import store from './store';
+import { NotificationProvider } from './context/notificationContext';
 
 export default function RootLayout() {
   return (
     <Provider store={store}>
-      <LayoutWithRole />
+      <NotificationProvider>
+        <LayoutWithRole />
+      </NotificationProvider>
     </Provider>
   );
 }
 
 function LayoutWithRole() {
-  const router = useRouter();
-
-  // Access the user's role and authentication status from the Redux store
-  const role = useSelector((state: RootState) => state.user.role);
-
-  useEffect(() => {
-  if (role === 'admin') {
-    router.replace('/adminScreens'); // Redirect to admin layout
-  } else if (role === 'user') {
-    router.replace('/mainScreens'); // Redirect to main layout
-  } else {
-    router.replace('/');
-  }
-  }, [role]);
-
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" options={{ title: 'Home' }} />

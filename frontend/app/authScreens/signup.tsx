@@ -3,21 +3,25 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Animated, Dimensions }
 import { useNavigation } from 'expo-router';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/rootStack';
-import { UserFormData, RestaurantFormData } from '../types/authTypes';
+import { UserFormData, RestaurantFormData, DriverFormData } from '../types/authTypes';
 import UserSignup from './sections/userSignup';
 import RestaurantSignup from './sections/restaurantSignup';
+import DriverSignup from './sections/driverSignup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
-import { UserSignupRoute } from '../endpoints/authEndpoints';
+import { UserSignupRoute, RestaurantSignupRoute, DriverSignupRoute } from '../endpoints/authEndpoints';
 import colors from '../styles/colors';
+import { useNotification } from '../context/notificationContext';
 
 export default function SignupScreen() {
-    const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: {label: '', apartment: '', street: '', area: '', building: '', floor: '', isDefault: true} });
-    const [restaurantFormData, setRestaurantFormData] = useState<RestaurantFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', cuisines: [], address: '', description: '', image: '', openingHours: { Monday: { open: '', close: '' }, Tuesday: { open: '', close: '' }, Wednesday: { open: '', close: '' }, Thursday: { open: '', close: '' }, Friday: { open: '', close: '' }, Saturday: { open: '', close: '' }, Sunday: { open: '', close: '' } } });
+    const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: {apartment: "", street: '', area: '', building: '', floor: ''} });
+    const [restaurantFormData, setRestaurantFormData] = useState<RestaurantFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', cuisines: [], address: {city: "", street: "", area: ""}, description: '', image: '', openingHours: { Monday: { open: '', close: '' }, Tuesday: { open: '', close: '' }, Wednesday: { open: '', close: '' }, Thursday: { open: '', close: '' }, Friday: { open: '', close: '' }, Saturday: { open: '', close: '' }, Sunday: { open: '', close: '' } } });
+    const [driverFormData, setDriverFormData] = useState<DriverFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', vehicleType: '', vehicleModel: '', vehiclePlateNumber: '' });
     const [currentSection, setCurrentSection] = useState(0);
     const [submitting, setSubmitting] = useState(false);
+    const { showNotification } = useNotification();
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-    const scrollY = useRef(new Animated.Value(0)).current; // Animated value for vertical scrolling
+    const scrollY = useRef(new Animated.Value(0)).current;
 
     const handleScrollDown = () => {
       Animated.spring(scrollY, { 
@@ -44,36 +48,47 @@ export default function SignupScreen() {
         try {
           if(currentSection === 0) {
             if(userFormData.password !== userFormData.confirmPassword) {
-              alert('Passwords do not match!');
+              showNotification('Passwords do not match!', 'error');
               return;
             } else if(userFormData.name === '' || userFormData.email === '' || userFormData.phone === '' || userFormData.password === '' || userFormData.confirmPassword === '') {
-              alert('Please fill all fields!');
+              showNotification('Passwords do not match!', 'error');
               return;
             }
             await UserSignupRoute(userFormData);
-            navigation.navigate('authScreens/login');
           } else if(currentSection === 1) {
-            console.log('Restaurant signup data:', restaurantFormData);
             if(restaurantFormData.password !== restaurantFormData.confirmPassword) {
-              alert('Passwords do not match!');
+              showNotification('Passwords do not match!', 'error');
               return;
             } else if(restaurantFormData.name === '' || restaurantFormData.email === '' || restaurantFormData.phone === '' || restaurantFormData.password === '' || restaurantFormData.confirmPassword === '') {
-              alert('Please fill all fields!');
-              return;
-            } else if(restaurantFormData.openingHours.Monday.open === '' || restaurantFormData.openingHours.Monday.close === '' || restaurantFormData.openingHours.Tuesday.open === '' || restaurantFormData.openingHours.Tuesday.close === '' || restaurantFormData.openingHours.Wednesday.open === '' || restaurantFormData.openingHours.Wednesday.close === '' || restaurantFormData.openingHours.Thursday.open === '' || restaurantFormData.openingHours.Thursday.close === '' || restaurantFormData.openingHours.Friday.open === '' || restaurantFormData.openingHours.Friday.close === '' || restaurantFormData.openingHours.Saturday.open === '' || restaurantFormData.openingHours.Saturday.close === '' || restaurantFormData.openingHours.Sunday.open === '' || restaurantFormData.openingHours.Sunday.close === '') {
-              alert('Please fill all opening and closing hours throughout the week!');
+              showNotification('Please fill all fields!', 'error');
               return;
             }
-            
+            await RestaurantSignupRoute(restaurantFormData);
+            showNotification('Restaurant signup successful!', 'success');
+          } else if(currentSection === 2) {
+            if(driverFormData.password !== driverFormData.confirmPassword) {
+              showNotification('Passwords do not match!', 'error');
+              return;
+            } else if(driverFormData.name === '' || driverFormData.email === '' || driverFormData.phone === '' || driverFormData.password === '' || driverFormData.confirmPassword === '') {
+              showNotification('Please fill all fields!', 'error');
+              return;
+            }
+            await DriverSignupRoute(driverFormData);
+            showNotification('Driver signup successful!', 'success');
           }
+          setTimeout(() => {
+            navigation.navigate('authScreens/login');
+          }, 1000);
         } catch (error) {
-          console.error('Error during signup:', error);
+          showNotification('Server error! Please try again later.', 'error');
         } finally {
           setSubmitting(false);
         }
       };
       handleLogin();
     }, [submitting]);
+
+
     return (
         <View style={styles.container}>
             <Animated.View style={{ width: '100%', height: '100%', transform: [{ translateY: scrollY }] }}>
@@ -108,8 +123,10 @@ export default function SignupScreen() {
                     <Text style={styles.welcomeText}>Register</Text>
                     {currentSection == 0 ? (
                         <UserSignup userFormData={userFormData} setUserFormData={setUserFormData} />
-                    ) : (
+                    ) : currentSection == 1 ? (
                         <RestaurantSignup restaurantFormData={restaurantFormData} setRestaurantFormData={setRestaurantFormData} />
+                    ) : (
+                        <DriverSignup driverFormData={driverFormData} setDriverFormData={setDriverFormData} />
                     )}
                     <View style={{ width: '100%', marginTop: 20 }}>
                         <TouchableOpacity onPressIn={() => setSubmitting(true)} style={{ marginHorizontal: 'auto', marginTop: 20, width: '60%', borderRadius: 50, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
