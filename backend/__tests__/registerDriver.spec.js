@@ -50,9 +50,6 @@ const res = {
 
     await registerDriver(req, res);
 
-   
-
-    // Verify driver creation
     expect(Driver.createDriver).toHaveBeenCalledWith({
       name: 'John Driver',
       email: 'john.driver@example.com',
@@ -65,10 +62,7 @@ const res = {
       }
     });
 
-    // Verify token generation
     expect(generateToken).toHaveBeenCalledWith('driver123', 'driver');
-
-    // Verify response
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       message: 'Driver registered successfully',
@@ -154,6 +148,6 @@ const res = {
       await registerDriver(req, res);
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({ error: 'All fields are required' });
-      jest.clearAllMocks(); // Reset between test cases
+      jest.clearAllMocks(); 
     }
   });

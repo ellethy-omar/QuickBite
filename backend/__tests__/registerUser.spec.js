@@ -3,7 +3,6 @@ const User = require('../models/User');
 const validator = require('validator');
 const { generateToken } = require('../middleware/requireAuth');
 
-// Mock the modules
 jest.mock('../models/User');
 jest.mock('validator');
 jest.mock('../middleware/requireAuth');
@@ -28,10 +27,7 @@ validator.isStrongPassword.mockReturnValue(true);
 generateToken.mockReturnValue('mockToken123');
 
 it('should register a new user successfully', async () => {
-    // Mock User.userExists to return false (user doesn't exist)
     User.userExists.mockResolvedValue(false);
-    
-    // Mock User.createUser to return a mock user
     const mockUser = {
       _id: '123',
       username: 'testuser',
@@ -42,11 +38,7 @@ it('should register a new user successfully', async () => {
     User.createUser.mockResolvedValue(mockUser);
 
     await registerUser(req, res);
-
-    // Verify User.userExists was called with correct arguments
     expect(User.userExists).toHaveBeenCalledWith('testuser', 'test@example.com');
-    
-    // Verify User.createUser was called with correct arguments
     expect(User.createUser).toHaveBeenCalledWith({
       username: 'testuser',
       email: 'test@example.com',
@@ -55,10 +47,8 @@ it('should register a new user successfully', async () => {
       addresses: ['123 Main St']
     });
 
-    // Verify generateToken was called with correct arguments
     expect(generateToken).toHaveBeenCalledWith('123', 'user');
 
-    // Verify response
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       message: 'User registered successfully',
@@ -86,7 +76,7 @@ it('should return 403 if required fields are missing', async () => {
       await registerUser(req, res);
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({ error: 'All fields are required' });
-      jest.clearAllMocks(); // Clear mocks between test cases
+      jest.clearAllMocks(); 
     }
   });
 
@@ -136,12 +126,10 @@ it('should return 400 for invalid email', async () => {
       }
     };
 
-    // Mock that user exists
     User.userExists.mockResolvedValue(true);
 
     await registerUser(invalidUserReq, res);
-
-    // Verify the checks
+    
     expect(User.userExists).toHaveBeenCalledWith('existinguser', 'existing@example.com');
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({ error: 'User already exists' });
