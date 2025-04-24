@@ -18,6 +18,8 @@
     !                    $ref: '#/components/schemas/Order'
     !                    $ref: '#/components/schemas/Message'
     !                    $ref: '#/components/schemas/Chat'
+    !                    $ref: '#/components/schemas/restaurantAddress'
+    !                    $ref: '#/components/schemas/UserAddress'
 */
 
 /**
@@ -188,7 +190,7 @@
  *           type: string
  *           example: "P@ssw0rdStrong!"
 
- *     Address:
+ *     RestaurantAddress:
  *       type: object
  *       required:
  *         - street
@@ -223,50 +225,48 @@
  *         saturday:
  *           $ref: '#/components/schemas/DailyHours'
 
- *     Restaurant:
+ *     Order:
  *       type: object
- *       required:
- *         - name
- *         - description
- *         - cuisineType
  *       properties:
- *         name:
+ *         status:
  *           type: string
- *           example: "Pizza Palace"
- *         description:
+ *           enum: [pending, processing, delivered, cancelled]
+ *           default: pending
+ *           example: pending
+ *         userID:
  *           type: string
- *           example: "Best pizza in town"
- *         cuisineType:
+ *           format: objectId
+ *           description: ID of the user who placed the order
+ *           example: "60c72b2f5f1b2c001f58c1b4"
+ *         restaurantID:
+ *           type: string
+ *           format: objectId
+ *           description: ID of the restaurant
+ *           example: "60c72b2f5f1b2c001f58c1b4"
+ *         deliveryDriverID:
+ *           type: string
+ *           format: objectId
+ *           description: ID of the delivery driver
+ *           example: "60c72b2f5f1b2c001f58c1b4"
+ *         items:
  *           type: array
  *           items:
- *             type: string
- *           example: ["Italian", "Pizza"]
- *         rating:
+ *             $ref: '#/components/schemas/Item'
+ *         totalAmount:
  *           type: number
- *           minimum: 0
- *           maximum: 5
- *           default: 0
- *         address:
- *           $ref: '#/components/schemas/Address'
- *         contact:
- *           $ref: '#/components/schemas/Contact'
- *         openingHours:
- *           $ref: '#/components/schemas/OpeningHours'
- *         isActive:
- *           type: boolean
- *           default: true
- *         logo:
- *           type: string
- *           example: "default-logo.jpg"
- *         coverImage:
- *           type: string
- *           example: "default-cover.jpg"
+ *           example: 35.99
+ *         userAddress:
+ *           $ref: '#/components/schemas/UserAddress'
+ *         restaurantAddress:
+ *           $ref: '#/components/schemas/RestaurantAddress'
  *         createdAt:
  *           type: string
  *           format: date-time
+ *           example: "2025-04-18T08:45:30.000Z"
  *         updatedAt:
  *           type: string
  *           format: date-time
+ *           example: "2025-04-18T09:45:30.000Z"
  */
 
 
@@ -274,7 +274,7 @@
  * @swagger
  * components:
  *   schemas:
- *     Address:
+ *     UserAddress:
  *       type: object
  *       properties:
  *         label:
@@ -315,7 +315,7 @@
  *         addresses:
  *           type: array
  *           items:
- *             $ref: '#/components/schemas/Address'
+ *             $ref: '#/components/schemas/userAddress'
  *         createdAt:
  *           type: string
  *           format: date-time

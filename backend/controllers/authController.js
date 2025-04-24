@@ -163,7 +163,7 @@ const loginDriver = async (req, res) => {
     const driver = await Driver.findByEmailOrPhone(emailOrPhone);
     if (!driver) {
       console.log("Driver not found");
-      return res.status(404).json({ error: 'Invalid credentials' });
+      return res.status(404).json({ error: 'Invalid crcd backendedentials' });
     }
 
     const isMatch = await driver.isPasswordMatch(password);
