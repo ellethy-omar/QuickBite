@@ -64,7 +64,7 @@ it('should register a new user successfully', async () => {
       message: 'User registered successfully',
       user: {
         _id: '123',
-        name: undefined, // backend uses 'name' but the mock uses 'username'
+        username: "testuser", 
         email: 'test@example.com',
         phone: '1234567890',
         addresses: ['123 Main St']
