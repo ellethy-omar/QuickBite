@@ -23,8 +23,7 @@ const OrderSchema = new Schema({
       ref: 'Restaurant', 
       required: true},
     deliveryDriverID:{type: Schema.Types.ObjectId,
-      ref: 'Driver', 
-      required: true}, //validate
+      ref: 'Driver'}, //validate
     items: [ItemSchema],
     totalAmount: Number
   },{ 

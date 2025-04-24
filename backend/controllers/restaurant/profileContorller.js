@@ -6,6 +6,7 @@ const getRestaurantProfie = async (req ,res) => {
     res.status(200).json({
         restaurant
     });
+    console.log('restaurant:', restaurant);
 }
 
 const updateRestaurantProfile = async (req ,res) => {

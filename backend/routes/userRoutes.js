@@ -9,7 +9,9 @@ const {
 const {
     createOrder,
     updateOrder,
-    cancelOrder
+    cancelOrder,
+    getAllRestaurants,
+    getProductsForRestaurant
 } = require('../controllers/user/ordersContorller');
 
 // profile routes
@@ -22,5 +24,7 @@ router.post("/restUserPassword", restUserPassword)
 router.post("/createOrder", createOrder);
 router.put("/updateOrder", updateOrder);
 router.put("/cancelOrder", cancelOrder);
+router.get("/getAllRestaurants", getAllRestaurants);
+router.get("/getProductsForRestaurant", getProductsForRestaurant);
 
 module.exports = router;

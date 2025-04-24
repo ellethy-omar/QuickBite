@@ -4,6 +4,7 @@ const getDriverProfile = async (req, res) => {
     const driver = Driver.findById(req.user._id);
 
     res.status(200).json({driver});
+    console.log('driver:', driver);
 }
 
 const updateDriverProfile = async (req, res) => {

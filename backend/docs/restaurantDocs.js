@@ -15,8 +15,10 @@
  *   get:
  *     tags:
  *       - Restaurant (JWT required)
- *     summary: Get the restaurant profile
- *     description: Returns the authenticated restaurant's profile.
+ *     summary: Retrieve the authenticated restaurant's profile
+ *     description: Requires JWT authentication. Returns the restaurant profile associated with the current user.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Restaurant profile data
@@ -26,19 +28,7 @@
  *               type: object
  *               properties:
  *                 restaurant:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                     email:
- *                       type: string
- *                     phone:
- *                       type: string
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *       401:
- *         description: Unauthorized
+ *                   $ref: '#/components/schemas/Restaurant'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
@@ -71,80 +61,192 @@
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ */
 
- * /api/restaurant/resetRestaurantPassword:
- *   post:
- *     tags:
- *       - Restaurant (JWT required)
- *     summary: Reset restaurant password
- *     description: Allows the restaurant to change its password.
- *     responses:
- *       505:
- *         description: Not implemented
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
-
+/**
+ * @swagger
  * /api/restaurant/getRestaurantProducts:
  *   get:
  *     tags:
  *       - Restaurant (JWT required)
- *     summary: Get all products for the restaurant
- *     description: Returns a list of all products created by the authenticated restaurant.
+ *     summary: Get all products belonging to the authenticated restaurant
+ *     description: Fetch all products that are associated with the restaurant's ID derived from the authenticated user.
  *     responses:
- *       505:
- *         description: Not implemented
+ *       200:
+ *         description: Successfully retrieved the list of products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: products are in an array
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/InvalidCredentialsError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 
+/**
+ * @swagger
  * /api/restaurant/addRestaurantProduct:
  *   post:
  *     tags:
  *       - Restaurant (JWT required)
- *     summary: Add a new product
- *     description: Adds a new product to the restaurant's menu.
+ *     summary: Add a new product for the authenticated restaurant
+ *     description: Allows a restaurant to add a new product by providing necessary details.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
+ *               - description
+ *               - price
+ *               - category
+ *               - isAvailable
  *             properties:
- *               product:
- *                 type: object
- *                 description: Product object to add
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               category:
+ *                 type: string
+ *               isAvailable:
+ *                 type: boolean
  *     responses:
- *       505:
- *         description: Not implemented
+ *       201:
+ *         description: Product added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
 
+/**
+ * @swagger
  * /api/restaurant/editRestaurantProduct:
  *   put:
  *     tags:
  *       - Restaurant (JWT required)
- *     summary: Edit a product
- *     description: Updates a specific product in the restaurant's menu.
+ *     summary: Edit an existing product of the restaurant
+ *     description: Update product details for an existing product that belongs to the authenticated restaurant.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - _id
  *             properties:
- *               product:
- *                 type: object
- *                 description: Product object to update
+ *               _id:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               category:
+ *                 type: string
+ *               isAvailable:
+ *                 type: boolean
  *     responses:
- *       505:
- *         description: Not implemented
+ *       200:
+ *         description: Product updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/responses/InvalidCredentialsError'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
+
+
+
+/**
+ * @swagger
+ * /api/restaurant/editRestaurantProductImage:
+ *   put:
+ *     tags:
+ *       - Restaurant (JWT required)
+ *     summary: Edit an existing product image of the restaurant
+ *     description: Update the image for an existing product that belongs to the authenticated restaurant.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - _id
+ *               - imageBase64
+ *               - tags
+ *             properties:
+ *               _id:
+ *                 type: string
+ *                 description: The unique ID of the product to update
+ *               imageBase64:
+ *                 type: string
+ *                 description: Base64 encoded image string
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: An array of tags to categorize the image
+ *     responses:
+ *       200:
+ *         description: Product image updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Image updated successfully"
+ *                 product:
+ *                   $ref: '#/components/schemas/Product'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/responses/InvalidCredentialsError'
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
