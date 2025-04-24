@@ -45,10 +45,12 @@ DriverSchema.statics.driverExists = async function (email, phone) {
  
  // 🔍 Static method to find driver by email or phone
  DriverSchema.statics.findByEmailOrPhone = async function (input) {
-   return await this.findOne({
-     $or: [{ email: input }, { phone: input }]
-   });
- };
+  if(!isNaN(input)){
+    return await this.findOne({ phone: Number(input) });
+  } else {
+    return await this.findOne({ email: input });
+  }
+};
 
 const Driver = mongoose.model('Driver', DriverSchema);
 module.exports = Driver;
