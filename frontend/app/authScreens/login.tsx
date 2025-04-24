@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import { setRole, setUserDetails } from '../slices/userSlice';
 import colors from '../styles/colors';
-import { LoginUserRoute, LoginRestaurantRoute, LoginDriverRoute } from '../endpoints/authEndpoints';
+import { LoginUserRoute, LoginRestaurantRoute, LoginDriverRoute, LoginAdminRoute } from '../endpoints/authEndpoints';
 import { useNotification } from '../context/notificationContext';
 
 
@@ -48,6 +48,7 @@ export default function LoginScreen() {
           setTimeout(() => {
             navigation.navigate('mainScreens');
             }, 1000);
+
           } else if (accType === 1) {
           const response = await LoginRestaurantRoute(email, password);
           if (response?.data?.token) {
@@ -56,20 +57,30 @@ export default function LoginScreen() {
           showNotification('Login successful!', 'success');
           dispatch(setRole('restaurant'));
           setTimeout(() => {
-            navigation.navigate('adminScreens');
+            navigation.navigate('driverScreens' as never);
             }, 1000);
+
         } else if (accType == 2){
-          console.log('Driver login');
           const response = await LoginDriverRoute(email, password);
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
-          alert('Login successful!');
           dispatch(setRole('driver')); 
+          setTimeout(() => {
+            navigation.navigate('');
+            }, 1000);
+
+       } else {
+          const response = await LoginAdminRoute(email,password);
+          if (response?.data?.token) {
+            await SecureStore.setItemAsync('jwtToken', response.data.token);
+          }
+          dispatch(setRole("admin"));
           setTimeout(() => {
             navigation.navigate('adminScreens');
             }, 1000);
-       }
+      }
+
       } catch (error) {
         if (error instanceof Error && 'response' in error && (error as any).response?.status === 404) {
           showNotification('Invalid credentials, please check your data and try again', 'error');
@@ -91,7 +102,7 @@ export default function LoginScreen() {
         <Text style={styles.subText}>Login to continue</Text>
           <View style={styles.inputContainer}>
             <IconSymbol name="person.fill" size={16} color={colors.primary}  />
-            <TextInput style={styles.input} placeholderTextColor="gray" placeholder={accType == 0 ? "Email or Username" : "Email or Phone Number"} value={email} onChangeText={(text) => setEmail(text)} />
+            <TextInput style={styles.input} placeholderTextColor="gray" placeholder={accType == 0 || accType == 3 ? "Email or Username" : "Email or Phone Number"} value={email} onChangeText={(text) => setEmail(text)} />
           </View>
           <View style={styles.inputContainer}>
             <IconSymbol name="lock.fill" size={16} color={colors.primary}  />
@@ -128,14 +139,17 @@ export default function LoginScreen() {
 
           <Text style={{ color: colors.primary, fontSize: 14, marginTop: 30, fontWeight: '500', textAlign: 'center' }}>Select your account type</Text>
           <View style={{ width: '100%', gap: 10, justifyContent: 'center', display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
-            <TouchableOpacity onPress={() => setAccType(0)} style={{ width: 100, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor:  accType == 0 ? colors.primary : 'white'}}>
-              <Text style={{ color: accType == 0 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15 }}>User</Text>
+            <TouchableOpacity onPress={() => setAccType(0)} style={{ width: 80, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor:  accType == 0 ? colors.primary : 'white'}}>
+              <Text style={{ color: accType == 0 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15, fontSize: 11 }}>User</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setAccType(1)} style={{ width: 100, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor: accType == 1 ? colors.primary : 'white'}}>
-              <Text style={{ color: accType == 1 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15 }}>Restaurant</Text>
+            <TouchableOpacity onPress={() => setAccType(1)} style={{ width: 80, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor: accType == 1 ? colors.primary : 'white'}}>
+              <Text style={{ color: accType == 1 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15, fontSize: 11 }}>Restaurant</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setAccType(2)} style={{ width: 100, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor: accType == 2 ? colors.primary : 'white'}}>
-              <Text style={{ color: accType == 2 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15 }}>Driver</Text>
+            <TouchableOpacity onPress={() => setAccType(2)} style={{ width: 80, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor: accType == 2 ? colors.primary : 'white'}}>
+              <Text style={{ color: accType == 2 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15, fontSize: 11 }}>Driver</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setAccType(3)} style={{ width: 80, padding: 10, height: 45, borderRadius: 15, justifyContent: 'center', alignItems: 'center', backgroundColor: accType == 3 ? colors.primary : 'white'}}>
+              <Text style={{ color: accType == 3 ? "white" : colors.primary, fontWeight: 'bold', position: 'absolute', paddingVertical: 15, fontSize: 11 }}>Admin</Text>
             </TouchableOpacity>
           </View>
       </View>

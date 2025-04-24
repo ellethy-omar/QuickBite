@@ -7,7 +7,7 @@ const {
 } = require('../controllers/driver/profileController');
 
 const {
-    getAllOrders,
+    getAllAvailableOrders,
     acceptOrder
 } = require('../controllers/driver/deliveryController');
 
@@ -19,7 +19,7 @@ router.post("/restDriverPassword", restDriverPassword)
 
 // dilvery routes
 
-router.get("/getAllOrders", getAllOrders);
+router.get("/getAllAvailableOrders", getAllAvailableOrders);
 router.put("/acceptOrder", acceptOrder);
 
 module.exports = router;

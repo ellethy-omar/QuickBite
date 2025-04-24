@@ -8,8 +8,10 @@ const {
     loginAdmin,
     registerRestaurant,
     loginRestaurant,
+    forgotPassword,
+    resetPassword,
     verifyToken
-} = require('../controllers/authController');
+  } = require('../controllers/authController');
 const { requireAuth } = require('../middleware/requireAuth');
 
 router.post('/registerUser', registerUser);
@@ -23,6 +25,10 @@ router.post('/loginAdmin', loginAdmin);
 
 router.post('/registerRestaurant', registerRestaurant);
 router.post('/loginRestaurant', loginRestaurant);
+
+// to be documented
+router.post('/forgotPassword', forgotPassword);
+router.post('/resetPassword', resetPassword);
 
 router.get('/verify', requireAuth, verifyToken);
 

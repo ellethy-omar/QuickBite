@@ -24,6 +24,7 @@ function LayoutWithRole() {
       <Stack.Screen name="authScreens/forgotPassword" options={{ title: 'Forgot Password' }} />
       <Stack.Screen name="mainScreens" />
       <Stack.Screen name="adminScreens" />
+      <Stack.Screen name="driverScreens" />
     </Stack>
   );
 }
