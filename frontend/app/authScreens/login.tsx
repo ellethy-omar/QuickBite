@@ -57,7 +57,7 @@ export default function LoginScreen() {
           showNotification('Login successful!', 'success');
           dispatch(setRole('restaurant'));
           setTimeout(() => {
-            navigation.navigate('driverScreens' as never);
+            navigation.navigate('adminScreens');
             }, 1000);
 
         } else if (accType == 2){
@@ -65,9 +65,10 @@ export default function LoginScreen() {
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
+          showNotification('Login successful!', 'success');
           dispatch(setRole('driver')); 
           setTimeout(() => {
-            navigation.navigate('');
+            navigation.navigate('driverScreens' as never);
             }, 1000);
 
        } else {
@@ -75,6 +76,7 @@ export default function LoginScreen() {
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
+          showNotification('Login successful!', 'success');
           dispatch(setRole("admin"));
           setTimeout(() => {
             navigation.navigate('adminScreens');

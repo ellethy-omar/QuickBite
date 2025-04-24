@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import colors from '@/app/styles/colors';
@@ -108,82 +108,82 @@ export default function UsersManageScreen() {
       );
     }
     
-    const styles = StyleSheet.create({
-      background: {
-        flex: 1,
-        backgroundColor: colors.primary,
-        paddingTop: 50,
-      },
-      titleText: {
-        fontSize: 24,
-        fontWeight: '800',
-        color: colors.primaryText,
-        textAlign: 'center',
-        marginBottom: 20,
-      },
-      searchBox: {
-        marginHorizontal: 'auto',
-        width: '94%',
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 10,
-        borderWidth: 1,
-        borderColor: colors.secondary,
-      },
-      resultContainer: {
-        paddingTop: 20,
-        backgroundColor: colors.background,
-        borderTopEndRadius: 20,
-        borderTopStartRadius: 20,
-        padding: 10,
-      },
-      toolKit: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '94%',
-        marginHorizontal: 'auto',
-        marginVertical: 10,
-      },
-      toolButton: {
-        flexDirection: 'row',
-        backgroundColor: colors.background,
-        alignItems: 'center',
-        gap: 5,
-        borderWidth: 1,
-        borderColor: colors.primary,
-        padding: 10,
-        borderRadius: 50,
-      },
-      infoText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: colors.primaryText,
-      },
-      noResultsText: {
-        color: colors.primary,
-        fontSize: 16,
-        fontWeight: '700',
-        textAlign: 'center',
-        marginTop: 50,
-      },
-      modalStyle: {
-        backgroundColor: '#f8f9fa',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-      },
-      modalContent: {
-        flex: 1,
-        padding: 20,
-      },
-      modalTitle: {
-        fontSize: 18,
-        fontWeight: '700',
-        marginBottom: 10,
-      },
-      sortOption: {
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
-      },
-    });
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    paddingTop: 50,
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.primaryText,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  searchBox: {
+    marginHorizontal: 'auto',
+    width: '94%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: colors.secondary,
+  },
+  resultContainer: {
+    paddingTop: 20,
+    backgroundColor: colors.background,
+    borderTopEndRadius: 20,
+    borderTopStartRadius: 20,
+    padding: 10,
+  },
+  toolKit: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '94%',
+    marginHorizontal: 'auto',
+    marginVertical: 10,
+  },
+  toolButton: {
+    flexDirection: 'row',
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    gap: 5,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    padding: 10,
+    borderRadius: 50,
+  },
+  infoText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primaryText,
+  },
+  noResultsText: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: 50,
+  },
+  modalStyle: {
+    backgroundColor: '#f8f9fa',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalContent: {
+    flex: 1,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  sortOption: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+});
