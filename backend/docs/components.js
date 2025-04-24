@@ -98,7 +98,30 @@
  *                 type: string
  *                 example: "If you see status 500 tell me, thsi is not an example"
  */
-
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Admin:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The unique identifier for the admin.
+ *         name:
+ *           type: string
+ *           description: The admin's name.
+ *         email:
+ *           type: string
+ *           description: The admin's email address.
+ *         phone:
+ *           type: string
+ *           description: The admin's phone number.
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The timestamp of when the admin was created.
+ */
 
 /**
  * @swagger
