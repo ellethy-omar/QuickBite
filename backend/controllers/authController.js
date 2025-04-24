@@ -155,6 +155,11 @@ const loginDriver = async (req, res) => {
   }
 
   try {
+    if(!validator.isEmail(emailOrPhone) && isNaN(emailOrPhone)) {
+      console.log("emailOrPhone is not an email or a phone number");
+      return res.status(403).json({ error: 'emailOrPhone is not an email or a phone number' });
+    }
+
     const driver = await Driver.findByEmailOrPhone(emailOrPhone);
     if (!driver) {
       console.log("Driver not found");
