@@ -43,6 +43,7 @@ wss.on('connection', (ws, request) => {
 });
 
 app.use((req, res) => {
+  console.log("Detected a request for an invalid route");
   res.status(404).json({ error: 'Invalid route' });
 });
 

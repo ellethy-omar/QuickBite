@@ -77,55 +77,71 @@
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
- * /api/driver/restDriverPassword:
- *   post:
- *     tags:
- *       - Driver (JWT required)
- *     summary: Reset driver's password.
- *     description: Resets the password for the authenticated driver.
- *     responses:
- *       200:
- *         description: Password reset successfully.
- *       401:
- *         description: Unauthorized, JWT missing or invalid.
- *       505:
- *         description: Not implemented yet.
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
- * /api/driver/getAllOrders:
- *   get:
- *     tags:
- *       - Driver (JWT required)
- *     summary: Get all delivery orders.
- *     description: Retrieves all orders available for delivery.
- *     responses:
- *       200:
- *         description: List of delivery orders.
- *       401:
- *         description: Unauthorized, JWT missing or invalid.
- *       505:
- *         description: Not implemented yet. 
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
- * /api/driver/acceptOrder:
- *   put:
- *     tags:
- *       - Driver (JWT required)
- *     summary: Accept a delivery order.
- *     description: Allows a driver to accept an order for delivery.
- *     responses:
- *       200:
- *         description: Order accepted successfully.
- *       401:
- *         description: Unauthorized, JWT missing or invalid.
- *       505:
- *         description: Not implemented yet.
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
- */
+* /api/driver/getAllOrders:
+*   get:
+*     tags:
+*       - Driver (JWT required)
+*     summary: Get all delivery orders.
+*     description: Retrieves all orders available for delivery.
+*     security:
+*       - bearerAuth: []
+*     responses:
+*       200:
+*         description: Get all orders available.
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 data:
+*                   type: array
+*                   items:
+*                     $ref: '#/components/schemas/Order'
+*       403:
+*         $ref: '#/components/responses/ParameterRequiredError'
+*       404:
+*         $ref: '#/components/responses/InvalidCredentialsError'
+*       420:
+*         $ref: '#/components/responses/UnauthorizedError'
+*       469:
+*         $ref: '#/components/responses/ForbiddenError'
+*       500:
+*         $ref: '#/components/responses/ServerError'
+
+* /api/driver/acceptOrder:
+*   put:
+*     tags:
+*       - Driver (JWT required)
+*     summary: Accept a delivery order.
+*     description: Allows a driver to accept an order for delivery.
+*     parameters:
+*       - name: orderId
+*         in: query
+*         description: The ID of the order to accept.
+*         required: true
+*         schema:
+*           type: string
+*     responses:
+*       200:
+*         description: Order accepted successfully.
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: "Order accepted successfully"
+*                 order:
+*                   $ref: '#/components/schemas/Order'
+*       403:
+*         $ref: '#/components/responses/ParameterRequiredError'
+*       404:
+*         $ref: '#/components/responses/InvalidCredentialsError'
+*       420:
+*         $ref: '#/components/responses/UnauthorizedError'
+*       469:
+*         $ref: '#/components/responses/ForbiddenError'
+*       500:
+*         $ref: '#/components/responses/ServerError'
+*/

@@ -16,7 +16,6 @@
     !                    $ref: '#/components/schemas/Admin'
     !                    $ref: '#/components/schemas/Product'
     !                    $ref: '#/components/schemas/Order'
-    !                    $ref: '#/components/schemas/Product'
     !                    $ref: '#/components/schemas/Message'
     !                    $ref: '#/components/schemas/Chat'
 */
@@ -59,7 +58,7 @@
  *             properties:
  *               error:
  *                 type: string
- *                 example: Parameter "name" is required
+ *                 example: Any thing can be required, I have tried
  *     UserAlreadyExistsError:
  *       description: The user already exists in the system
  *       content:
@@ -87,7 +86,7 @@
  * components:
  *   responses:
  *     ServerError:
- *       description: Server error during login. Call Omar
+ *       description: Server error. Call Omar
  *       content:
  *         application/json:
  *           schema:
@@ -95,7 +94,7 @@
  *             properties:
  *               error:
  *                 type: string
- *                 example: "Server error during login"
+ *                 example: "If you see status 500 tell me, thsi is not an example"
  */
 
 
@@ -118,9 +117,6 @@
  *         phone:
  *           type: number
  *           example: 201012345678
- *         password:
- *           type: string
- *           example: $2b$10$abcdefg1234567890hashedPassword
  *         Vehicle:
  *           type: object
  *           properties:
@@ -357,7 +353,7 @@
  *         image:
  *           type: string
  *           default: "default-cover.jpg"
- *           example: "pizza.jpg"
+ *           example: "<some url>"
  */
 
 /**
@@ -375,7 +371,7 @@
  *         quantity:
  *           type: number
  *           example: 2
-
+ *
  *     Order:
  *       type: object
  *       properties:
