@@ -1,32 +1,133 @@
-const Restaurant = require('../../models/Restaurant');
 const Product = require('../../models/Product');
 
 const getRestaurantProducts = async (req, res) => {
-    const restaurant = Restaurant.findbyId(req.user._id);
-
-    res.status(505).json({
-        errror: "Not implmented yet"
-    })
-}
+    try {
+        const products = await Product.find({ restraurantID: req.user._id });
+        res.status(200).json({
+            message:"products are in an array", 
+            data: products
+        });
+        console.log('products:', products);
+    } catch (err) {
+        res.status(500).json({
+            error: "Failed to fetch products",
+            details: err.message
+        });
+        console.log('Error fetching products:', err);
+    }
+};
 
 const addRestaurantProduct = async (req, res) => {
-    const { product } = req.body;
+    try {
+        const { name, description, price, category, isAvailable } = req.body;
 
-    res.status(505).json({
-        errror: "Not implmented yet"
-    })
-}
+        if (!name || !description || !price || !category || !isAvailable) {
+            console.log("Missing required fields");
+            return res.status(403).json({ error: 'Missing required fields' });
+        }
+
+        if(price < 0) {
+            console.log("Price must be a positive number");
+            return res.status(403).json({ error: 'Price must be a positive number' });
+        }
+
+        const newProduct = new Product({
+            name,
+            description,
+            price,
+            category,
+            isAvailable,
+            restraurantID: req.user._id
+        });
+
+        const savedProduct = await newProduct.save();
+        res.status(201).json(savedProduct);
+        console.log('savedProduct:', savedProduct);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to add product', details: err.message });
+        console.log('Error adding product:', err);
+    }
+};
 
 const editRestaurantProduct = async (req, res) => {
-    const { product } = req.body;
+    try {
+        const { _id, ...updates } = req.body;
 
-    res.status(505).json({
-        errror: "Not implmented yet"
-    })
-}
+        if(!updates) {
+            console.log("No updates provided");
+            return res.status(403).json({ error: 'No updates provided' });
+        }
+        if(!_id) {
+            console.log("Product ID is required");
+            return res.status(403).json({ error: 'Product ID is required' });
+        }
+
+        if (price !== undefined) {
+            if (price <= 0) {
+                console.log("Price must be a positive number");
+                return res.status(403).json({ error: 'Price must be a positive number' });
+            }
+        }
+
+        const updatedProduct = await Product.findOneAndUpdate(
+            { _id, restraurantID: req.user._id },
+            updates,
+            { new: true }
+        );
+
+        if (!updatedProduct) {
+            console.log("Product not found");
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        res.status(200).json(updatedProduct);
+        console.log('updatedProduct:', updatedProduct);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to edit product', details: err.message });
+        console.log('Error editing product:', err);
+    }
+};
+
+const cloudinary = require('cloudinary').v2;
+
+const editRestaurantProductImage = async (req, res) => {
+    try {
+        const { _id, imageBase64, tags } = req.body;
+
+        if (!_id || !imageBase64 || !tags || !Array.isArray(tags) || tags.length === 0) {
+            console.log("Missing required fields");
+            return res.status(403).json({ error: 'Product ID, imageBase64, and tags are required.' });
+        }
+
+        const product = await Product.findOne({ _id, restraurantID: req.user._id });
+
+        if (!product) {
+            console.log("Product not found");
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        const uploadResponse = await cloudinary.uploader.upload(imageBase64, {
+            tags: tags,
+        });
+
+        product.image = uploadResponse.secure_url;
+        await product.save();
+
+        res.status(200).json({
+            message: 'Image updated successfully',
+            product,
+        });
+        console.log('product:', product);
+    } catch (err) {
+        console.error('Error updating product image:', err);
+        res.status(500).json({ error: 'Failed to update product image', details: err.message });
+    }
+};
+
 
 module.exports = {
     getRestaurantProducts,
     addRestaurantProduct,
-    editRestaurantProduct
+    editRestaurantProduct,
+    editRestaurantProductImage
 }

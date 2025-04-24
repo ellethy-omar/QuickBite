@@ -9,7 +9,8 @@ const {
 const {
     getRestaurantProducts,
     addRestaurantProduct,
-    editRestaurantProduct
+    editRestaurantProduct,
+    editRestaurantProductImage
 } = require('../controllers/restaurant/menuController')
 
 // profile routes
@@ -22,5 +23,6 @@ router.post("/resetRestaurantPassword", resetRestaurantPassword)
 router.get("/getRestaurantProducts", getRestaurantProducts)
 router.post("/addRestaurantProduct", addRestaurantProduct)
 router.put("/editRestaurantProduct", editRestaurantProduct)
+router.put("/editRestaurantProductImage", editRestaurantProductImage)
 
 module.exports = router;

@@ -11,7 +11,6 @@ const upload = async (req, res) => {
     try {
         const { imageBase64, tags } = req.body;
     
-        // Validate required fields
         if (!imageBase64) {
           return res.status(400).json({ error: 'Image base64 string is required.' });
         }
@@ -49,8 +48,6 @@ const getImages = async (req, res) => {
     }
 };
   
-
-
 module.exports = {
     upload,
     getImages

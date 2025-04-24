@@ -68,20 +68,6 @@
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
 
- * /api/admin/restAdminPassword:
- *   post:
- *     tags:
- *       - Admin (JWT required)
- *     summary: Reset admin password
- *     description: Allows admin to change their password.
- *     responses:
- *       505:
- *         description: Not implemented
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
-
  * /api/admin/sendwarningToUser:
  *   post:
  *     tags:

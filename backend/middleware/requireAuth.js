@@ -23,6 +23,7 @@ const requireAuth = async (req, res, next) => {
 
 const requireRole = (role) => (req, res, next) => {
     if (req.user.role !== role) {
+        console.log("Access denied, invalid role");
         return res.status(469).json({ error: "Access denied, you don't have the authority to do this!" });
     }
     next();
