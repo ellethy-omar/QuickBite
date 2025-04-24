@@ -2,6 +2,21 @@ const mongoose = require('mongoose');
  
 const { Schema } = mongoose;
 
+const addressSchema = new Schema({
+  street: { type: String, required: true },
+  city: { type: String, required: true },
+  area: { type: String, required: true }
+})
+
+const userAddressSchema = new Schema({
+  label: String,
+  area: String,
+  street: String,
+  building: String,
+  floor: String,
+  apartment: String,
+  isDefault: Boolean
+})
 
 const ItemSchema = new Schema({
     productId: {type: Schema.Types.ObjectId,
@@ -18,10 +33,12 @@ const OrderSchema = new Schema({
     },
     userID: {type: Schema.Types.ObjectId,
       ref: 'User', 
-      required: true},//validate, //should be a present user
+      required: true},
+    userAddress: userAddressSchema,
     restaurantID: {type: Schema.Types.ObjectId,
       ref: 'Restaurant', 
       required: true},
+    restaurantAddress: addressSchema,
     deliveryDriverID:{type: Schema.Types.ObjectId,
       ref: 'Driver'}, //validate
     items: [ItemSchema],

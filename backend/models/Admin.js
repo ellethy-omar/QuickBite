@@ -45,11 +45,6 @@ const AdminSchema = new Schema({
     return this.findOne({ $or: [{ name: identifier }, { email: identifier }] }).select('+password');
   };
   
-//   userSchema.statics.findByIdSafe = async function(id) {
-//     return this.findById(id).select('-password');
-//   };
-  
-  
 AdminSchema.methods.isPasswordMatch = async function(plainPassword) {
     return await bcrypt.compare(plainPassword, this.password);
   };

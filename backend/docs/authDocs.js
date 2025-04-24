@@ -270,10 +270,11 @@
 /**
  * @swagger
  * /api/auth/registerAdmin:
- *   post: 
- *     tags: 
+ *   post:
+ *     tags:
  *       - Authentication (No JWT required)
  *     summary: Register a new admin
+ *     description: Create a new admin account by providing a name, email, password, and phone number. The endpoint validates the input (checks for required fields, valid email, and strong password) and returns a JWT token upon successful registration.
  *     requestBody:
  *       required: true
  *       content:
@@ -281,27 +282,57 @@
  *           schema:
  *             type: object
  *             required:
+ *               - name
  *               - email
  *               - password
  *             properties:
+ *               name:
+ *                 type: string
+ *                 description: The desired name for the new admin.
  *               email:
  *                 type: string
+ *                 description: The admin's email address.
  *               password:
  *                 type: string
+ *                 description: The admin's password.
+ *               phone:
+ *                 type: string
+ *                 description: The admin's phone number.
  *     responses:
  *       201:
- *         description: Admin registered successfully
+ *         description: Admin registered successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Admin registered successfully
+ *                 admin:
+ *                   $ref: '#/components/schemas/Admin'
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for authenticated access.
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6IjY3ZjgyOWY2MDI2Zjc0MTViNWMyNTRmMCIsImlhdCI6MTc0NDMxNjkxOCwiZXhwIjoxNzQ0NTc2MTE4fQ.qhDHvIN4axeovWd4960i27FRWte20r4eMtGlPFruuMI"
  *       400:
- *         description: Bad request
+ *         $ref: '#/components/responses/InvalidCredentialsError'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       410:
+ *         $ref: '#/components/responses/AdminAlreadyExistsError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
 
 /**
  * @swagger
  * /api/auth/loginAdmin:
  *   post:
- *     tags: 
+ *     tags:
  *       - Authentication (No JWT required)
  *     summary: Login an existing admin
+ *     description: Authenticate an existing admin using the email and password. Returns the admin information and a JWT token if the credentials are valid.
  *     requestBody:
  *       required: true
  *       content:
@@ -312,19 +343,37 @@
  *               - email
  *               - password
  *             properties:
- *               email:
+ *               usernameOrEmail:
  *                 type: string
+ *                 description: The admin's email or username.
  *               password:
  *                 type: string
+ *                 description: The admin's password.
  *     responses:
  *       200:
- *         description: Admin logged in successfully
+ *         description: Login successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 admin:
+ *                   $ref: '#/components/schemas/Admin'
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for authenticated access.
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6IjY3ZjgyOWY2MDI2Zjc0MTViNWMyNTRmMCIsImlhdCI6MTc0NDMxNjkxOCwiZXhwIjoxNzQ0NTc2MTE4fQ.qhDHvIN4axeovWd4960i27FRWte20r4eMtGlPFruuMI"
  *       400:
  *         $ref: '#/components/responses/InvalidCredentialsError'
  *       403:
  *         $ref: '#/components/responses/ParameterRequiredError'
  *       404:
  *         $ref: '#/components/responses/InvalidCredentialsError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
 
 /**
