@@ -114,6 +114,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontWeight: '700',
-        fontSize: 16,
+        fontSize: 12,
     },
 });
