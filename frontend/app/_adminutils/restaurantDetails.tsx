@@ -77,7 +77,7 @@ export default function RestaurantDetails() {
         <IconSymbol name="chevron.left.to.line" size={20} color={colors.primary} />
       </TouchableOpacity>
 
-      <TouchableOpacity style={{ position: 'absolute', top: 50, right: 10, zIndex: 4, backgroundColor: colors.primary, padding: 8, borderRadius: 100 }} onPress={openRestaurantActionsModal}>
+      <TouchableOpacity style={{ position: 'absolute', top: 50, right: 10, zIndex: 4, backgroundColor: colors.primary, padding: 5, borderRadius: 100 }} onPress={openRestaurantActionsModal}>
         <IconSymbol name="pencil" size={20} color={colors.primaryText} />
       </TouchableOpacity>
 
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     marginTop: -60,
     borderWidth: 1,
     marginBottom: 5,
-    borderColor: colors.secondary,
+    borderColor: colors.primary,
   },
   bodyContainer: {
     padding: 10,

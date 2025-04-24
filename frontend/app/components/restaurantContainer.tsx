@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from 'expo-router'; // Import useNavigation
+import { useNavigation } from 'expo-router';
 import colors from '../styles/colors';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { RestaurantData } from '../types/restaurant';
@@ -37,10 +37,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 2,
+    elevation: 3,
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,

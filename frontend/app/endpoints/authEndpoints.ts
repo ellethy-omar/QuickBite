@@ -102,3 +102,17 @@ export const LoginUserRoute = async (name: string, password: string) => {
         throw error;
     }
 }
+
+export const LoginAdminRoute = async (name:string, password: string) => {
+    const reqBody = {
+        email: name,
+        password: password,
+    }
+    try {
+        const response = await apiClient.post('/api/auth/loginAdmin', reqBody);
+        return response;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
