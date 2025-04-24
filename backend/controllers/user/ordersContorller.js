@@ -1,10 +1,11 @@
 const Order = require('../../models/Order')
 const Restaurant = require('../../models/Restaurant')
 const Product = require('../../models/Product')
+const User = require('../../models/User')
 
 const createOrder = async (req, res) => {
     try {
-      const { restaurantID, items } = req.body;
+      const { restaurantID, items, address } = req.body;
       const userID = req.user._id;
 
       if ( !restaurantID || !items || !Array.isArray(items) || items.length === 0) {
@@ -27,10 +28,34 @@ const createOrder = async (req, res) => {
         }
         totalAmount += product.price * item.quantity;
       }
+
+      const user = await User.findById(userID);
+
+      const normalize = str => str?.toString().toLowerCase().trim();
+
+      console.log('User Addresses:', JSON.stringify(user.addresses, null, 2));
+      console.log('Incoming Address:', JSON.stringify(address, null, 2));
+
+      const addressMatch = user.addresses.find(a =>
+        normalize(a.label) === normalize(address.label) &&
+        normalize(a.area) === normalize(address.area) &&
+        normalize(a.street) === normalize(address.street) &&
+        normalize(a.building) === normalize(address.building) &&
+        normalize(a.floor) === normalize(address.floor) &&
+        normalize(a.apartment) === normalize(address.apartment)
+      );
+      
+      if (!addressMatch) {
+        console.log("Address not found in user's addresses.");
+        return res.status(404).json({ error: "Address not found." });
+      }
+      console.log('Matched Address:', addressMatch);
   
       const newOrder = await Order.create({
         userID,
+        userAddress: addressMatch,
         restaurantID,
+        restaurantAddress: restaurant.address,
         items,
         totalAmount
       });

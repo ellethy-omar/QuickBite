@@ -76,22 +76,15 @@
  *             properties:
  *               restaurantID:
  *                 type: string
- *                 description: "ID of the restaurant where the order is made"
+ *                 description: ID of the restaurant where the order is placed
  *                 example: "60d2145f1b8b1f20d1e71234"
  *               items:
  *                 type: array
- *                 description: "List of items in the order"
+ *                 description: List of items in the order
  *                 items:
- *                   type: object
- *                   properties:
- *                     productId:
- *                       type: string
- *                       description: "Product ID"
- *                       example: "60d2145f1b8b1f20d1e12345"
- *                     quantity:
- *                       type: integer
- *                       description: "Quantity of the product"
- *                       example: 2
+ *                   $ref: '#/components/schemas/Item'
+ *               address:
+ *                 $ref: '#/components/schemas/UserAddress'
  *     responses:
  *       201:
  *         description: "Order created successfully"

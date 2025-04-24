@@ -1,5 +1,5 @@
 const User = require('../models/User');
-// const Admin = require('../models/Admin'); // Assuming you have an Admin model
+const Admin = require('../models/Admin'); // Assuming you have an Admin model
 const Driver = require('../models/Driver'); // Assuming you have a Driver model
 const Restaurant = require('../models/Restaurant');
 const validator = require('validator');
@@ -163,7 +163,7 @@ const loginDriver = async (req, res) => {
     const driver = await Driver.findByEmailOrPhone(emailOrPhone);
     if (!driver) {
       console.log("Driver not found");
-      return res.status(404).json({ error: 'Invalid credentials' });
+      return res.status(404).json({ error: 'Invalid crcd backendedentials' });
     }
 
     const isMatch = await driver.isPasswordMatch(password);
@@ -188,17 +188,89 @@ const loginDriver = async (req, res) => {
 };
 
 const registerAdmin = async (req, res) => {
-  res.status(505).json({
-    error: "Not implmented"
-  })
-  // const token = generateToken(admin._id, "admin");
+  const { username, email, password, phone } = req.body;
+
+  if (!username || !email || !password) {
+    console.log("All fields are not available for admin registration");
+    return res.status(403).json({ error: 'All fields are required' });
+  }
+
+  if (!validator.isEmail(email)) {
+    console.log("Email is not valid");
+    return res.status(400).json({ error: 'Invalid email address' });
+  }
+
+  if (!validator.isStrongPassword(password)) {
+    console.log("Password is not strong enough");
+    return res.status(400).json({ error: 'Password is not strong enough' });
+  }
+
+  try {
+    const existingAdmin = await Admin.AdminExists(username, email);
+    if (existingAdmin) {
+      console.log("Admin already exists");
+      return res.status(403).json({ error: 'Admin already exists' });
+    }
+
+    const savedAdmin = await Admin.createAdmin({ username, email, password, phone });
+
+    const token = generateToken(savedAdmin._id, "admin");
+
+    const adminData = savedAdmin.toObject();
+    delete adminData.password;
+
+    res.status(201).json({
+      message: 'Admin registered successfully',
+      admin: adminData,
+      token
+    });
+
+    console.log('savedAdmin:', adminData);
+
+  } catch (error) {
+    console.error('Admin registration error:', error);
+    res.status(500).json({ error: 'Server error during admin registration', details: error });
+  }
 };
 
 const loginAdmin = async (req, res) => {
-  res.status(505).json({
-    error: "Not implmented"
-  })
-  // const token = generateToken(admin._id, "admin");
+  const { usernameOrEmail, password } = req.body;
+
+  if (!usernameOrEmail || !password) {
+    console.log("Both username/email and password are not available for admin login");
+    return res.status(403).json({ error: 'Both username/email and password are required' });
+  }
+
+  try {
+    const admin = await Admin.findByUsernameOrEmail(usernameOrEmail);
+    if (!admin) {
+      console.log("Admin not found");
+      return res.status(404).json({ error: 'Invalid credentials' });
+    }
+
+    const isMatch = await admin.isPasswordMatch(password);
+    if (!isMatch) {
+      console.log("Password does not match");
+      return res.status(404).json({ error: 'Invalid credentials' });
+    }
+
+    const token = generateToken(admin._id, "admin");
+
+    const adminData = admin.toObject();
+    delete adminData.password;
+
+    res.status(200).json({
+      message: 'Login successful',
+      admin: adminData,
+      token
+    });
+
+    console.log('admin:', adminData);
+
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({ error: 'Server error during admin login', details: error });
+  }
 };
 
 const registerRestaurant = async (req, res) => {
@@ -241,7 +313,7 @@ const registerRestaurant = async (req, res) => {
       restaurant: newRestaurant,
       token
     });
-    console.log("Driver logged in, Sucess response sent");
+    console.log("newRestaurant:", newRestaurant);
 
   } catch (err) {
     console.error('Register error:', err);
