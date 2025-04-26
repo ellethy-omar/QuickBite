@@ -105,7 +105,7 @@ export const LoginUserRoute = async (name: string, password: string) => {
 
 export const LoginAdminRoute = async (name:string, password: string) => {
     const reqBody = {
-        email: name,
+        usernameOrEmail: name,
         password: password,
     }
     try {
