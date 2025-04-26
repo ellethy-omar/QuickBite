@@ -57,7 +57,7 @@ export default function LoginScreen() {
           showNotification('Login successful!', 'success');
           dispatch(setRole('restaurant'));
           setTimeout(() => {
-            navigation.navigate('adminScreens');
+            navigation.navigate('restaurantScreens');
             }, 1000);
 
         } else if (accType == 2){

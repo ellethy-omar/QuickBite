@@ -5,5 +5,6 @@ export type RootStackParamList = {
     index: undefined;
     mainScreens: undefined;
     adminScreens: undefined;
+    restaurantScreens: undefined;
     '/': undefined;
   };
