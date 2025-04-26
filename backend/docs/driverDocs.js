@@ -77,7 +77,7 @@
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
-* /api/driver/getAllOrders:
+* /api/driver/getAllAvailableOrders:
 *   get:
 *     tags:
 *       - Driver (JWT required)
@@ -97,6 +97,10 @@
 *                   type: array
 *                   items:
 *                     $ref: '#/components/schemas/Order'
+*                 products:
+*                   type: array
+*                   items:
+*                     $ref: '#/components/schemas/Product'
 *       403:
 *         $ref: '#/components/responses/ParameterRequiredError'
 *       404:
