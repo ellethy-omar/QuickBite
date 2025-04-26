@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { NavigationProp } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 import colors from '@/app/styles/colors';
 import { RootStackParamList } from '@/app/types/rootStack';
+// import { GetUserProfile } from '@/app/endpoints/userEndpoints'; ❌ Don't call backend yet
 
 export default function SettingsIndex() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+  const user = useSelector((state: any) => state.user); // 🧠 Select Redux user slice
+
   const settingsOptions = [
     { 
       title: 'Profile Settings', 
       description: 'Update your name, photo, and personal details',
-      route: 'profile'  // No leading slash for navigate
+      route: 'profile'
     },
     { 
       title: 'Account Settings', 
@@ -25,7 +28,11 @@ export default function SettingsIndex() {
       route: 'notifications'
     },
   ];
-  
+
+  useEffect(() => {
+    console.log('🔵 Current Redux User:', JSON.stringify(user, null, 2));
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Settings</Text>
@@ -47,7 +54,7 @@ export default function SettingsIndex() {
   );
 }
 
-// Styles stay the same
+// Same styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
