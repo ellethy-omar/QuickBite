@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { AddRestaurantProduct, EditRestaurantProduct, GetRestaurantProducts } from '@/app/endpoints/restaurantEndpoints';
 import { useNotification } from '@/app/context/notificationContext';
@@ -11,21 +11,25 @@ export default function AddOrEditProductScreen() {
   const { showNotification } = useNotification();
 
   const [formData, setFormData] = useState({
+    _id: '', // 🔥 include it!
     name: '',
     description: '',
     price: '',
     category: '',
     isAvailable: true,
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
       const fetchProduct = async () => {
         try {
+          setLoading(true);
           const response = await GetRestaurantProducts();
           const product = response.data.find((p: any) => p._id === id);
           if (product) {
             setFormData({
+              _id: product._id, // 🔥 capture the ID here too
               name: product.name,
               description: product.description,
               price: product.price.toString(),
@@ -36,36 +40,47 @@ export default function AddOrEditProductScreen() {
         } catch (error) {
           console.error('Error fetching product:', error);
           showNotification('Failed to load product.', 'error');
+        } finally {
+          setLoading(false);
         }
       };
-
       fetchProduct();
     }
   }, [id]);
 
+  const isFormValid = formData.name && formData.price && formData.category;
+
   const handleSave = async () => {
-    if (!formData.name || !formData.price || !formData.category) {
+    if (!isFormValid) {
       Alert.alert('Error', 'Please fill in all required fields.');
       return;
     }
   
     const cleanedProduct = {
+      _id: formData._id, // Include ID if editing
       name: formData.name.trim(),
       description: formData.description.trim(),
-      price: parseFloat(formData.price), // 💥 MAKE SURE it's number
+      price: parseFloat(formData.price),
       category: formData.category.trim(),
-      isAvailable: formData.isAvailable ?? true, // 💥 FORCE boolean
+      isAvailable: formData.isAvailable ?? true,
     };
+  
+    console.log('📤 Attempting to save product:', cleanedProduct); // 🔥 DEBUG PRINT
   
     try {
       if (id) {
-        await EditRestaurantProduct({
-          _id: id,
-          ...cleanedProduct,
-        });
+        console.log('🛠 Editing existing product...');
+        await EditRestaurantProduct(cleanedProduct);
         showNotification('Product updated successfully!', 'success');
       } else {
-        await AddRestaurantProduct(cleanedProduct);
+        console.log('➕ Adding new product...');
+        await AddRestaurantProduct({
+          name: cleanedProduct.name,
+          description: cleanedProduct.description,
+          price: cleanedProduct.price,
+          category: cleanedProduct.category,
+          isAvailable: cleanedProduct.isAvailable,
+        });
         showNotification('Product added successfully!', 'success');
       }
       router.back();
@@ -75,8 +90,14 @@ export default function AddOrEditProductScreen() {
     }
   };
   
-  
-  
+
+  if (id && loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -113,7 +134,11 @@ export default function AddOrEditProductScreen() {
         placeholder="Enter category"
       />
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+      <TouchableOpacity 
+        style={[styles.saveButton, { backgroundColor: isFormValid ? colors.primary : '#ccc' }]} 
+        onPress={handleSave}
+        disabled={!isFormValid}
+      >
         <Text style={styles.saveButtonText}>{id ? 'Update Product' : 'Add Product'}</Text>
       </TouchableOpacity>
     </View>
@@ -124,6 +149,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: colors.background },
   label: { fontSize: 14, fontWeight: 'bold', marginTop: 10, color: colors.text },
   input: { backgroundColor: '#f9f9f9', padding: 10, borderRadius: 8, marginTop: 6, marginBottom: 10, borderColor: '#ddd', borderWidth: 1 },
-  saveButton: { backgroundColor: colors.primary, padding: 14, borderRadius: 8, marginTop: 20, alignItems: 'center' },
+  saveButton: { padding: 14, borderRadius: 8, marginTop: 20, alignItems: 'center' },
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });

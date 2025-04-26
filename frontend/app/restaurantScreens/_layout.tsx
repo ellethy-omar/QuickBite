@@ -1,17 +1,19 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { IconSymbol, IconSymbolName } from '@/components/ui/IconSymbol';
+import { IconSymbol } from '@/components/ui/IconSymbol'; // ✅ Assuming you have the IconSymbol component
 import colors from '@/app/styles/colors';
 
-export default function RestaurantScreensLayout() {
+export default function RestaurantLayout() {
   return (
     <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ color, size, focused }) => {
-          let iconName: IconSymbolName = 'fork.knife';
+          let iconName = 'fork.knife';
           if (route.name === 'dashboard') {
-            iconName = focused ? 'list.bullet.rectangle.fill' : 'list.bullet.rectangle';
+            iconName = focused ? 'rectangle.grid.2x2.fill' : 'rectangle.grid.2x2';
+          } else if (route.name === 'orders') {
+            iconName = focused ? 'cart.fill' : 'cart';
           } else if (route.name === 'settings') {
             iconName = focused ? 'gearshape.fill' : 'gearshape';
           }
@@ -31,7 +33,8 @@ export default function RestaurantScreensLayout() {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tabs.Screen name="dashboard" options={{ title: 'Products' }} />
+      <Tabs.Screen name="dashboard" options={{ title: 'Dashboard' }} />
+      <Tabs.Screen name="orders" options={{ title: 'Orders' }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
     </Tabs>
   );
