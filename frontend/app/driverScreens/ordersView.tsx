@@ -1,62 +1,33 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import colors from '../styles/colors';
 import { OrderDriver } from '../types/orderDriver';
 import OrderContainer from '../components/orderContainer';
+import { fetchUserOrders } from '../endpoints/driverEndpoints';
+import { useNotification } from '../context/notificationContext';
 
 export default function OrdersView() {
-    const [orders, setOrders] = useState<OrderDriver[]>([
-        {
-            orderId: '1',
-            userId: '1',
-            restaurantId: '1',
-            createdOn: new Date().toISOString(),
-            deliveryAddress: {
-                label: "home",
-                area: "Giza",
-                street: "Street 1",
-                building: "4",
-                floor: "3",
-                apartment: "2",
-                isDefault: true,
-            },
-            totalAmount: 100,
-            userName: "John Doe",
-            restaurantName: "Restaurant 1",
-            restaurantLogo: "https://fastly.picsum.photos/id/696/200/300.jpg?hmac=Ukxvga_1GYxgfAqzwDhBPfVta6-hJKUhayVlI1yMIdk",
-            restaurantPhone: "0111111111",
-            restaurantAddress: {
-                area: "Giza",
-                city: "Cairo",
-                street: "Street 1",
-            },
-        },
-        {
-            orderId: '2',
-            userId: '2',
-            restaurantId: '2',
-            createdOn: new Date().toISOString(),
-            deliveryAddress: {
-                label: "work",
-                area: "Cairo",
-                street: "Street 2",
-                building: "5",
-                floor: "4",
-                apartment: "3",
-                isDefault: false,
-            },
-            totalAmount: 150,
-            userName: "Jane Smith",
-            restaurantName: "Restaurant 2",
-            restaurantLogo: "https://fastly.picsum.photos/id/696/200/300.jpg?hmac=Ukxvga_1GYxgfAqzwDhBPfVta6-hJKUhayVlI1yMIdk",
-            restaurantPhone: "0122222222",
-            restaurantAddress: {
-                area: "Cairo",
-                city: "Cairo",
-                street: "Street 2",
-            },
+    const { showNotification } = useNotification();
+    const [fetching, setFetching] = useState(true);
+    const [orders, setOrders] = useState<OrderDriver[]>([]);
+
+    useEffect(() => {
+      if(!fetching) return;
+
+      const fetchOrders = async () => {
+        try {
+          const response = await fetchUserOrders();
+          console.log(response);
+          setOrders(response);
+        } catch {
+          showNotification("an error occurred while fetching orders", "error");
+        } finally {
+          setFetching(false);
         }
-    ]);
+      }
+
+      fetchOrders();
+    }, [fetching]);
 
     return (
         <View style={styles.background}>
@@ -67,10 +38,16 @@ export default function OrdersView() {
           {/* Add flex: 1 to ScrollView */}
           <ScrollView contentContainerStyle={styles.scrollViewContent} style={styles.scrollView} bounces={false} overScrollMode='never' contentInset={{top: 50, bottom: 0}} showsVerticalScrollIndicator={false}>
             <View style={styles.ordersListContainer}>
+              {fetching ? (
+                <Text style={styles.noResultsText}>Loading...</Text>
+              ) : (
+                <>
               {orders.length > 0 ? (
                 orders.map((order) => <OrderContainer key={order.orderId} order={order} />)
               ) : (
                 <Text style={styles.noResultsText}>No active orders available</Text>
+              )}
+              </>
               )}
             </View>
           </ScrollView>
