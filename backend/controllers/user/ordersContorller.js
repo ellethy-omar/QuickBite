@@ -54,8 +54,10 @@ const createOrder = async (req, res) => {
       const newOrder = await Order.create({
         userID,
         userAddress: addressMatch,
+        userName: user.name,
         restaurantID,
         restaurantAddress: restaurant.address,
+        restaurantLogo: restaurant.logo,
         items,
         totalAmount
       });
