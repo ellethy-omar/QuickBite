@@ -32,30 +32,51 @@
 
 /**
  * @swagger
- * /api/user/updateUserProfilePhoto:
+ * /api/user/updateUserProfile:
  *   put:
  *     tags:
  *       - User (JWT required)
- *     summary: Update user profile photo
+ *     summary: Update user profile information
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               photo:
+ *               name:
  *                 type: string
- *                 format: binary
+ *                 description: The name of the user.
+ *               email:
+ *                 type: string
+ *                 description: The email address of the user.
+ *               phone:
+ *                 type: string
+ *                 description: The phone number of the user.
+ *               addresses:
+ *                 type: array
+ *                 items:
+ *                   $ref: '#/components/schemas/UserAddress'
+ *                 description: A list of the user's addresses.
  *     responses:
- *       505:
- *         description: Not implemented yet
+ *       200:
+ *         description: User profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/responses/InvalidCredentialsError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
 
 /**
@@ -118,7 +139,7 @@
  *         description: "List of all restaurants"
  *         content:
  *           application/json:
- *             data:
+ *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Restaurant'
