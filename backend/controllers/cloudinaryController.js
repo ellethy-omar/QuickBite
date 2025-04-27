@@ -29,6 +29,18 @@ const upload = async (req, res) => {
       }
 };
 
+const uploadBase64Image = async (base64, tags = []) => {
+  if (!base64) {
+    throw new Error('No image provided');
+  }
+
+  const uploadResponse = await cloudinary.uploader.upload(base64, {
+    tags: tags,
+  });
+
+  return uploadResponse;
+};
+
 const getImages = async (req, res) => {
     try {
       const { tag } = req.params;
@@ -50,5 +62,6 @@ const getImages = async (req, res) => {
   
 module.exports = {
     upload,
-    getImages
+    getImages,
+    uploadBase64Image
 }
