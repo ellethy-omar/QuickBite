@@ -35,32 +35,117 @@
  *         $ref: '#/components/responses/ForbiddenError'
 
  * /api/restaurant/updateRestaurantProfile:
- *   put:
- *     tags:
- *       - Restaurant (JWT required)
- *     summary: Update the restaurant profile
- *     description: Allows the restaurant to update its profile information.
- *     responses:
- *       505:
- *         description: Not implemented
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
+*   put:
+*     tags:
+*       - Restaurant (JWT required)
+*     summary: Update restaurant profile
+*     description: Allows a restaurant to update its profile details such as name, description, cuisine type, address, contact, and opening hours.
+*     requestBody:
+*       description: Restaurant profile details to be updated
+*       content:
+*         application/json:
+*           required: true
+*           schema:
+*             type: object
+*             properties:
+*               name:
+*                 type: string
+*                 description: Name of the restaurant
+*               description:
+*                 type: string
+*                 description: Description of the restaurant
+*               cuisineType:
+*                 type: array
+*                 items:
+*                   type: string
+*                 description: List of cuisine types (e.g., Italian, Pizza)
+*               address:
+*                 $ref: '#/components/schemas/restaurantAddress'
+*               contact:
+*                 $ref: '#/components/schemas/UserAddress'
+*               openingHours:
+*                 type: object
+*                 description: Object containing opening hours for each day of the week
+*               isActive:
+*                 type: boolean
+*                 description: Status of the restaurant (active or inactive)
+*             required:
+*               - name
+*               - description
+*               - cuisineType
+*               - address
+*               - contact
+*               - openingHours
+*     responses:
+*       200:
+*         description: Restaurant profile updated successfully
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: "Restaurant profile updated successfully"
+*                 restaurant:
+*                   $ref: '#/components/schemas/Restaurant'
+*       404:
+*         $ref: '#/components/responses/InvalidCredentialsError'
+*       420:
+*         $ref: '#/components/responses/UnauthorizedError'
+*       469:
+*         $ref: '#/components/responses/ForbiddenError'
+*       500:
+*         $ref: '#/components/responses/ServerError'
+
 
  * /api/restaurant/updateRestaurantProfilePhoto:
  *   put:
  *     tags:
  *       - Restaurant (JWT required)
  *     summary: Update restaurant profile photo
- *     description: Allows the restaurant to upload/update its profile photo.
+ *     description: Allows the restaurant to upload or update its profile photo.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               imageBase64:
+ *                 type: string
+ *                 description: Base64 encoded image data for the profile photo.
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of tags associated with the image.
+ *             required:
+ *               - imageBase64
+ *               - tags
  *     responses:
- *       505:
- *         description: Not implemented
+ *       200:
+ *         description: Profile photo updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Image updated successfully'
+ *                 Restaurant:
+ *                   $ref: '#/components/schemas/Restaurant'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
 
 /**

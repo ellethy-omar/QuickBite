@@ -9,16 +9,13 @@ const getAllAvailableOrders = async (req, res) => {
         return res.status(404).json({ message: 'No available orders found.' });
       }
   
-      // Step 1: Collect all productIds from all orders
       const allProductIds = availableOrders.flatMap(order => 
         order.items.map(item => item.productId)
       );
   
-      // Step 2: Query Products based on these IDs (avoid duplicates)
       const uniqueProductIds = [...new Set(allProductIds.map(id => id.toString()))];
       const products = await Product.find({ _id: { $in: uniqueProductIds } });
   
-      // Step 3: Send orders + products
       res.status(200).json({
         data: availableOrders,
         products: products
