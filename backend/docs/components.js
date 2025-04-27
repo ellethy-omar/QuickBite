@@ -302,11 +302,20 @@
  *           format: objectId
  *           description: ID of the user who placed the order
  *           example: "60c72b2f5f1b2c001f58c1b4"
+ *         userName:
+ *           type: string
+ *           description: The user we are dilvering the order to
+ *           example: "Ahmed"
  *         restaurantID:
  *           type: string
  *           format: objectId
  *           description: ID of the restaurant
  *           example: "60c72b2f5f1b2c001f58c1b4"
+ *         restaurantLogo:
+ *           type: string
+ *           format: URL
+ *           description: Logo of the restaurant
+ *           example: "some link from cloudinary"
  *         deliveryDriverID:
  *           type: string
  *           format: objectId
