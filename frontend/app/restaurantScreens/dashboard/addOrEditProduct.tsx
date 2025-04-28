@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { AddRestaurantProduct, EditRestaurantProduct, GetRestaurantProducts } from '@/app/endpoints/restaurantEndpoints';
+import { AddRestaurantProduct, EditRestaurantProduct, GetRestaurantProducts, EditRestaurantProductImage } from '@/app/endpoints/restaurantEndpoints';
 import { useNotification } from '@/app/context/notificationContext';
+import * as ImagePicker from 'expo-image-picker';
 import colors from '@/app/styles/colors';
 
 export default function AddOrEditProductScreen() {
@@ -11,14 +12,19 @@ export default function AddOrEditProductScreen() {
   const { showNotification } = useNotification();
 
   const [formData, setFormData] = useState({
-    _id: '', // 🔥 include it!
+    _id: '',
     name: '',
     description: '',
     price: '',
     category: '',
     isAvailable: true,
+    image: '',
   });
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [newImageBase64, setNewImageBase64] = useState<string | null>(null);
+
+  const isFormValid = formData.name.trim() && formData.price.trim() && formData.category.trim();
 
   useEffect(() => {
     if (id) {
@@ -29,12 +35,13 @@ export default function AddOrEditProductScreen() {
           const product = response.data.find((p: any) => p._id === id);
           if (product) {
             setFormData({
-              _id: product._id, // 🔥 capture the ID here too
+              _id: product._id,
               name: product.name,
               description: product.description,
               price: product.price.toString(),
               category: product.category,
               isAvailable: product.isAvailable,
+              image: product.image || '',
             });
           }
         } catch (error) {
@@ -48,107 +55,155 @@ export default function AddOrEditProductScreen() {
     }
   }, [id]);
 
-  const isFormValid = formData.name && formData.price && formData.category;
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets?.[0]?.base64) {
+      setNewImageBase64(result.assets[0].base64);
+    }
+  };
 
   const handleSave = async () => {
     if (!isFormValid) {
       Alert.alert('Error', 'Please fill in all required fields.');
       return;
     }
-  
-    const cleanedProduct = {
-      _id: formData._id, // Include ID if editing
-      name: formData.name.trim(),
-      description: formData.description.trim(),
-      price: parseFloat(formData.price),
-      category: formData.category.trim(),
-      isAvailable: formData.isAvailable ?? true,
-    };
-  
-    console.log('📤 Attempting to save product:', cleanedProduct); // 🔥 DEBUG PRINT
-  
+
     try {
+      setSaving(true);
+
+      const cleanedProduct = {
+        _id: formData._id,
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        price: parseFloat(formData.price),
+        category: formData.category.trim(),
+        isAvailable: formData.isAvailable,
+      };
+
+      let productId = formData._id;
+
       if (id) {
-        console.log('🛠 Editing existing product...');
         await EditRestaurantProduct(cleanedProduct);
         showNotification('Product updated successfully!', 'success');
       } else {
-        console.log('➕ Adding new product...');
-        await AddRestaurantProduct({
+        const response = await AddRestaurantProduct({
           name: cleanedProduct.name,
           description: cleanedProduct.description,
           price: cleanedProduct.price,
           category: cleanedProduct.category,
           isAvailable: cleanedProduct.isAvailable,
         });
+        productId = response._id;
         showNotification('Product added successfully!', 'success');
       }
+
+      if (newImageBase64 && productId) {
+        await EditRestaurantProductImage({
+          _id: productId,
+          imageBase64: newImageBase64,
+          tags: ['product'],
+        });
+        showNotification('Product image updated!', 'success');
+      }
+
       router.back();
     } catch (error) {
-      console.error('🔴 Error saving product:', error);
+      console.error('Error saving product:', error);
       showNotification('Failed to save product.', 'error');
+    } finally {
+      setSaving(false);
     }
   };
-  
 
   if (id && loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+      {formData.image || newImageBase64 ? (
+        <Image
+          source={{ uri: newImageBase64 ? `data:image/jpeg;base64,${newImageBase64}` : formData.image }}
+          style={styles.productImage}
+          resizeMode="cover"
+        />
+      ) : null}
+
+      <TouchableOpacity style={styles.imageButton} onPress={handlePickImage}>
+        <Text style={styles.imageButtonText}>Upload / Change Image</Text>
+      </TouchableOpacity>
+
       <Text style={styles.label}>Product Name</Text>
-      <TextInput
-        style={styles.input}
-        value={formData.name}
-        onChangeText={(text) => setFormData({ ...formData, name: text })}
-        placeholder="Enter product name"
+      <TextInput 
+        style={styles.input} 
+        value={formData.name} 
+        onChangeText={(text) => setFormData({ ...formData, name: text })} 
+        placeholder="Enter product name" 
       />
 
       <Text style={styles.label}>Description</Text>
-      <TextInput
-        style={styles.input}
-        value={formData.description}
-        onChangeText={(text) => setFormData({ ...formData, description: text })}
-        placeholder="Enter description"
+      <TextInput 
+        style={[styles.input, { height: 80 }]} 
+        value={formData.description} 
+        multiline 
+        onChangeText={(text) => setFormData({ ...formData, description: text })} 
+        placeholder="Enter description" 
       />
 
       <Text style={styles.label}>Price</Text>
-      <TextInput
-        style={styles.input}
-        value={formData.price}
-        keyboardType="decimal-pad"
-        onChangeText={(text) => setFormData({ ...formData, price: text })}
-        placeholder="Enter price"
+      <TextInput 
+        style={styles.input} 
+        value={formData.price} 
+        keyboardType="decimal-pad" 
+        onChangeText={(text) => setFormData({ ...formData, price: text })} 
+        placeholder="Enter price" 
       />
 
       <Text style={styles.label}>Category</Text>
-      <TextInput
-        style={styles.input}
-        value={formData.category}
-        onChangeText={(text) => setFormData({ ...formData, category: text })}
-        placeholder="Enter category"
+      <TextInput 
+        style={styles.input} 
+        value={formData.category} 
+        onChangeText={(text) => setFormData({ ...formData, category: text })} 
+        placeholder="Enter category" 
       />
 
-      <TouchableOpacity 
-        style={[styles.saveButton, { backgroundColor: isFormValid ? colors.primary : '#ccc' }]} 
+      <TouchableOpacity
+        style={[
+          styles.saveButton,
+          { backgroundColor: isFormValid ? colors.primary : '#ccc' }
+        ]}
         onPress={handleSave}
-        disabled={!isFormValid}
+        disabled={!isFormValid || saving}
       >
-        <Text style={styles.saveButtonText}>{id ? 'Update Product' : 'Add Product'}</Text>
+        {saving ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.saveButtonText}>
+            {id ? 'Update Product' : 'Add Product'}
+          </Text>
+        )}
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: colors.background },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
+  productImage: { width: '100%', height: 180, borderRadius: 8, marginBottom: 10 },
   label: { fontSize: 14, fontWeight: 'bold', marginTop: 10, color: colors.text },
   input: { backgroundColor: '#f9f9f9', padding: 10, borderRadius: 8, marginTop: 6, marginBottom: 10, borderColor: '#ddd', borderWidth: 1 },
+  imageButton: { backgroundColor: '#ddd', padding: 10, borderRadius: 8, alignItems: 'center', marginBottom: 20 },
+  imageButtonText: { fontSize: 14, fontWeight: 'bold', color: '#333' },
   saveButton: { padding: 14, borderRadius: 8, marginTop: 20, alignItems: 'center' },
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });

@@ -1,10 +1,65 @@
-// restaurantEndpoints.ts
 import apiClient from "../apiclient";
+
+// --- PUT: Update restaurant profile
+export const UpdateRestaurantProfile = async (profileData: {
+  name: string;
+  description: string;
+  cuisineType: string[];
+  address: {
+    street: string;
+    city: string;
+    area: string;
+  };
+  contact: {
+    phone: string;
+    email: string;
+    password?: string; // optional, unless you want to allow password update here
+  };
+  openingHours: any; // you can refine the type if needed
+  isActive: boolean;
+}): Promise<any> => {
+  try {
+    const response = await apiClient.put('/api/restaurant/updateRestaurantProfile', profileData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating restaurant profile:', error);
+    throw error;
+  }
+};
+
+// --- PUT: Edit existing product image
+export const EditRestaurantProductImage = async (imageData: {
+  _id: string;
+  imageBase64: string;
+  tags: string[];
+}): Promise<any> => {
+  try {
+    const response = await apiClient.put('/api/restaurant/editRestaurantProductImage', imageData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating product image:', error);
+    throw error;
+  }
+};
+
+// --- PUT: Update restaurant profile photo
+export const UpdateRestaurantProfilePhoto = async (photoData: {
+  imageBase64: string;
+  tags: string[];
+}): Promise<any> => {
+  try {
+    const response = await apiClient.put('/api/restaurant/updateRestaurantProfilePhoto', photoData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating restaurant profile photo:', error);
+    throw error;
+  }
+};
 
 // --- GET: Fetch restaurant profile
 export const GetRestaurantProfile = async (): Promise<any> => {
   try {
-    const response = await apiClient.get('/api/restaurant/getRestaurantProfile');
+    const response = await apiClient.get('/api/restaurant/getRestaurantProfie');
     return response.data;
   } catch (error) {
     console.error('Error fetching restaurant profile:', error);
