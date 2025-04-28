@@ -6,7 +6,7 @@ export default function DashboardLayout() {
     <Stack
       screenOptions={{
         headerShown: true,
-        headerTitle: 'Dashboard',
+        headerTitle: 'Products',
       }}
     />
   );

@@ -33,7 +33,7 @@ export default function RestaurantLayout() {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tabs.Screen name="dashboard" options={{ title: 'Dashboard' }} />
+      <Tabs.Screen name="dashboard" options={{ title: 'Products' }} />
       <Tabs.Screen name="orders" options={{ title: 'Orders' }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
     </Tabs>

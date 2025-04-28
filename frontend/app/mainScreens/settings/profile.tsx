@@ -237,7 +237,7 @@ export default function ProfileSettingsScreen() {
 
           {/* Buttons */}
           <View style={{ flexDirection: "row", marginTop: 20 }}>
-            <TouchableOpacity style={[styles.formSaveButton, { flex: 1, marginRight: 8 }]} onPress={handleAddOrEditAddress}>
+            <TouchableOpacity style={[styles.saveButton, { flex: 1, marginTop: 0, marginRight: 8 }]} onPress={handleAddOrEditAddress}>
               <Text style={{ color: 'white', fontWeight: 'bold' }}>{isEditing ? 'Update Address' : 'Add Address'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.cancelButton, { flex: 1 }]} onPress={cancelEditing}>
