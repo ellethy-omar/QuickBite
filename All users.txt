@@ -169,3 +169,21 @@ Restaurant:
       "createdAt": {"$date": "2022-08-10T08:30:00Z"}
     }
   ]
+
+  //restaurants inserted 
+  "contact": {
+        "phone": "+96534567890",
+        "email": "info@mandiexpress.com",
+        "password":"EXprMandi123"
+      },
+
+      "contact": {
+        "phone": "+96523456789",
+        "email": "orders@shawarmahouse.com",
+        "password": "shawarmaHH25"
+      },
+      "contact": {
+        "phone": "+96512345678",
+        "email": "salmiya@burgerking.com",
+        "password": "burgerkinggg!25"
+      },
