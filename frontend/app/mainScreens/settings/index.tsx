@@ -22,11 +22,11 @@ export default function SettingsIndex() {
       description: 'Manage password and account security options',
       route: 'account'
     },
-    { 
-      title: 'Notification Settings', 
-      description: 'Control when and how you receive notifications',
-      route: 'notifications'
-    },
+    // { 
+    //   title: 'Notification Settings', 
+    //   description: 'Control when and how you receive notifications',
+    //   route: 'notifications'
+    // },
   ];
 
   useEffect(() => {
