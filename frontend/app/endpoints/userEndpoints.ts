@@ -2,6 +2,30 @@
 import apiClient from "../apiclient";
 import { OrderDetails } from "../types/orders"; // 🔥 importing your real type
 
+export const UpdateUserProfile = async (profileData: {
+  name: string;
+  email: string;
+  phone: string;
+  addresses: {
+    label: string;
+    area: string;
+    street: string;
+    building: string;
+    floor: string;
+    apartment: string;
+    isDefault: boolean;
+  }[];
+}) => {
+  try {
+    const response = await apiClient.put('/api/user/updateUserProfile', profileData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    throw error;
+  }
+};
+
+
 // --- GET: Fetch user profile ---
 export const GetUserProfile = async (): Promise<{
   user: {

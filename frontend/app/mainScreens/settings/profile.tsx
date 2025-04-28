@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert 
 import { useSelector, useDispatch } from 'react-redux';
 import { setUserDetails } from '@/app/slices/userSlice'; 
 import { useNotification } from '@/app/context/notificationContext';
+import { UpdateUserProfile } from '@/app/endpoints/userEndpoints';
 import colors from '@/app/styles/colors';
-// import { UpdateUserProfile } from '@/app/endpoints/userEndpoints'; // 🧠 UNCOMMENT later when you have real endpoint
 
 export default function ProfileSettingsScreen() {
   const dispatch = useDispatch();
@@ -12,7 +12,6 @@ export default function ProfileSettingsScreen() {
   const reduxUser = useSelector((state: any) => state.user);
 
   const [userData, setUserData] = useState(reduxUser);
-  const [expandedAddresses, setExpandedAddresses] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editAddressId, setEditAddressId] = useState<string | null>(null);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
@@ -28,16 +27,13 @@ export default function ProfileSettingsScreen() {
   });
 
   const updateField = (field: string, value: string) => {
-    setUserData({
-      ...userData,
-      [field]: value
-    });
+    setUserData({ ...userData, [field]: value });
   };
 
   const setDefaultAddress = (id: string) => {
     const updatedAddresses = userData.addresses.map((address: any) => ({
       ...address,
-      isDefault: (address._id || address.id) === id
+      isDefault: (address._id || address.id) === id,
     }));
     setUserData({ ...userData, addresses: updatedAddresses });
   };
@@ -48,24 +44,59 @@ export default function ProfileSettingsScreen() {
       return;
     }
 
+    let updatedAddresses = [...userData.addresses];
+
+    if (newAddress.isDefault) {
+      updatedAddresses = updatedAddresses.map((addr) => ({ ...addr, isDefault: false }));
+    }
+
     if (isEditing && editAddressId) {
-      const updatedAddresses = userData.addresses.map((address: any) =>
+      updatedAddresses = updatedAddresses.map((address: any) =>
         (address._id || address.id) === editAddressId
           ? { ...newAddress, id: editAddressId }
           : address
       );
-      setUserData({ ...userData, addresses: updatedAddresses });
     } else {
       const newAddressWithId = {
         ...newAddress,
-        id: (Math.random() * 1000000).toFixed(0) // ✨ Random ID since frontend only
+        id: (Math.random() * 1000000).toFixed(0),
       };
-      setUserData({
-        ...userData,
-        addresses: [...userData.addresses, newAddressWithId],
-      });
+      updatedAddresses.push(newAddressWithId);
     }
 
+    setUserData({ ...userData, addresses: updatedAddresses });
+    cancelEditing();
+  };
+
+  const handleDeleteAddress = (id: string) => {
+    const addressToDelete = userData.addresses.find((address: any) => (address._id || address.id) === id);
+
+    if (addressToDelete?.isDefault) {
+      Alert.alert('Error', 'Cannot delete the default address.');
+      return;
+    }
+
+    Alert.alert('Confirm Deletion', 'Are you sure you want to delete this address?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          const updatedAddresses = userData.addresses.filter((address: any) => (address._id || address.id) !== id);
+          setUserData({ ...userData, addresses: updatedAddresses });
+        },
+      },
+    ]);
+  };
+
+  const handleEditAddress = (address: any) => {
+    setNewAddress(address);
+    setEditAddressId(address._id || address.id);
+    setIsAddingAddress(true);
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
     setIsAddingAddress(false);
     setIsEditing(false);
     setEditAddressId(null);
@@ -81,90 +112,91 @@ export default function ProfileSettingsScreen() {
     });
   };
 
-  const handleDeleteAddress = (id: string) => {
-    const addressToDelete = userData.addresses.find((address: any) => (address._id || address.id) === id);
-
-    if (addressToDelete?.isDefault) {
-      Alert.alert('Error', 'Cannot delete the default address.');
-      return;
-    }
-
-    Alert.alert(
-      'Confirm Deletion',
-      'Are you sure you want to delete this address?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            const updatedAddresses = userData.addresses.filter((address: any) => (address._id || address.id) !== id);
-            setUserData({ ...userData, addresses: updatedAddresses });
-          },
-        },
-      ]
-    );
-  };
-
-  const handleEditAddress = (address: any) => {
-    setNewAddress(address);
-    setEditAddressId(address._id || address.id);
-    setIsAddingAddress(true);
-    setIsEditing(true);
-  };
-
   const handleSave = async () => {
     try {
+      if (!userData.name?.trim() || !userData.email?.trim() || !userData.phone?.trim()) {
+        Alert.alert('Validation Error', 'Name, Email, and Phone are required.');
+        return;
+      }
+
+      if (userData.addresses.length === 0) {
+        Alert.alert('Validation Error', 'At least one address is required.');
+        return;
+      }
+
+      const hasDefault = userData.addresses.some((addr: any) => addr.isDefault);
+      if (!hasDefault) {
+        Alert.alert('Validation Error', 'Please select a default address.');
+        return;
+      }
+
+      await UpdateUserProfile({
+        name: userData.name.trim(),
+        email: userData.email.trim(),
+        phone: userData.phone.trim(),
+        addresses: userData.addresses.map((addr: any) => ({
+          label: addr.label?.trim() ?? '',
+          area: addr.area?.trim() ?? '',
+          street: addr.street?.trim() ?? '',
+          building: addr.building?.trim() ?? '',
+          floor: addr.floor?.trim() ?? '',
+          apartment: addr.apartment?.trim() ?? '',
+          isDefault: addr.isDefault ?? false,
+        })),
+      });
+
       dispatch(setUserDetails(userData));
       showNotification('Profile updated successfully!', 'success');
-      // await UpdateUserProfile(userData); // 🧠 Real saving when endpoint is ready
-      console.log('📦 Saved user profile:', JSON.stringify(userData, null, 2));
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error('🔴 Error saving profile:', error);
       showNotification('Failed to update profile.', 'error');
     }
   };
 
   return (
     <ScrollView style={styles.container}>
-      {/* --- Profile Information --- */}
+      {/* Profile Info */}
       <Text style={styles.label}>Name</Text>
-      <TextInput
-        style={styles.input}
-        value={userData.name}
-        onChangeText={(text) => updateField('name', text)}
-        placeholder="Name"
-      />
-
+      <TextInput style={styles.input} value={userData.name} onChangeText={(text) => updateField("name", text)} placeholder="Name" />
       <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={styles.input}
-        value={userData.email}
-        onChangeText={(text) => updateField('email', text)}
-        placeholder="Email"
-      />
-
+      <TextInput style={styles.input} value={userData.email} onChangeText={(text) => updateField("email", text)} placeholder="Email" />
       <Text style={styles.label}>Phone</Text>
-      <TextInput
-        style={styles.input}
-        value={userData.phone}
-        onChangeText={(text) => updateField('phone', text)}
-        placeholder="Phone"
-      />
+      <TextInput style={styles.input} value={userData.phone} onChangeText={(text) => updateField("phone", text)} placeholder="Phone" />
 
-      {/* --- Addresses Section --- */}
+      {/* Addresses */}
       <Text style={styles.sectionTitle}>Addresses</Text>
 
       {userData.addresses.length === 0 ? (
-        <Text style={{ color: '#666', marginBottom: 10 }}>No addresses yet.</Text>
+        <Text style={{ color: "#666", marginBottom: 10 }}>No addresses yet.</Text>
       ) : (
-        userData.addresses.map((address: any, index: number) => (
+        userData.addresses.map((address: any) => (
           <View key={address._id || address.id} style={styles.addressCard}>
-            <Text style={styles.addressLabel}>{address.label}</Text>
-            <Text style={styles.addressText}>{address.street}, {address.area}</Text>
-            <Text style={styles.addressText}>{address.building} • Floor {address.floor} • Apt {address.apartment}</Text>
-            {address.isDefault && <Text style={styles.defaultBadge}>Default</Text>}
-            <View style={{ flexDirection: 'row', marginTop: 8 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+              <Text style={styles.addressLabel}>{address.label}</Text>
+              {address.isDefault && <Text style={styles.defaultBadge}>Default</Text>}
+            </View>
+
+            {(address.street || address.area) && (
+              <Text style={styles.addressText}>
+                {address.street}
+                {address.street && address.area ? ", " : ""}
+                {address.area}
+              </Text>
+            )}
+
+            {(address.building || address.floor || address.apartment) && (
+              <Text style={styles.addressText}>
+                {address.building && `Building ${address.building}`}
+                {address.building && address.floor && " • "}
+                {address.floor && `Floor ${address.floor}`}
+                {address.floor && address.apartment && " • "}
+                {address.apartment && `Apt ${address.apartment}`}
+              </Text>
+            )}
+
+            {address.city && <Text style={styles.addressText}>{address.city}</Text>}
+
+            <View style={{ flexDirection: "row", marginTop: 8, justifyContent: "space-between" }}>
               <TouchableOpacity style={styles.editButton} onPress={() => handleEditAddress(address)}>
                 <Text style={styles.buttonText}>Edit</Text>
               </TouchableOpacity>
@@ -174,55 +206,70 @@ export default function ProfileSettingsScreen() {
                 disabled={address.isDefault}
               >
                 <Text style={styles.buttonText}>
-                  {address.isDefault ? 'Undeletable' : 'Delete'}
+                  {address.isDefault ? "Undeletable" : "Delete"}
                 </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.defaultButton, address.isDefault && styles.disabledDefaultButton]}
+                onPress={() => setDefaultAddress(address._id || address.id)}
+                disabled={address.isDefault}
+              >
+                <Text style={styles.buttonText}>Set Default</Text>
               </TouchableOpacity>
             </View>
           </View>
         ))
       )}
 
-      {/* --- Add New Address --- */}
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => {
-          setIsAddingAddress(true);
-          setIsEditing(false);
-          setNewAddress({
-            label: '',
-            street: '',
-            city: '',
-            area: '',
-            building: '',
-            floor: '',
-            apartment: '',
-            isDefault: false,
-          });
-        }}
-      >
-        <Text style={{ color: 'white', fontWeight: 'bold' }}>+ Add New Address</Text>
-      </TouchableOpacity>
-
-      {/* --- Address Form --- */}
-      {isAddingAddress && (
+      {/* Add / Edit Address Form */}
+      {isAddingAddress ? (
         <View style={styles.addressForm}>
-          <TextInput style={styles.input} placeholder="Label" value={newAddress.label} onChangeText={(text) => setNewAddress({ ...newAddress, label: text })} />
-          <TextInput style={styles.input} placeholder="Street" value={newAddress.street} onChangeText={(text) => setNewAddress({ ...newAddress, street: text })} />
-          <TextInput style={styles.input} placeholder="Area" value={newAddress.area} onChangeText={(text) => setNewAddress({ ...newAddress, area: text })} />
-          <TextInput style={styles.input} placeholder="City" value={newAddress.city} onChangeText={(text) => setNewAddress({ ...newAddress, city: text })} />
-          <TextInput style={styles.input} placeholder="Building" value={newAddress.building} onChangeText={(text) => setNewAddress({ ...newAddress, building: text })} />
-          <TextInput style={styles.input} placeholder="Floor" value={newAddress.floor} onChangeText={(text) => setNewAddress({ ...newAddress, floor: text })} />
-          <TextInput style={styles.input} placeholder="Apartment" value={newAddress.apartment} onChangeText={(text) => setNewAddress({ ...newAddress, apartment: text })} />
+          {/* Inputs */}
+          {["Label", "Street", "Area", "City", "Building", "Floor", "Apartment"].map((field, idx) => (
+            <TextInput
+              key={idx}
+              style={styles.input}
+              placeholder={field}
+              value={(newAddress as any)[field.toLowerCase()]}
+              onChangeText={(text) => setNewAddress({ ...newAddress, [field.toLowerCase()]: text })}
+            />
+          ))}
 
-          <TouchableOpacity style={styles.saveButton} onPress={handleAddOrEditAddress}>
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>{isEditing ? 'Update Address' : 'Add Address'}</Text>
-          </TouchableOpacity>
+          {/* Buttons */}
+          <View style={{ flexDirection: "row", marginTop: 20 }}>
+            <TouchableOpacity style={[styles.formSaveButton, { flex: 1, marginRight: 8 }]} onPress={handleAddOrEditAddress}>
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>{isEditing ? 'Update Address' : 'Add Address'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.cancelButton, { flex: 1 }]} onPress={cancelEditing}>
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+      ) : (
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            setIsAddingAddress(true);
+            setIsEditing(false);
+            setNewAddress({
+              label: "",
+              street: "",
+              city: "",
+              area: "",
+              building: "",
+              floor: "",
+              apartment: "",
+              isDefault: false,
+            });
+          }}
+        >
+          <Text style={{ color: "white", fontWeight: "bold" }}>+ Add New Address</Text>
+        </TouchableOpacity>
       )}
 
-      {/* --- Save Profile --- */}
+      {/* Save Changes */}
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={{ color: 'white', fontWeight: 'bold' }}>Save Changes</Text>
+        <Text style={{ color: "white", fontWeight: "bold" }}>Save Changes</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -236,12 +283,16 @@ const styles = StyleSheet.create({
   addressCard: { backgroundColor: '#fff', padding: 12, borderRadius: 8, marginBottom: 10, borderColor: '#ddd', borderWidth: 1 },
   addressLabel: { fontWeight: 'bold', color: colors.primary, marginBottom: 5 },
   addressText: { color: '#666', fontSize: 12 },
-  defaultBadge: { marginTop: 5, color: '#4CAF50', fontWeight: 'bold', fontSize: 12 },
-  editButton: { backgroundColor: colors.primary, padding: 6, borderRadius: 4, marginRight: 10 },
-  deleteButton: { backgroundColor: '#f44336', padding: 6, borderRadius: 4 },
+  defaultBadge: { backgroundColor: '#4CAF50', color: '#fff', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, fontSize: 10, overflow: 'hidden' },
+  editButton: { backgroundColor: colors.primary, padding: 6, borderRadius: 4, flex: 1, marginRight: 5 },
+  deleteButton: { backgroundColor: '#f44336', padding: 6, borderRadius: 4, flex: 1, marginRight: 5 },
+  defaultButton: { backgroundColor: '#3F51B5', padding: 6, borderRadius: 4, flex: 1 },
   disabledDeleteButton: { backgroundColor: '#bbb' },
-  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
+  disabledDefaultButton: { backgroundColor: '#bbb' },
+  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 12, textAlign: 'center' },
   addButton: { backgroundColor: colors.primary, padding: 14, borderRadius: 8, marginTop: 20, alignItems: 'center' },
-  saveButton: { backgroundColor: colors.primary, padding: 14, borderRadius: 8, marginTop: 20, alignItems: 'center' },
+  saveButton: { backgroundColor: colors.primary, padding: 14, borderRadius: 8, alignItems: 'center', justifyContent: 'center', marginTop: 20 },
+  formSaveButton: { backgroundColor: colors.primary, padding: 14, borderRadius: 8, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  cancelButton: { backgroundColor: '#aaa', padding: 14, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   addressForm: { marginTop: 20 },
 });

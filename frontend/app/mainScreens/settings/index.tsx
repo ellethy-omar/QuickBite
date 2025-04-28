@@ -17,11 +17,11 @@ export default function SettingsIndex() {
       description: 'Update your name, photo, and personal details',
       route: 'profile'
     },
-    { 
-      title: 'Account Settings', 
-      description: 'Manage password and account security options',
-      route: 'account'
-    },
+    // { 
+    //   title: 'Account Settings', 
+    //   description: 'Manage password and account security options',
+    //   route: 'account'
+    // },
     // { 
     //   title: 'Notification Settings', 
     //   description: 'Control when and how you receive notifications',
