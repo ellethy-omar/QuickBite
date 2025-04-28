@@ -34,13 +34,9 @@ const OrderSchema = new Schema({
     userID: {type: Schema.Types.ObjectId,
       ref: 'User', 
       required: true},
-    userName: { type: String },
-    userAddress: userAddressSchema,
     restaurantID: {type: Schema.Types.ObjectId,
       ref: 'Restaurant', 
       required: true},
-    restaurantAddress: addressSchema,
-    restaurantLogo : { type: String },
     deliveryDriverID:{type: Schema.Types.ObjectId,
       ref: 'Driver'}, //validate
     items: [ItemSchema],

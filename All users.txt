@@ -64,3 +64,108 @@ Restaurant:
   "password": "P@ssw0rdStrong!"
 }
 
+
+// in AppDB NOT test
+// admins before hashing passwords 
+[
+    {
+      "_id": "64a1b8c7f2d12e001f3e5201",
+      "name": "Laura Smith",
+      "email": "l.smith@admin.test",
+      "phone": "+1-555-1122",
+      "password": "TempPass123!",
+      "handledRequests" :3,
+      "created_at": "2024-02-01T09:00:00Z"
+    },
+    {
+      "_id": "64a1b8c7f2d12e002f4e6302",
+      "name": "James Wilson",
+      "email": "j.wilson@admin.test",
+      "phone": "+1-555-3344",
+      "password": "Demo!Password456",
+      "handledRequests" :4,
+      "created_at": "2024-02-01T09:05:00Z"
+    },
+    {
+      "_id": "64a1b8c7f2d12e003g5e7403",
+      "name": "Sophia Brown",
+      "email": "s.brown@admin.test",
+      "phone": "+1-555-5566",
+      "password": "TestAdmin789#",
+      "handledRequests" :0,
+      "created_at": "2024-02-01T09:10:00Z"
+    },
+    {
+      "_id": "64a1b8c7f2d12e004h6f8504",
+      "name": "Ethan Taylor",
+      "email": "e.taylor@admin.test",
+      "phone": "+1-555-7788",
+      "password": "TempAccess$101",
+      "handledRequests" :2,
+      "created_at": "2024-02-01T09:15:00Z"
+    },
+    {
+        "_id": "64a1b8c7f2d12e005f7e9605",
+        "name": "Olivia Davis",
+        "email": "o.davis@admin.test",
+        "phone": "+1-555-9900",
+        "password": "DevPass2023@",
+        "handledRequests" :0,
+        "created_at": "2024-02-01T09:20:00Z"
+      },
+      {
+        "_id": "64a1b8c7f2d12e006f8fa606",
+        "name": "Noah Martinez",
+        "email": "n.martinez@admin.test",
+        "phone": "+1-555-1020",
+        "password": "SystemAdmin$505",
+        "handledRequests" :6,
+        "created_at": "2024-02-01T09:25:00Z"
+      }
+    
+  ]
+
+  //drivers created
+  [
+    {
+      "_id": {"$oid": "907f1f77bcf86cd799439051"},
+      "name": "Ahmed Hassan",
+      "email": "ahmed@delivery.com",
+      "phone": "+96595556677",
+      "password": "Ahmed123",
+      "vehicle": {
+        "type": "motorcycle",
+        "plateNumber": "KUW 2023",
+        "model": "Yamaha YZ450F"
+      },
+      
+      "rating": 4.7,
+      "deliveryStats": {
+        "completed": 142,
+        "avgDeliveryTime": 28.5
+      },
+      "isBanned":false ,
+      "profilePicture": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYEcn4f9pNWsKke0RCLyClhhvGna0jwAq0XP9N7l5luvKVpW2k-sCKbNw&s",
+      "createdAt": {"$date": "2022-02-15T07:00:00Z"}
+    },
+    {
+      "_id": {"$oid": "64a1b8c7f2d12e001f3e5251"},
+      "name": "Yousef Mohammed",
+      "email": "yousef@delivery.com",
+      "phone": "+96597778899",
+      "password": "Yousef123",
+      "vehicle": {
+        "type": "car",
+        "plateNumber": "KUW 2024",
+        "model": "Suzuki Celerio"
+      },
+      "rating": 4.9,
+      "deliveryStats": {
+        "completed": 89,
+        "avgDeliveryTime": 25.2
+      },
+      "isBanned":false ,
+      "profilePicture": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsPJ9cm0-r5p50py0yUzvM5ZtEB-xWoJRPRA&s",
+      "createdAt": {"$date": "2022-08-10T08:30:00Z"}
+    }
+  ]
