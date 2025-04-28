@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, SafeAreaView, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/app/store'; 
+import { RootState } from '@/app/store';
 import { useNotification } from '@/app/context/notificationContext';
 import colors from '@/app/styles/colors';
 import { GetProductsForRestaurant, CreateOrder } from '@/app/endpoints/userEndpoints';
@@ -18,12 +18,9 @@ export default function RestaurantDetailsScreen() {
   const [cart, setCart] = useState<{ [productId: string]: number }>({});
 
   useEffect(() => {
-    console.log('Me', user);
     const fetchProducts = async () => {
       try {
         const response = await GetProductsForRestaurant(id as string);
-        console.log('Fetched products:', response);
-
         const mappedProducts: MenuItem[] = response.data.map((prod: any) => ({
           id: prod._id,
           name: prod.name,
@@ -31,7 +28,6 @@ export default function RestaurantDetailsScreen() {
           description: prod.description,
           image: prod.image || 'https://via.placeholder.com/100',
         }));
-
         setProducts(mappedProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -97,6 +93,13 @@ export default function RestaurantDetailsScreen() {
       return;
     }
 
+    const defaultAddress = user.addresses.find(addr => addr.isDefault) || user.addresses[0];
+
+    if (!defaultAddress) {
+      showNotification('No valid address found.', 'error');
+      return;
+    }
+
     const orderItems = Object.keys(cart).map(productId => ({
       productId,
       quantity: cart[productId],
@@ -106,7 +109,7 @@ export default function RestaurantDetailsScreen() {
       const orderData = {
         restaurantID: id as string,
         items: orderItems,
-        address: user.addresses[0], // Pull address
+        address: defaultAddress,
       };
 
       const response = await CreateOrder(orderData);
@@ -164,91 +167,19 @@ export default function RestaurantDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.background,
-  },
-  productsContainer: {
-    padding: 16,
-    paddingBottom: 100,
-  },
-  productCard: {
-    backgroundColor: '#fff',
-    marginBottom: 16,
-    borderRadius: 10,
-    overflow: 'hidden',
-    flexDirection: 'row',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  productImage: {
-    width: 100,
-    height: 100,
-  },
-  productInfo: {
-    flex: 1,
-    padding: 12,
-  },
-  productName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  productDesc: {
-    fontSize: 12,
-    color: '#666',
-    marginVertical: 4,
-  },
-  productPrice: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.primary,
-    marginVertical: 6,
-  },
-  cartActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  quantityButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  quantityButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  quantityText: {
-    marginHorizontal: 8,
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  cartBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: colors.primary,
-    padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cartBarText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  container: { flex: 1, backgroundColor: colors.background },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
+  productsContainer: { padding: 16, paddingBottom: 100 },
+  productCard: { backgroundColor: '#fff', marginBottom: 16, borderRadius: 10, overflow: 'hidden', flexDirection: 'row', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
+  productImage: { width: 100, height: 100 },
+  productInfo: { flex: 1, padding: 12 },
+  productName: { fontSize: 16, fontWeight: 'bold', color: colors.text },
+  productDesc: { fontSize: 12, color: '#666', marginVertical: 4 },
+  productPrice: { fontSize: 14, fontWeight: '600', color: colors.primary, marginVertical: 6 },
+  cartActions: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
+  quantityButton: { backgroundColor: colors.primary, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 4 },
+  quantityButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  quantityText: { marginHorizontal: 8, fontSize: 16, fontWeight: '600', color: colors.text },
+  cartBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.primary, padding: 16, alignItems: 'center', justifyContent: 'center' },
+  cartBarText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });
