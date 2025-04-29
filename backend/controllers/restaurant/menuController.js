@@ -26,7 +26,7 @@ const addRestaurantProduct = async (req, res) => {
             return res.status(403).json({ error: 'Missing required fields' });
         }
 
-        if(price < 0) {
+        if(price <= 0) {
             console.log("Price must be a positive number");
             return res.status(403).json({ error: 'Price must be a positive number' });
         }
@@ -62,7 +62,7 @@ const editRestaurantProduct = async (req, res) => {
             return res.status(403).json({ error: 'Product ID is required' });
         }
 
-        if (price !== undefined) {
+        if (updates.price !== undefined) {
             if (price <= 0) {
                 console.log("Price must be a positive number");
                 return res.status(403).json({ error: 'Price must be a positive number' });
@@ -88,8 +88,6 @@ const editRestaurantProduct = async (req, res) => {
     }
 };
 
-const cloudinary = require('cloudinary').v2;
-
 const editRestaurantProductImage = async (req, res) => {
     try {
         const { _id, imageBase64, tags } = req.body;
@@ -106,9 +104,11 @@ const editRestaurantProductImage = async (req, res) => {
             return res.status(404).json({ error: 'Product not found' });
         }
 
-        const uploadResponse = await cloudinary.uploader.upload(imageBase64, {
-            tags: tags,
-        });
+        const uploadResponse = await uploadBase64Image(imageBase64, tags);
+        if (!uploadResponse || !uploadResponse.secure_url) {
+            console.log("Image upload failed");
+            return res.status(500).json({ error: 'Image upload failed.' });
+        }
 
         product.image = uploadResponse.secure_url;
         await product.save();
