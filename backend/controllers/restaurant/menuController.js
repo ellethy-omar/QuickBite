@@ -42,7 +42,7 @@ const addRestaurantProduct = async (req, res) => {
             price,
             category,
             isAvailable,
-            restaurantID: req.user._id,
+            restaurantId: req.user._id,
             stockAvailable: Math.round(stockAvailable)
         });
 
