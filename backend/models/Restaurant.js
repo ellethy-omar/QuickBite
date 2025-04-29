@@ -67,14 +67,9 @@ const restaurantSchema = new Schema({
       type: Boolean,
       default: true
     },
-    logo: {
-      type: String,
-      default: 'default-logo.jpg'
-    },
-    coverImage: {
-      type: String,
-      default: 'default-cover.jpg'
-    }
+    logo: String,
+    coverImage: String,
+    isBanned:{type: Boolean, default:false} 
   }, {
     timestamps: true // Automatically adds createdAt and updatedAt
 });

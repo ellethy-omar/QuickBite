@@ -23,7 +23,7 @@
  *                 user:
  *                   $ref: '#/components/schemas/User'
  *       500:
- *         description: Server error. Call Omar
+ *         $ref: '#/components/responses/ServerError'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
