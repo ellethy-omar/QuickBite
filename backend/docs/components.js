@@ -412,7 +412,10 @@
  *         price:
  *           type: number
  *           example: 12.99
- *         restraurantID:
+ *         stockAvailable:
+ *           type: number
+ *           example: 12.99
+ *         restraurantId:
  *           type: string
  *           format: objectId
  *           description: "ID of the restaurant to which the product belongs"

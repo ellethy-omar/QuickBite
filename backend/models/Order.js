@@ -2,22 +2,6 @@ const mongoose = require('mongoose');
  
 const { Schema } = mongoose;
 
-const addressSchema = new Schema({
-  street: { type: String, required: true },
-  city: { type: String, required: true },
-  area: { type: String, required: true }
-})
-
-const userAddressSchema = new Schema({
-  label: String,
-  area: String,
-  street: String,
-  building: String,
-  floor: String,
-  apartment: String,
-  isDefault: Boolean
-})
-
 const ItemSchema = new Schema({
     productId: {type: Schema.Types.ObjectId,
       ref: 'Product', 
@@ -58,11 +42,15 @@ OrderSchema.statics.validateOrder = async function(orderData) {
   }
 
   // 2. Check all product IDs exist and belong to this restaurant
-  const productIds = items.map(item => item.productID);
+  const productIds = items.map(item => item.productId);
+
   const products = await mongoose.model('Product').find({
     _id: { $in: productIds },
-    restaurantID: restaurantID
-  });
+    restaurantId: restaurantID
+  })
+
+  console.log('products*:', products);
+  console.log('productIds:', productIds);
 
   // 3. Verify all products were found
   if (products.length !== productIds.length) {

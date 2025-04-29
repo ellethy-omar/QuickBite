@@ -210,6 +210,8 @@
  *                 type: string
  *               price:
  *                 type: number
+ *               stockAvailable:
+ *                 type: number
  *               category:
  *                 type: string
  *               isAvailable:

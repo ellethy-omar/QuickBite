@@ -6,7 +6,7 @@ const ProductSchema = new Schema({
     name: String,
     description: String,
     price: Number,
-    restraurantID: {type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}, // rest id should be present
+    restaurantId: {type: Schema.Types.ObjectId, ref: 'Restaurant', required: true}, // rest id should be present
     category: String,
     stockAvailable: Number, // should be decremented once an order is placed and checked before placing an order
     image: String,  
