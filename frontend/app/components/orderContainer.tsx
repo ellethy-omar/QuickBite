@@ -1,10 +1,17 @@
 import { Text, StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import colors from '../styles/colors';
 import { OrderDriver } from '../types/orderDriver';
+import { useNavigation } from 'expo-router';
 
 export default function OrderContainer({order}: {order: OrderDriver}) {
+    const navigation = useNavigation();
+
+    const handlePress = () => {
+        navigation.navigate('_driverutils/orderConfirm', { order: JSON.stringify(order) });
+    };
+
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={handlePress}>
         <View style={styles.mainSection}>
             <Image source={{uri: order.restaurantLogo}} style={styles.image} resizeMode="cover" />
             <View style={{flex: 1, gap: 3}}>

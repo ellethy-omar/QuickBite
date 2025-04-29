@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://192.168.1.155:4123',
+    baseURL: 'http://quickbite.zapto.org',
 });
 
 export default apiClient;
