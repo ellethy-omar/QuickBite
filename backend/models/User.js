@@ -12,17 +12,19 @@ const addressSchema = new Schema({
   building: String,
   floor: String,
   apartment: String,
-  isDefault: Boolean
+  isDefault: Boolean  //there should be one address in the array with isDefault=true 
 });
 
 // User schema
 const userSchema = new Schema({
-  name: String,
-  email: { type: String, required: true, unique: true },
-  phone: String,
-  password: { type: String, required: true, select: false }, // exclude from default query
-  addresses: [addressSchema],
-  createdAt: { type: Date, default: Date.now }
+     name: String,
+     email: { type: String, required: true, unique: true },
+     phone: String,
+     password: { type: String, required: true, select: false }, // exclude from default query
+     addresses: [addressSchema],
+     profilePicture: String,
+     isBanned:{type: Boolean, default:false} ,
+     createdAt: { type: Date, default: Date.now }
 });
 
 // Hash password before saving

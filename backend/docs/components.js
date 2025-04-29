@@ -248,6 +248,47 @@
  *         saturday:
  *           $ref: '#/components/schemas/DailyHours'
 
+
+ *     Restaurant:
+*       type: object
+*       required:
+*         - name
+*         - description
+*         - cuisineType
+*         - address
+*         - contact
+*         - openingHours
+*       properties:
+*         name:
+*           type: string
+*           example: "The Best Restaurant"
+*         description:
+*           type: string
+*           example: "A place that serves delicious food."
+*         cuisineType:
+*           type: array
+*           items:
+*             type: string
+*           example: ["Italian", "Pizza"]
+*         address:
+*           $ref: '#/components/schemas/RestaurantAddress'
+*         contact:
+*           $ref: '#/components/schemas/Contact'
+*         openingHours:
+*           $ref: '#/components/schemas/OpeningHours'
+*         isActive:
+*           type: boolean
+*           example: true
+*         logo:
+*           type: string
+*           example: "logo.jpg"
+*         coverImage:
+*           type: string
+*           example: "cover.jpg"
+*         createdAt:
+*           type: string
+
+
  *     Order:
  *       type: object
  *       properties:
@@ -261,11 +302,20 @@
  *           format: objectId
  *           description: ID of the user who placed the order
  *           example: "60c72b2f5f1b2c001f58c1b4"
+ *         userName:
+ *           type: string
+ *           description: The user we are dilvering the order to
+ *           example: "Ahmed"
  *         restaurantID:
  *           type: string
  *           format: objectId
  *           description: ID of the restaurant
  *           example: "60c72b2f5f1b2c001f58c1b4"
+ *         restaurantLogo:
+ *           type: string
+ *           format: URL
+ *           description: Logo of the restaurant
+ *           example: "some link from cloudinary"
  *         deliveryDriverID:
  *           type: string
  *           format: objectId
@@ -338,7 +388,7 @@
  *         addresses:
  *           type: array
  *           items:
- *             $ref: '#/components/schemas/userAddress'
+ *             $ref: '#/components/schemas/UserAddress'
  *         createdAt:
  *           type: string
  *           format: date-time

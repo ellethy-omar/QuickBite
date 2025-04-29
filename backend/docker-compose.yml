@@ -1,0 +1,25 @@
+services:
+  #MongoDB
+  mongo_db:
+    container_name: database_container
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongo_db:/data/db
+
+  app:
+    build: .
+    ports:
+      - 4123:4123
+    environment:
+      - PORT= 4123
+      - JWT_SECRET=fmkrnkfenklerga54esgr5akjkja
+      - MONGO_URI=mongodb+srv://MobileProject:tests123@cluster0.chfauhd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - CLOUDINARY_API_KEY="897849593445172"
+      - CLOUDINARY_API_SECRET="ThOBWL7oXUhpEUba-N59WK8iEmM"
+
+    depends_on:
+      - mongo_db
+
+volumes:
+  mongo_db: {}

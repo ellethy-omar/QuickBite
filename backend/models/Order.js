@@ -34,13 +34,11 @@ const OrderSchema = new Schema({
     userID: {type: Schema.Types.ObjectId,
       ref: 'User', 
       required: true},
-    userAddress: userAddressSchema,
     restaurantID: {type: Schema.Types.ObjectId,
       ref: 'Restaurant', 
       required: true},
-    restaurantAddress: addressSchema,
     deliveryDriverID:{type: Schema.Types.ObjectId,
-      ref: 'Driver'}, //validate
+      ref: 'Driver'},
     items: [ItemSchema],
     totalAmount: Number
   },{ 
