@@ -26,5 +26,8 @@
     "license": "ISC",
     "author": {
         "name": "Omar Gamal"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0"
     }
 }
