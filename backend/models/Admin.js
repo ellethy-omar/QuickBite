@@ -7,6 +7,8 @@ const AdminSchema = new Schema({
     email: { type: String, required: true, unique: true },
     phone: String,
     password: { type: String, required: true, select: false }, // exclude from default query
+    handledRequests :Number,
+    profilePicture: String,
     createdAt: { type: Date, default: Date.now }
   });
 
