@@ -19,9 +19,9 @@ const getRestaurantProducts = async (req, res) => {
 
 const addRestaurantProduct = async (req, res) => {
     try {
-        const { name, description, price, category, isAvailable } = req.body;
+        const { name, description, price, category, isAvailable, stockAvailable } = req.body;
 
-        if (!name || !description || !price || !category || !isAvailable) {
+        if (!name || !description || !price || !category || !isAvailable || !stockAvailable) {
             console.log("Missing required fields");
             return res.status(403).json({ error: 'Missing required fields' });
         }
@@ -31,13 +31,19 @@ const addRestaurantProduct = async (req, res) => {
             return res.status(403).json({ error: 'Price must be a positive number' });
         }
 
+        if (stockAvailable <= 0) {
+            console.log("Stock available must be a positive number");
+            return res.status(403).json({ error: 'Stock available must be a positive number' });
+        }
+        
         const newProduct = new Product({
             name,
             description,
             price,
             category,
             isAvailable,
-            restraurantID: req.user._id
+            restaurantID: req.user._id,
+            stockAvailable: Math.round(stockAvailable)
         });
 
         const savedProduct = await newProduct.save();
@@ -69,8 +75,16 @@ const editRestaurantProduct = async (req, res) => {
             }
         }
 
+        if (updates.stockAvailable !== undefined) {
+            if (stockAvailable <= 0) {
+                console.log("stockAvailable must be a positive number");
+                return res.status(403).json({ error: 'stockAvailable must be a positive number' });
+            }
+            updates.stockAvailable = Math.round(stockAvailable);
+        }
+
         const updatedProduct = await Product.findOneAndUpdate(
-            { _id, restraurantID: req.user._id },
+            { _id, restaurantId: req.user._id },
             updates,
             { new: true }
         );
@@ -115,9 +129,9 @@ const editRestaurantProductImage = async (req, res) => {
 
         res.status(200).json({
             message: 'Image updated successfully',
-            product,
+            image: product.image,
         });
-        console.log('product:', product);
+        console.log('image:', product.image);
     } catch (err) {
         console.error('Error updating product image:', err);
         res.status(500).json({ error: 'Failed to update product image', details: err.message });
