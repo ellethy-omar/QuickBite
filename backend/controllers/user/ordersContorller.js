@@ -1,7 +1,6 @@
 const Order = require('../../models/Order')
 const Restaurant = require('../../models/Restaurant')
 const Product = require('../../models/Product')
-const User = require('../../models/User')
 
 const createOrder = async (req, res) => {
     try {
