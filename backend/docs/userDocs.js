@@ -81,6 +81,38 @@
 
 /**
  * @swagger
+ * /api/user/updateUserProfilePhoto:
+ *   put:
+ *     tags:
+ *       - User (JWT required)
+ *     summary: Update user profile information
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UploadImagePayload'
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ImageUploadResponse'
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
+
+/**
+ * @swagger
  * /api/user/createOrder:
  *   post:
  *     tags:
