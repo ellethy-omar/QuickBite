@@ -2,20 +2,44 @@
 const Admin = require('../../models/Admin')
 const { uploadBase64Image } = require('../../controllers/cloudinaryController');
 const getAdminProfile = async (req, res) => {
-    const admin = Admin.findById(req.user._id);
+    const admin = await Admin.findById(req.user._id);
 
     res.status(200).json({admin});
 }
 
 const updateAdminProfile = async (req, res) => {
-    const admin = Admin.findById(req.user._id);
+    try {
+        const { name, email, phone } = req.body;
 
-    // I need some updating logic here
+        // Only allow update of specific fields
+        const updateFields = {};
+        if (name !== undefined) updateFields.name = name;
+        if (email !== undefined) updateFields.email = email;
+        if (phone !== undefined) updateFields.phone = phone;
 
-    res.status(505).json({
-        errror: "Not implmented yet"
-    })
-}
+        const updatedAdmin = await Admin.findByIdAndUpdate(
+            req.user._id,
+            { $set: updateFields },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedAdmin) {
+            return res.status(404).json({ error: "Admin not found" });
+        }
+
+        res.status(200).json({
+            message: "Profile updated successfully",
+            admin: updatedAdmin
+        });
+
+    } catch (error) {
+        console.error("Update admin profile error:", error);
+        res.status(500).json({
+            error: "Internal server error",
+            details: error.message
+        });
+    }
+};
 
 const updateAdminProfilePhoto = async (req, res) => {
     try {

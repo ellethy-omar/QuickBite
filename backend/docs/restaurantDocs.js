@@ -97,7 +97,69 @@
 *         $ref: '#/components/responses/ForbiddenError'
 *       500:
 *         $ref: '#/components/responses/ServerError'
+ */
 
+
+/**
+ * @swagger
+ * /api/restaurant/updateRestaurantLogo:
+ *   put:
+ *     tags:
+ *       - Restaurant (JWT required)
+ *     summary: Edit an existing logo of the restaurant
+ *     description: Update the logo that belongs to the authenticated restaurant.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UploadImagePayload'
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ImageUploadResponse'
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
+
+/**
+ * @swagger
+ * /api/restaurant/updateRestaurantCoverImage:
+ *   put:
+ *     tags:
+ *       - Restaurant (JWT required)
+ *     summary: Edit an cover image of the restaurant
+ *     description: Update the cover image that belongs to the authenticated restaurant.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UploadImagePayload'
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ImageUploadResponse'
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
 
 /**
@@ -235,64 +297,94 @@
 
 
 
+
+
 /**
  * @swagger
- * /api/restaurant/updateRestaurantLogo:
+ * /api/restaurant/editRestaurantProductImage:
  *   put:
  *     tags:
  *       - Restaurant (JWT required)
- *     summary: Edit an existing logo of the restaurant
- *     description: Update the logo that belongs to the authenticated restaurant.
+ *     summary: Edit a product image
+ *     description: Update the image for a specific product belonging to the authenticated restaurant.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UploadImagePayload'
+ *             type: object
+ *             properties:
+ *               _id:
+ *                 type: string
+ *                 description: ID of the product to update.
+ *               imageBase64:
+ *                 type: string
+ *                 description: Base64‐encoded image data.
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Tags to apply when uploading (must be a non‐empty array).
+ *             required:
+ *               - _id
+ *               - imageBase64
+ *               - tags
  *     responses:
  *       200:
- *         description: User profile updated successfully
+ *         description: Image updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ImageUploadResponse'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Image updated successfully"
+ *                 image:
+ *                   type: string
+ *                   format: uri
+ *                   description: URL of the newly uploaded product image.
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
- *       403:
- *         $ref: '#/components/responses/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/responses/InvalidCredentialsError'
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
 
 /**
  * @swagger
- * /api/restaurant/updateRestaurantCoverImage:
- *   put:
+ * /api/restaurant/getRestaurantAllRequiredOrders:
+ *   get:
  *     tags:
  *       - Restaurant (JWT required)
- *     summary: Edit an cover image of the restaurant
- *     description: Update the cover image that belongs to the authenticated restaurant.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UploadImagePayload'
+ *     summary: Fetch new required orders
+ *     description: Retrieve all new orders that require action for the authenticated restaurant.
  *     responses:
  *       200:
- *         description: User profile updated successfully
+ *         description: Orders fetched successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ImageUploadResponse'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Orders fetched successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
+ *       404:
+ *         $ref: '#/components/responses/InvalidCredentialsError'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
- *       403:
- *         $ref: '#/components/responses/ParameterRequiredError'
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
