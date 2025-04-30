@@ -80,7 +80,7 @@ OrderSchema.statics.createOrder = async function(orderData) {
  
 OrderSchema.statics.findOrdersNeedingDelivery = async function() {
   return this.find({
-    deliveryDriverID: { $exists: false },
+    deliveryDriverID: {  $in: [null, undefined] },
     status: { $ne: 'cancelled' }
   })
   .populate('restaurantID', 'name address')
@@ -92,11 +92,11 @@ OrderSchema.statics.findOrdersNeedingDelivery = async function() {
 OrderSchema.statics.findOrdersByUserId = async function(userID) {
   return this.find({ userID })
     .populate('restaurantID', 'name logo')
-    .populate('items.productID', 'name image')
+    .populate('items.productId', 'name image')
     .sort({ timestamp: -1 }); // newest first
 };
 
-// find orders by restaurant id 
+// find orders by restaurant id   
 OrderSchema.statics.findOrdersByRestaurantId = async function(restaurantID) {
   return this.find({ restaurantID })
     .populate('userID', 'name addresses')
@@ -104,50 +104,34 @@ OrderSchema.statics.findOrdersByRestaurantId = async function(restaurantID) {
     .sort({ timestamp: -1 });
 };
 
-//find order by ID
-OrderSchema.statics.findOrderById = async function(orderId) {
-  return this.findById(orderId)
-    .populate('restaurantID')
-    .populate('userID')
-    .populate('deliveryDriverID')
-    .populate('items.productID');
+//resturant find new orders for a sepcfic restaurant with status pending 
+OrderSchema.statics.findNewRestaurantOrders = async function(restaurantID) {
+  return this.find({  restaurantID,
+    status: { $eq: 'pending' }  
+   })
+    .populate('userID', 'name addresses')
+    .populate('deliveryDriverID', 'name phone')
+    .sort({ timestamp: -1 });
 };
 
 
-//update status of order by id 
-const updateOrderStatus = async (orderId, newStatus) => {
-  return Order.findByIdAndUpdate(
-    orderId,
-    { 
-      $set: { status: newStatus },
-      $currentDate: { updatedAt: true } 
-    },
-    { new: true } // Return the updated document
-  );
-};
+//find order by ID not tested yet 
+// OrderSchema.statics.findOrderById = async function(orderId) {
+//   return this.findById(orderId)
+//     .populate('restaurantID')
+//     .populate('userID')
+//     .populate('deliveryDriverID')
+//     .populate('items.productID');
+// };
 
-const unassignDeliveryMan = async (orderId) => {
-  return Order.findByIdAndUpdate(
-    orderId,
-    { 
-      $unset: { deliveryManId: "" },
-      $set: { status: 'preparing' }
-    },
-    { new: true }
-  );
-};
 
-const assignDeliveryMan = async (orderId, deliveryManId) => {
-  return Order.findByIdAndUpdate(
-    orderId,
-    { 
-      $set: { 
-        deliveryDriverID: deliveryManId
-      }
-    },
-    { new: true } // Return the updated document
-  ).populate('deliveryManId', 'name phone vehicle');
-};
+//update status of order by id in test queries line 80
+
+
+// unassignDeliveryman by order id in test queries line 97
+
+
+//assign a delivery man by the order id and delivery man id in test queries line 115
 
 
 
