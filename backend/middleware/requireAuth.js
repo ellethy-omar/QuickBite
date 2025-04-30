@@ -13,7 +13,7 @@ const requireAuth = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
-        console.log(req.user);
+        console.log("user:", req.user);
         next();
     } catch (error) {
         console.error('JWT Verification Error:', error.message);

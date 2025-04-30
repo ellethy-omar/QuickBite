@@ -71,14 +71,14 @@ const updateUserProfilePhoto = async (req, res) => {
             return res.status(500).json({ error: 'Image upload failed.' });
         }
 
-        user.image = uploadResponse.secure_url;
+        user.profilePicture = uploadResponse.secure_url;
         await user.save();
 
         res.status(200).json({
-            message: 'Image updated successfully',
-            user,
-        });
-        console.log('user:', user);
+          message: 'Profile image successfully',
+          imageURL: uploadResponse.secure_url,
+      });
+      console.log('imageURL:', uploadResponse.secure_url);
     } catch (err) {
         console.error('Error updating user image:', err);
         res.status(500).json({ error: 'Failed to update user image', details: err.message });
