@@ -1,7 +1,7 @@
 const Driver = require('../../models/Driver')
 const { uploadBase64Image } = require('../../controllers/cloudinaryController');
 const getDriverProfile = async (req, res) => {
-    const driver = Driver.findById(req.user._id);
+    const driver = await Driver.findById(req.user._id);
 
     res.status(200).json({driver});
     console.log('driver:', driver);
@@ -9,10 +9,10 @@ const getDriverProfile = async (req, res) => {
 
 const updateDriverProfile = async (req, res) => {
     try {
-        const driverId = req.user.id; // Must be set by your authentication middleware
+        const driverId = req.user._id; // Must be set by your authentication middleware
 
         // Fields allowed to be updated
-        const allowedFields = ['name', 'email', 'phone', 'vehicle', 'rating', 'deliveryStats'];
+        const allowedFields = ['name', 'email', 'phone', 'vehicle'];
 
         // Filter request body to only allow allowedFields
         const updates = {};
@@ -32,6 +32,8 @@ const updateDriverProfile = async (req, res) => {
         if (!updatedDriver) {
             return res.status(404).json({ error: 'Driver not found' });
         }
+
+        delete updatedDriver.password;
 
         res.status(200).json({
             message: 'Driver profile updated successfully',

@@ -57,7 +57,7 @@
 * /api/admin/updateAdminProfilePhoto:
  *   put:
  *     tags:
- *       - User (JWT required)
+ *       - Admin (JWT required)
  *     summary: Update admin profile information
  *     security:
  *       - bearerAuth: []
