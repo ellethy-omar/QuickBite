@@ -168,7 +168,7 @@ const unBanRestaurant = async (req, res) => {
       const restaurant = await Restaurant.findById(restaurantId)
       if (!restaurant) return res.status(404).json({ error: 'Restaurant not found.' })
   
-      restaurant.isBanned = true
+      restaurant.isBanned = false
       await restaurant.save()
   
       res.json({ message: 'Restaurant has been banned.' })
