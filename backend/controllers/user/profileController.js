@@ -24,21 +24,38 @@ const updateUserProfile = async (req, res) => {
       if (name) updates.name = name;
       if (email) updates.email = email;
       if (phone) updates.phone = phone;
-  
-      if (Array.isArray(addresses)) {
-        addresses.forEach((address) => {
-          if (address._id) {
-            const addressIndex = user.addresses.findIndex((a) => a._id.toString() === address._id.toString());
-            if (addressIndex > -1) {
-              user.addresses[addressIndex] = { ...user.addresses[addressIndex], ...address };
+
+      if (addresses) {
+        if (!Array.isArray(addresses)) {
+          console.log("Addresses should be an array");
+          return res.status(403).json({ error: 'Addresses should be an array' });
+        }
+      
+        const updatedAddresses = [];
+      
+        addresses.forEach(givenAddress => {
+          if (givenAddress._id) {
+            const existing = user.addresses.id(givenAddress._id);
+            if (existing) {
+              // Update existing address
+              existing.address = givenAddress.address;
+              existing.city = givenAddress.city;
+              existing.state = givenAddress.state;
+              existing.zipCode = givenAddress.zipCode;
+              existing.country = givenAddress.country;
+              updatedAddresses.push(existing);
+            } else {
+              // Address with given _id not found, treat as new
+              updatedAddresses.push(givenAddress);
             }
           } else {
-            user.addresses.push(address);
+            // New address (no _id)
+            updatedAddresses.push(givenAddress);
           }
         });
-      }
-  
-      Object.assign(user, updates);
+      
+        user.addresses = updatedAddresses;
+      }      
   
       await user.save();
   

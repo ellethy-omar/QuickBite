@@ -1,8 +1,9 @@
+const Order = require('../../models/Order');
 const Product = require('../../models/Product');
 
 const getRestaurantProducts = async (req, res) => {
     try {
-        const products = await Product.find({ restraurantID: req.user._id });
+        const products = await Product.find({ restaurantId: req.user._id });
         res.status(200).json({
             message:"products are in an array", 
             data: products
@@ -69,18 +70,18 @@ const editRestaurantProduct = async (req, res) => {
         }
 
         if (updates.price !== undefined) {
-            if (price <= 0) {
+            if (updates.price <= 0) {
                 console.log("Price must be a positive number");
                 return res.status(403).json({ error: 'Price must be a positive number' });
             }
         }
 
         if (updates.stockAvailable !== undefined) {
-            if (stockAvailable <= 0) {
+            if (updates.stockAvailable <= 0) {
                 console.log("stockAvailable must be a positive number");
                 return res.status(403).json({ error: 'stockAvailable must be a positive number' });
             }
-            updates.stockAvailable = Math.round(stockAvailable);
+            updates.stockAvailable = Math.round(updates.stockAvailable);
         }
 
         const updatedProduct = await Product.findOneAndUpdate(
@@ -133,15 +134,35 @@ const editRestaurantProductImage = async (req, res) => {
         });
         console.log('image:', product.image);
     } catch (err) {
-        console.error('Error updating product image:', err);
+        console.log('Error updating product image:', err);
         res.status(500).json({ error: 'Failed to update product image', details: err.message });
     }
 };
 
+const getRestaurantAllRequiredOrders = async (req, res) => {
+    try {
+        const orders = await Order.findNewRestaurantOrders(req.user._id);
+        if (!orders) {
+            console.log("No orders found");
+            return res.status(404).json({ error: 'No orders found' });
+        }
+
+        res.status(200).json({
+            message: "Orders fetched successfully",
+            data: orders
+        });
+
+        console.log('orders:', orders);
+    } catch (error) {
+        console.log('Error fetching required orders:', err);
+        res.status(500).json({ error: 'Failed to fetch required orders', details: err.message });        
+    }
+}
 
 module.exports = {
     getRestaurantProducts,
     addRestaurantProduct,
     editRestaurantProduct,
-    editRestaurantProductImage
+    editRestaurantProductImage,
+    getRestaurantAllRequiredOrders
 }

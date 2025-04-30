@@ -41,18 +41,14 @@ OrderSchema.statics.validateOrder = async function(orderData) {
     return { isValid: false, error: 'Restaurant not found' };
   }
 
-  // 2. Check all product IDs exist and belong to this restaurant
   const productIds = items.map(item => item.productId);
 
   const products = await mongoose.model('Product').find({
     _id: { $in: productIds },
     restaurantId: restaurantID
-  })
+  });
 
-  console.log('products*:', products);
-  console.log('productIds:', productIds);
-
-  // 3. Verify all products were found
+  // Verify all products were found
   if (products.length !== productIds.length) {
     const foundIds = products.map(p => p._id.toString());
     const missingIds = productIds.filter(id => !foundIds.includes(id.toString()));
@@ -62,6 +58,17 @@ OrderSchema.statics.validateOrder = async function(orderData) {
       missingProducts: missingIds
     };
   }
+
+  // Calculate totalAmount
+  let totalAmount = 0;
+  for (const item of items) {
+    const product = products.find(p => p._id.toString() === item.productId.toString());
+    if (!product) continue; // Just in case
+    totalAmount += product.price * (item.quantity || 1);
+  }
+
+  // Set totalAmount in orderData
+  orderData.totalAmount = totalAmount;
 
   return { isValid: true };
 };
