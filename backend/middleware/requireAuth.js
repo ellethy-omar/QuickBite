@@ -13,7 +13,7 @@ const requireAuth = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
-        console.log(req.user);
+        console.log("user:", req.user);
         next();
     } catch (error) {
         console.error('JWT Verification Error:', error.message);
@@ -37,7 +37,7 @@ function generateToken(_id, role) {
         role === "driver" ||
         role === "admin"
     )
-        return jwt.sign({ _id , role }, process.env.JWT_SECRET, { expiresIn: "3d" });
+        return jwt.sign({ _id , role }, process.env.JWT_SECRET, { expiresIn: "7d" });
     else
         throw new Error("Invalid role");
 }

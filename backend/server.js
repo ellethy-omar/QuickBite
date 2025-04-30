@@ -9,8 +9,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 const {
-  intializeMongooseConnection,
-  intializeMongoClientConnection
+  intializeMongooseConnection
 } = require('./config/db');
 
 intializeMongooseConnection();
@@ -29,6 +28,10 @@ const swaggerConfigurations = {
 
 const swaggerSpec = swaggerJsdoc(swaggerConfigurations);
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+const testQueries = require('./controllers/testQueries');
+
+app.use('/testQueries', testQueries);
 
 const integrationRouter = require('./routes/integrationRouter');
 app.use('/api', integrationRouter);

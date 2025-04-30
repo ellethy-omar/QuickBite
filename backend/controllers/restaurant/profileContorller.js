@@ -1,5 +1,5 @@
 const Restaurant = require('../../models/Restaurant');
-
+const { uploadBase64Image } = require('../../controllers/cloudinaryController');
 const getRestaurantProfie = async (req ,res) => {
     const restaurant = await Restaurant.findById(req.user._id);
 
@@ -54,7 +54,7 @@ const updateRestaurantProfile = async (req, res) => {
 };
   
 
-const updateRestaurantProfilePhoto = async (req, res) => {
+const updateRestaurantLogo = async (req, res) => {
     try {
         const { imageBase64, tags } = req.body;
 
@@ -71,17 +71,48 @@ const updateRestaurantProfilePhoto = async (req, res) => {
             return res.status(500).json({ error: 'Image upload failed.' });
         }
 
-        restaurant.logo = uploadResponse;
+        restaurant.logo = uploadResponse.secure_url;
         await restaurant.save();
 
         res.status(200).json({
-            message: 'Image updated successfully',
-            Restaurant: restaurant,
+            message: 'Logo updated successfully',
+            imageURL: uploadResponse.secure_url,
         });
-        console.log('Restaurant:', restaurant);
+        console.log('imageURL:', uploadResponse.secure_url);
     } catch (err) {
-        console.error('Error updating Restaurant image:', err);
-        res.status(500).json({ error: 'Failed to update Restaurant image', details: err.message });
+        console.error('Error updating Restaurant Logo:', err);
+        res.status(500).json({ error: 'Failed to update Restaurant Logo', details: err.message });
+    }
+}
+
+const updateRestaurantCoverImage = async (req, res) => {
+    try {
+        const { imageBase64, tags } = req.body;
+
+        if (!imageBase64 || !tags || !Array.isArray(tags) || tags.length === 0) {
+            console.log("Missing required fields");
+            return res.status(403).json({ error: 'Product ID, imageBase64, and tags are required.' });
+        }
+
+        const restaurant = await Restaurant.findById(req.user._id);
+
+        const uploadResponse = await uploadBase64Image(imageBase64, tags);
+        if (!uploadResponse || !uploadResponse.secure_url) {
+            console.log("Image upload failed");
+            return res.status(500).json({ error: 'Image upload failed.' });
+        }
+
+        restaurant.coverImage = uploadResponse.secure_url;
+        await restaurant.save();
+
+        res.status(200).json({
+            message: 'Cover image updated successfully',
+            imageURL: uploadResponse.secure_url,
+        });
+        console.log('imageURL:', uploadResponse.secure_url);
+    } catch (err) {
+        console.error('Error updating Restaurant Cover image:', err);
+        res.status(500).json({ error: 'Failed to update Restaurant Cover image', details: err.message });
     }
 }
 
@@ -96,6 +127,7 @@ const resetRestaurantPassword = async (req, res) => {
 module.exports = {
     getRestaurantProfie,
     updateRestaurantProfile,
-    updateRestaurantProfilePhoto,
+    updateRestaurantLogo,
+    updateRestaurantCoverImage,
     resetRestaurantPassword
 }

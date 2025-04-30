@@ -9,9 +9,9 @@ const DriverSchema = new Schema({
    password: { type: String, required: true },
    vehicle: 
      {
-      type:String ,
       plateNumber: String,
-      model: String
+      model: String,
+      cateogry:String 
     },
    rating: Number,
    deliveryStats: 

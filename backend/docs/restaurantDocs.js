@@ -98,54 +98,6 @@
 *       500:
 *         $ref: '#/components/responses/ServerError'
 
-
- * /api/restaurant/updateRestaurantProfilePhoto:
- *   put:
- *     tags:
- *       - Restaurant (JWT required)
- *     summary: Update restaurant profile photo
- *     description: Allows the restaurant to upload or update its profile photo.
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               imageBase64:
- *                 type: string
- *                 description: Base64 encoded image data for the profile photo.
- *               tags:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: List of tags associated with the image.
- *             required:
- *               - imageBase64
- *               - tags
- *     responses:
- *       200:
- *         description: Profile photo updated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Image updated successfully'
- *                 Restaurant:
- *                   $ref: '#/components/schemas/Restaurant'
- *       403:
- *         $ref: '#/components/responses/ParameterRequiredError'
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
- *       500:
- *         $ref: '#/components/responses/ServerError'
  */
 
 /**
@@ -209,6 +161,8 @@
  *               description:
  *                 type: string
  *               price:
+ *                 type: number
+ *               stockAvailable:
  *                 type: number
  *               category:
  *                 type: string
@@ -283,55 +237,62 @@
 
 /**
  * @swagger
- * /api/restaurant/editRestaurantProductImage:
+ * /api/restaurant/updateRestaurantLogo:
  *   put:
  *     tags:
  *       - Restaurant (JWT required)
- *     summary: Edit an existing product image of the restaurant
- *     description: Update the image for an existing product that belongs to the authenticated restaurant.
+ *     summary: Edit an existing logo of the restaurant
+ *     description: Update the logo that belongs to the authenticated restaurant.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - _id
- *               - imageBase64
- *               - tags
- *             properties:
- *               _id:
- *                 type: string
- *                 description: The unique ID of the product to update
- *               imageBase64:
- *                 type: string
- *                 description: Base64 encoded image string
- *               tags:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: An array of tags to categorize the image
+ *             $ref: '#/components/schemas/UploadImagePayload'
  *     responses:
  *       200:
- *         description: Product image updated successfully
+ *         description: User profile updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Image updated successfully"
- *                 product:
- *                   $ref: '#/components/schemas/Product'
- *       403:
- *         $ref: '#/components/responses/ParameterRequiredError'
- *       404:
- *         $ref: '#/components/responses/InvalidCredentialsError'
+ *               $ref: '#/components/schemas/ImageUploadResponse'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
+
+/**
+ * @swagger
+ * /api/restaurant/updateRestaurantCoverImage:
+ *   put:
+ *     tags:
+ *       - Restaurant (JWT required)
+ *     summary: Edit an cover image of the restaurant
+ *     description: Update the cover image that belongs to the authenticated restaurant.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UploadImagePayload'
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ImageUploadResponse'
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
