@@ -2,6 +2,7 @@
 import apiClient from "../apiclient";
 import { OrderDetails } from "../types/orders"; // 🔥 importing your real type
 
+// --- PUT: Update user profile ---
 export const UpdateUserProfile = async (profileData: {
   name: string;
   email: string;
@@ -25,14 +26,21 @@ export const UpdateUserProfile = async (profileData: {
   }
 };
 
-
 // --- GET: Fetch user profile ---
 export const GetUserProfile = async (): Promise<{
   user: {
     name: string;
     email: string;
     phone: string;
-    addresses: string[];
+    addresses: {
+      label: string;
+      area: string;
+      street: string;
+      building: string;
+      floor: string;
+      apartment: string;
+      isDefault: boolean;
+    }[];
     createdAt: string;
   }
 }> => {
@@ -46,16 +54,12 @@ export const GetUserProfile = async (): Promise<{
 };
 
 // --- PUT: Update user profile photo ---
-export const UpdateUserProfilePhoto = async (photo: any): Promise<any> => {
-  const formData = new FormData();
-  formData.append('photo', photo);
-
+export const UpdateUserProfilePhoto = async (photoData: {
+  imageBase64: string;
+  tags: string[];
+}): Promise<any> => {
   try {
-    const response = await apiClient.put('/api/user/updateUserProfilePhoto', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await apiClient.put('/api/user/updateUserProfilePhoto', photoData);
     return response.data;
   } catch (error) {
     console.error('Error updating profile photo:', error);
@@ -76,7 +80,7 @@ export const CreateOrder = async (orderData: {
     apartment: string,
     isDefault: boolean,
   }
-}): Promise<OrderDetails> => { // 🧠 Return the full created order details
+}): Promise<OrderDetails> => {
   try {
     const response = await apiClient.post('/api/user/createOrder', orderData);
     return response.data;
