@@ -1,5 +1,5 @@
 const routesIntegrator = require('express').Router();
-const { requireAuth, requireRole } = require('../middleware/requireAuth');
+const { requireAuth, requireRole, checkForBan } = require('../middleware/requireAuth');
 
 const authRoutes = require('./authRoutes');
 const cloudinaryRoutes = require('./cloudinaryRoutes');
@@ -19,6 +19,7 @@ routesIntegrator.use('/auth', authRoutes);
 routesIntegrator.use('/cloudinary', cloudinaryRoutes);
 routesIntegrator.use(requireAuth);
 routesIntegrator.use('/admin', requireRole("admin"), adminRoutes);
+routesIntegrator.use(checkForBan);
 routesIntegrator.use('/driver', requireRole("driver"), driverRoutes);
 routesIntegrator.use('/restaurant', requireRole("restaurant"), restaurantRoutes);
 routesIntegrator.use('/user', requireRole("user"), userRoutes);

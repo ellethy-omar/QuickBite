@@ -14,6 +14,7 @@ const requireAuth = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         console.log("user:", req.user);
+
         next();
     } catch (error) {
         console.error('JWT Verification Error:', error.message);
@@ -28,6 +29,36 @@ const requireRole = (role) => (req, res, next) => {
     }
     next();
 };
+
+const checkForBan = async (req, res, next) => {
+    switch (req.user.role) {
+        case "user":
+            if (req.user.isBanned) {
+                const User = require('../models/User');
+                const user = User.findById(req.user._id)
+                if (user.isBanned) {
+                    return res.status(420).json({ error: "User is banned" });
+                }
+            }
+            break;
+        case "restaurant":
+            const Restaurant = require('../models/Restaurant');
+            const restaurant = User.findById(req.user._id)
+            if (restaurant.isBanned) {
+                return res.status(420).json({ error: "User is banned" });
+            }
+            break;
+        case "driver":
+            const Driver = require('../models/Driver');
+            const driver = User.findById(req.user._id)
+            if (driver.isBanned) {
+                return res.status(420).json({ error: "User is banned" });
+            }
+            break;
+        default:
+    }
+    next();
+}
 
 // Generate JWT with OTP
 function generateToken(_id, role) {
@@ -45,5 +76,6 @@ function generateToken(_id, role) {
 module.exports = {
     requireAuth,
     requireRole,
-    generateToken
+    generateToken,
+    checkForBan
 };

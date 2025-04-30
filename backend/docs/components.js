@@ -104,23 +104,48 @@
  *   schemas:
  *     Admin:
  *       type: object
+ *       required:
+ *         - email
+ *         - password
  *       properties:
  *         _id:
  *           type: string
- *           description: The unique identifier for the admin.
+ *           readOnly: true
+ *           description: Unique identifier of the admin.
+ *           example: "605c3c2f1c9d440000a1b2c3"
  *         name:
  *           type: string
- *           description: The admin's name.
+ *           description: Admin’s full name.
+ *           example: "Alice Smith"
  *         email:
  *           type: string
- *           description: The admin's email address.
+ *           format: email
+ *           description: Admin’s unique email address.
+ *           example: "admin@example.com"
  *         phone:
  *           type: string
- *           description: The admin's phone number.
+ *           description: Admin’s contact phone number.
+ *           example: "+15551234567"
+ *         password:
+ *           type: string
+ *           writeOnly: true
+ *           description: Password for admin account (hashed in the database).
+ *           example: "P@ssw0rd!"
+ *         handledRequests:
+ *           type: integer
+ *           description: Number of requests this admin has handled.
+ *           example: 42
+ *         profilePicture:
+ *           type: string
+ *           format: uri
+ *           description: URL to the admin’s profile picture.
+ *           example: "https://cdn.example.com/avatars/admin123.png"
  *         createdAt:
  *           type: string
  *           format: date-time
- *           description: The timestamp of when the admin was created.
+ *           readOnly: true
+ *           description: Timestamp when the admin account was created.
+ *           example: "2025-04-30T14:20:00Z"
  */
 
 /**
