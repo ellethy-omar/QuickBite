@@ -21,8 +21,8 @@ export default function HomeScreen() {
           name: rest.name,
           email: rest.contact?.email || '',
           ordersDone: 0,
-          image: rest.logo ? `http://192.168.1.217:4123/uploads/${rest.logo}` : 'https://via.placeholder.com/60',
-          banner: rest.coverImage ? `http://192.168.1.217:4123/uploads/${rest.coverImage}` : 'https://via.placeholder.com/300x150',
+          image: rest.logo ? `${rest.logo}` : 'https://i.imgur.com/6VBx3io.png',
+          banner: rest.coverImage ? `${rest.coverImage}` : 'https://i.imgur.com/6VBx3io.png',
           phone: rest.contact?.phone || '',
           bio: rest.description || '',
           rating: rest.rating || 0,
@@ -30,7 +30,9 @@ export default function HomeScreen() {
           address: `${rest.address?.area || ''}, ${rest.address?.city || ''}`,
           cuisines: rest.cuisineType || [],
           menu: [],
+          openingHours: rest.openingHours || undefined, // ✅ <--- ADD THIS
         }));
+        
 
         setRestaurants(mappedRestaurants);
       } catch (error) {
@@ -47,23 +49,48 @@ export default function HomeScreen() {
     (router as any).push(`mainScreens/home/${id}`); // 🧠 Just like you did for orders
   };
 
-  const renderRestaurant = ({ item }: { item: RestaurantData }) => (
-    <TouchableOpacity 
-      style={styles.card}
-      onPress={() => handlePressRestaurant(item.id)}
-    >
-      <View style={styles.infoContainer}>
-        <Image source={{ uri: item.image }} style={styles.logo} />
-        <View>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.cuisine}>
-            {item.cuisines.slice(0, 2).join(', ') || 'No cuisines'}
-          </Text>
+  const renderRestaurant = ({ item }: { item: RestaurantData }) => {
+    console.log('🔍 Rendering restaurant:', item.name);
+    console.log('📦 Full item:', item);
+  
+    const today = new Date().toLocaleString('en-US', { weekday: 'long' }).toLowerCase();
+    console.log('🗓️ Today is:', today);
+  
+    const hours = item.openingHours?.[today];
+    console.log('⏰ Hours today:', hours);
+  
+    return (
+      <TouchableOpacity 
+        style={styles.card}
+        onPress={() => handlePressRestaurant(item.id)}
+        activeOpacity={0.9}
+      >
+        <Image source={{ uri: item.banner }} style={styles.banner} />
+  
+        <View style={styles.infoContainer}>
+          <Image source={{ uri: item.image }} style={styles.logo} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.cuisine}>{item.cuisines.slice(0, 2).join(', ') || 'No cuisines'}</Text>
+          </View>
         </View>
-      </View>
-      <Text style={styles.arrow}>→</Text>
-    </TouchableOpacity>
-  );
+  
+        {item.bio ? <Text style={styles.description}>{item.bio}</Text> : null}
+  
+        <View style={styles.metaRow}>
+          {item.phone && <Text style={styles.metaText}>📞 {item.phone}</Text>}
+          {hours ? (
+            <Text style={styles.metaText}>🕒 {hours.open} - {hours.close}</Text>
+          ) : (
+            <Text style={styles.metaText}>⏳ Hours not available</Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  
+  
+  
 
   if (loading) {
     return (
@@ -108,22 +135,21 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 12,
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 3,
+    elevation: 3,
+    paddingBottom: 12, // for spacing under the row
   },
   infoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 12,
   },
   logo: {
     width: 50,
@@ -156,4 +182,32 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#888',
   },
+  banner: {
+    width: '100%',
+    height: 140,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    marginBottom: 12,
+    backgroundColor: '#eee',
+    resizeMode: 'cover',
+  },
+  description: {
+    fontSize: 13,
+    color: '#444',
+    paddingHorizontal: 12,
+    paddingTop: 8,
+  },
+  
+  metaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    marginTop: 10,
+  },
+  
+  metaText: {
+    fontSize: 12,
+    color: '#666',
+  },  
 });
