@@ -85,7 +85,7 @@ OrderSchema.statics.findOrdersNeedingDelivery = async function() {
   })
   .populate('restaurantID', 'name address')
   .populate('userID', 'name phone addresses')
-  .populate('items.productID', 'name price');
+  .populate('items.productId', 'name price');
 };
 
 //find orders by user id
