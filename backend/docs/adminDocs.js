@@ -54,19 +54,34 @@
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
 
- * /api/admin/updateAdminProfilePhoto:
+* /api/admin/updateAdminProfilePhoto:
  *   put:
  *     tags:
- *       - Admin (JWT required)
- *     summary: Update admin profile photo
- *     description: Allows admin to update their profile photo.
+ *       - User (JWT required)
+ *     summary: Update admin profile information
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UploadImagePayload'
  *     responses:
- *       505:
- *         description: Not implemented
+ *       200:
+ *         description: Admin profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ImageUploadResponse'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
 
  * /api/admin/sendwarningToUser:
  *   post:
