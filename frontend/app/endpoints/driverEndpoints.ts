@@ -5,26 +5,8 @@ import * as SecureStore from 'expo-secure-store';
 import { DriverData } from '../types/driver';
 
 export const fetchUserOrders = async () => {
-  try {
-      let token = await SecureStore.getItemAsync('jwtToken');
-      if (!token) {
-        throw new Error('No token found');
-      }
-
-      if (isTokenExpired(token)) {
-        console.log("Token expired, refreshing...");
-        token = await refreshAuthToken();
-        if (!token) {
-          throw new Error('Failed to refresh token');
-        }
-        await SecureStore.setItemAsync('jwtToken', token);
-      }
-      
-      const response = await apiClient.get('/api/driver/getAllAvailableOrders', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  try {      
+      const response = await apiClient.get('/api/driver/getAllAvailableOrders');
   
       console.log("response", JSON.stringify(response.data.data, null,2));
       const orders: OrderDriver[] = response.data.data.map((order: any) => ({
@@ -52,23 +34,7 @@ export const fetchUserOrders = async () => {
 
 export const acceptOrder = async (orderId: string) => {
   try {
-    let token = await SecureStore.getItemAsync('jwtToken');
-    if (!token) {
-      throw new Error('No token found');
-    }
-
-    if (isTokenExpired(token)) {
-      console.log("Token expired, refreshing...");
-      token = await refreshAuthToken();
-      if (!token) {
-        throw new Error('Failed to refresh token');
-      }
-      await SecureStore.setItemAsync('jwtToken', token);
-    }
-
-    const response = await apiClient.put(
-      `/api/driver/acceptOrder?orderId=${orderId}`, {}
-    );
+    const response = await apiClient.put(`/api/driver/acceptOrder?orderId=${orderId}`, {});
     
 
     return response.data;
@@ -80,25 +46,7 @@ export const acceptOrder = async (orderId: string) => {
 
 export const fetchDriverProfile = async ()  => {
   try {
-    let token = await SecureStore.getItemAsync('jwtToken');
-    if (!token) {
-      throw new Error('No token found');
-    }
-
-    if (isTokenExpired(token)) {
-      console.log("Token expired, refreshing...");
-      token = await refreshAuthToken();
-      if (!token) {
-        throw new Error('Failed to refresh token');
-      }
-      await SecureStore.setItemAsync('jwtToken', token);
-    }
-
-    const response = await apiClient.get('/api/driver/getDriverProfile', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+      const response = await apiClient.get('/api/driver/getDriverProfile')
 
     return response.data.driver;
   } catch (error: any) {
@@ -121,27 +69,7 @@ export const editDriverProfile = async (driverData: DriverData) => {
   }
 
   try {
-    let token = await SecureStore.getItemAsync('jwtToken');
-    if (!token) {
-      throw new Error('No token found');
-    }
-
-    if (isTokenExpired(token)) {
-      console.log("Token expired, refreshing...");
-      token = await refreshAuthToken();
-      if (!token) {
-        throw new Error('Failed to refresh token');
-      }
-      await SecureStore.setItemAsync('jwtToken', token);
-    }
-
-    console.log("body", body);
-    const response = await apiClient.put('/api/driver/updateDriverProfile', body, {
-      headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      },
-    });
+    const response = await apiClient.put('/api/driver/updateDriverProfile', body);
 
     return response.data;
   } catch (error: any) {
