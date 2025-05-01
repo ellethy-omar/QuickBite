@@ -15,6 +15,19 @@ routesIntegrator.get("/", (req, res)=> {
     })
 });
 
+// before requireAuth
+routesIntegrator.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      return res
+        .header('Access-Control-Allow-Origin',  '*')
+        .header('Access-Control-Allow-Methods','GET,POST,PUT,DELETE,OPTIONS')
+        .header('Access-Control-Allow-Headers','Content-Type,Authorization')
+        .sendStatus(204);
+    }
+    next();
+});
+  
+
 routesIntegrator.use('/auth', authRoutes);
 routesIntegrator.use('/cloudinary', cloudinaryRoutes);
 routesIntegrator.use(requireAuth);
