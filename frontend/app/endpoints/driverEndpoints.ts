@@ -67,13 +67,7 @@ export const acceptOrder = async (orderId: string) => {
     }
 
     const response = await apiClient.put(
-      `/api/driver/acceptOrder?orderId=${orderId}`,
-      null,
-      {
-        headers: {
-          Authorization:`Bearer ${token}`,
-        },
-      }
+      `/api/driver/acceptOrder?orderId=${orderId}`, {}
     );
     
 
