@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store'; // 🧠 Important
 
 const apiClient = axios.create({
-  baseURL: 'http://192.168.1.217:4123', // Your local server
+  baseURL: 'http://quickbite.zapto.org', // Your local server
   headers: {
     'Content-Type': 'application/json', // Standard header
   },
