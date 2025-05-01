@@ -40,7 +40,9 @@ export default function OrderConfirm() {
                 await acceptOrder(orderData.orderId);
                 showNotification('Order Accepted', 'success')
                 setTimeout(() => {
-                    navigation.navigate('_driverutils/orderAcceptedView');
+                    navigation.navigate('_driverutils/orderAcceptedView', {
+                        order: JSON.stringify(orderData),
+                    });
                 }, 1000);
             } catch (error) {
                 console.error("Error accepting order:", error);
