@@ -43,16 +43,16 @@ const checkForBan = async (req, res, next) => {
             break;
         case "restaurant":
             const Restaurant = require('../models/Restaurant');
-            const restaurant = User.findById(req.user._id)
+            const restaurant = Restaurant.findById(req.user._id)
             if (restaurant.isBanned) {
-                return res.status(420).json({ error: "User is banned" });
+                return res.status(420).json({ error: "Restaurant is banned" });
             }
             break;
         case "driver":
             const Driver = require('../models/Driver');
-            const driver = User.findById(req.user._id)
+            const driver = Driver.findById(req.user._id)
             if (driver.isBanned) {
-                return res.status(420).json({ error: "User is banned" });
+                return res.status(420).json({ error: "Driver is banned" });
             }
             break;
         default:
