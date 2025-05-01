@@ -39,6 +39,7 @@
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ */
 
 /**
  * @swagger
