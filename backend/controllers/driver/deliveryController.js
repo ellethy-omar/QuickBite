@@ -5,7 +5,7 @@ const getAllAvailableOrders = async (req, res) => {
   
       if (availableOrders.length === 0) {
         console.log('No available orders found.');
-        return res.status(404).json({ message: 'No available orders found.' });
+        return res.status(200).json({ message: 'No available orders found.', data: [] });
       }
   
       res.status(200).json({
