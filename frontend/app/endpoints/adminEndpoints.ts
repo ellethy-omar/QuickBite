@@ -4,25 +4,7 @@ import { isTokenExpired, refreshAuthToken } from '@/app/utils/authHelpers';
 
 export const fetchAllUsers = async () => {
     try {
-        let token = await SecureStore.getItemAsync('jwtToken');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        if (isTokenExpired(token)) {
-            console.log("Token expired, refreshing...");
-            token = await refreshAuthToken();
-            if (!token) {
-                throw new Error('Failed to refresh token');
-            }
-            await SecureStore.setItemAsync('jwtToken', token);
-        }
-
-        const response = await apiClient.get('/api/admin/getAllUsers', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await apiClient.get('/api/admin/getAllUsers');
 
         return response.data;
     } catch (error: any) {
@@ -33,25 +15,7 @@ export const fetchAllUsers = async () => {
 
 export const fetchAllRestaurants = async () => {
     try {
-        let token = await SecureStore.getItemAsync('jwtToken');
-        if (!token) {
-            throw new Error('No token found');
-        }
-
-        if (isTokenExpired(token)) {
-            console.log("Token expired, refreshing...");
-            token = await refreshAuthToken();
-            if (!token) {
-                throw new Error('Failed to refresh token');
-            }
-            await SecureStore.setItemAsync('jwtToken', token);
-        }
-
-        const response = await apiClient.get('/api/admin/getAllRestaurants', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await apiClient.get('/api/admin/getAllRestaurants');
 
         console.log("response", JSON.stringify(response.data, null, 2));
         const mappedRestaurants = response.data.map((restaurant: any) => ({
