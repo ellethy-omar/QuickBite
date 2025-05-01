@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { setUserDetails } from '@/app/slices/userSlice'; 
 import { useNotification } from '@/app/context/notificationContext';
-import { UpdateUserProfile } from '@/app/endpoints/userEndpoints';
+import { UpdateUserProfile, GetUserProfile, UpdateUserProfilePhoto } from '@/app/endpoints/userEndpoints';
 import colors from '@/app/styles/colors';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function ProfileSettingsScreen() {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ export default function ProfileSettingsScreen() {
   const reduxUser = useSelector((state: any) => state.user);
 
   const [userData, setUserData] = useState(reduxUser);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editAddressId, setEditAddressId] = useState<string | null>(null);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
@@ -25,6 +27,20 @@ export default function ProfileSettingsScreen() {
     apartment: '',
     isDefault: false,
   });
+
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      try {
+        const data = await GetUserProfile();
+        console.log('Fetched user profile:', data);
+        setProfileImage(data.user?.profilePicture || null);
+      } catch (err) {
+        console.error('Error fetching profile image:', err);
+      }
+    };
+
+    fetchProfileImage();
+  }, []);
 
   const updateField = (field: string, value: string) => {
     setUserData({ ...userData, [field]: value });
@@ -153,8 +169,54 @@ export default function ProfileSettingsScreen() {
     }
   };
 
+  const handleImagePick = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      showNotification('Permission to access media library is required.', 'error');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (result.canceled) {
+      console.log('🚫 Image picker cancelled');
+      return;
+    }
+
+    try {
+      const base64 = result.assets?.[0]?.base64;
+      if (!base64) {
+        showNotification('Failed to read image.', 'error');
+        return;
+      }
+
+      const res = await UpdateUserProfilePhoto({
+        imageBase64: `data:image/jpeg;base64,${base64}`,
+        tags: ['profile'],
+      });
+
+      setProfileImage(res.imageURL);
+      showNotification('Profile image updated!', 'success');
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      showNotification('Failed to upload image.', 'error');
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
+      <TouchableOpacity style={styles.avatarContainer} onPress={handleImagePick}>
+        <Image
+          source={{ uri: profileImage || 'https://i.imgur.com/6VBx3io.png' }}
+          style={styles.avatar}
+        />
+      </TouchableOpacity>
+
       {/* Profile Info */}
       <Text style={styles.label}>Name</Text>
       <TextInput style={styles.input} value={userData.name} onChangeText={(text) => updateField("name", text)} placeholder="Name" />
@@ -224,7 +286,6 @@ export default function ProfileSettingsScreen() {
       {/* Add / Edit Address Form */}
       {isAddingAddress ? (
         <View style={styles.addressForm}>
-          {/* Inputs */}
           {["Label", "Street", "Area", "City", "Building", "Floor", "Apartment"].map((field, idx) => (
             <TextInput
               key={idx}
@@ -235,7 +296,6 @@ export default function ProfileSettingsScreen() {
             />
           ))}
 
-          {/* Buttons */}
           <View style={{ flexDirection: "row", marginTop: 20 }}>
             <TouchableOpacity style={[styles.saveButton, { flex: 1, marginTop: 0, marginRight: 8 }]} onPress={handleAddOrEditAddress}>
               <Text style={{ color: 'white', fontWeight: 'bold' }}>{isEditing ? 'Update Address' : 'Add Address'}</Text>
@@ -267,7 +327,6 @@ export default function ProfileSettingsScreen() {
         </TouchableOpacity>
       )}
 
-      {/* Save Changes */}
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={{ color: "white", fontWeight: "bold" }}>Save Changes</Text>
       </TouchableOpacity>
@@ -277,6 +336,18 @@ export default function ProfileSettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, padding: 16 },
+  avatarContainer: { alignItems: 'center', marginBottom: 16 },
+  avatar: { width: 100, height: 100, borderRadius: 50 },
+  cameraOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    transform: [{ translateX: 10 }, { translateY: 10 }],
+  },
   label: { fontSize: 14, fontWeight: 'bold', marginTop: 10, color: colors.text },
   input: { backgroundColor: '#f9f9f9', padding: 10, borderRadius: 8, marginTop: 6, marginBottom: 10, borderColor: '#ddd', borderWidth: 1 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', marginVertical: 15, color: colors.primary },

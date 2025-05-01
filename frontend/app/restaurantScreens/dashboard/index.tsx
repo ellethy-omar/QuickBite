@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
+
 import { useRouter } from 'expo-router';
 import { GetRestaurantProducts } from '@/app/endpoints/restaurantEndpoints';
 import { useNotification } from '@/app/context/notificationContext';
@@ -15,6 +18,7 @@ export default function DashboardScreen() {
     try {
       setLoading(true);
       const response = await GetRestaurantProducts();
+      console.log('Fetched products:', response.data);
       setProducts(response.data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -24,9 +28,12 @@ export default function DashboardScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchProducts();
+    }, [])
+  );
+  
 
   if (loading) {
     return (
@@ -73,9 +80,9 @@ export default function DashboardScreen() {
               </Text>
               <View style={styles.priceAvailabilityRow}>
                 <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
-                <Text style={[styles.availability, { color: item.isAvailable ? '#4CAF50' : '#F44336' }]}>
-                  {item.isAvailable ? 'Available' : 'Unavailable'}
-                </Text>
+                {/* <Text style={[styles.availability, { color: item.isAvailable ? '#4CAF50' : '#F44336' }]}>
+                  {item.stockAvailable ? 'Available' : 'Unavailable'}
+                </Text> */}
               </View>
             </View>
           </TouchableOpacity>

@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { AddRestaurantProduct, EditRestaurantProduct, GetRestaurantProducts, EditRestaurantProductImage } from '@/app/endpoints/restaurantEndpoints';
 import { useNotification } from '@/app/context/notificationContext';
 import * as ImagePicker from 'expo-image-picker';
+import { Switch } from 'react-native';
 import colors from '@/app/styles/colors';
 
 export default function AddOrEditProductScreen() {
@@ -73,11 +74,11 @@ export default function AddOrEditProductScreen() {
       Alert.alert('Error', 'Please fill in all required fields.');
       return;
     }
-
+  
     try {
       setSaving(true);
-
-      const cleanedProduct = {
+  
+      const payload = {
         _id: formData._id,
         name: formData.name.trim(),
         description: formData.description.trim(),
@@ -85,24 +86,24 @@ export default function AddOrEditProductScreen() {
         category: formData.category.trim(),
         isAvailable: formData.isAvailable,
       };
-
+  
       let productId = formData._id;
-
+  
       if (id) {
-        await EditRestaurantProduct(cleanedProduct);
+        // ✅ EDIT
+        await EditRestaurantProduct(payload);
         showNotification('Product updated successfully!', 'success');
       } else {
+        // ✅ ADD
         const response = await AddRestaurantProduct({
-          name: cleanedProduct.name,
-          description: cleanedProduct.description,
-          price: cleanedProduct.price,
-          category: cleanedProduct.category,
-          isAvailable: cleanedProduct.isAvailable,
+          ...payload,
+          stockAvailable: 99, // only needed in Add
         });
         productId = response._id;
         showNotification('Product added successfully!', 'success');
       }
-
+  
+      // ✅ Upload image if selected
       if (newImageBase64 && productId) {
         await EditRestaurantProductImage({
           _id: productId,
@@ -111,15 +112,17 @@ export default function AddOrEditProductScreen() {
         });
         showNotification('Product image updated!', 'success');
       }
-
+  
       router.back();
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error('❌ Error saving product:', error);
       showNotification('Failed to save product.', 'error');
     } finally {
       setSaving(false);
     }
   };
+  
+  
 
   if (id && loading) {
     return (
@@ -176,6 +179,13 @@ export default function AddOrEditProductScreen() {
         onChangeText={(text) => setFormData({ ...formData, category: text })} 
         placeholder="Enter category" 
       />
+      {/* <View style={styles.switchContainer}>
+  <Text style={styles.label}>Available:</Text>
+  <Switch
+    value={formData.isAvailable}
+    onValueChange={(value) => setFormData({ ...formData, isAvailable: value })}
+  />
+</View> */}
 
       <TouchableOpacity
         style={[
@@ -206,4 +216,11 @@ const styles = StyleSheet.create({
   imageButtonText: { fontSize: 14, fontWeight: 'bold', color: '#333' },
   saveButton: { padding: 14, borderRadius: 8, marginTop: 20, alignItems: 'center' },
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  
 });

@@ -27,6 +27,32 @@ export const UpdateRestaurantProfile = async (profileData: {
   }
 };
 
+export const UpdateRestaurantLogo = async (payload: {
+  imageBase64: string;
+  tags: string[];
+}): Promise<any> => {
+  try {
+    const response = await apiClient.put('/api/restaurant/updateRestaurantLogo', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating restaurant logo:', error);
+    throw error;
+  }
+};
+
+export const UpdateRestaurantCover = async (payload: {
+  imageBase64: string;
+  tags: string[];
+}): Promise<any> => {
+  try {
+    const response = await apiClient.put('/api/restaurant/updateRestaurantCoverImage', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating restaurant cover image:', error);
+    throw error;
+  }
+};
+
 // --- PUT: Edit existing product image
 export const EditRestaurantProductImage = async (imageData: {
   _id: string;
