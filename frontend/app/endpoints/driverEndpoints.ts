@@ -25,7 +25,7 @@ export const fetchUserOrders = async () => {
         restaurantLogo: order.restaurantLogo,
       }));
       
-      return orders.slice(0, 3);
+      return orders;
     } catch (error: any) {
       console.error("error fetching orders", error.response?.data || error.message);
       throw error;
