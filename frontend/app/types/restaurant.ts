@@ -9,9 +9,17 @@ export interface RestaurantData {
     bio: string,
     rating: number,
     ratingCount: number,
-    address: string,
+    address: {
+        street: string,
+        city: string,
+        area: string,
+        _id: string
+    },
     cuisines: string[],
     menu: MenuItem[],
+    description: string,
+    isActive: boolean
+    isBanned: boolean,
 }
 
 export interface MenuItem {

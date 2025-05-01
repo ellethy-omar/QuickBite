@@ -14,17 +14,19 @@ export default function RestaurantContainer({ restaurantData }: {restaurantData:
 
   return (
     <TouchableOpacity style={styles.background} onPress={handlePress}>
-      <Image source={{ uri: restaurantData.image }} style={{ width: 120, height: 100, borderRadius: 8 }} />
-      <View style={{ display: 'flex', flexDirection: 'column', paddingLeft: 10, width: '100%', gap: 5, paddingTop: 4 }}>
-        <Text style={styles.titleText}>{restaurantData.name}</Text>
-        <View style={{ display: 'flex', flexDirection: 'row', gap: 4, alignContent: 'center', alignItems: 'center' }}>
-          <IconSymbol name="star.fill" size={18} color={colors.primary} />
-          <Text style={styles.infoText}>
-            {`Rating: ${restaurantData.rating} (${restaurantData.ratingCount > 100 ? '100+' : restaurantData.ratingCount})`}
-          </Text>
-        </View>
-        <Text style={styles.infoText}>Orders Done: {restaurantData.ordersDone}</Text>
-        <Text style={styles.infoText}>Address: {restaurantData.address}</Text>
+      <Image source={{ uri: restaurantData.image }} style={{ width: 100, height: 100, borderRadius: 8, objectFit: 'contain' }} />
+      <View style={{ display: 'flex', flexDirection: 'column', paddingLeft: 10, flex: 1, gap: 5, paddingTop: 4 }}>
+      <Text style={styles.titleText} numberOfLines={1} ellipsizeMode="tail">{restaurantData.name}</Text>
+      <View style={{ display: 'flex', flexDirection: 'row', gap: 4, alignContent: 'center', alignItems: 'center' }}>
+        <IconSymbol name="star.fill" size={16} color={colors.primary} />
+        <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">
+        {`Rating: ${restaurantData.rating}`}
+        </Text>
+      </View>
+      <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">Orders Done: {restaurantData.ordersDone}</Text>
+      <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">
+        Address: {restaurantData.address.area}, {restaurantData.address.city}, {restaurantData.address.street}
+      </Text>
       </View>
     </TouchableOpacity>
   );

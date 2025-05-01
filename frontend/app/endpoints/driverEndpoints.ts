@@ -66,11 +66,16 @@ export const acceptOrder = async (orderId: string) => {
       await SecureStore.setItemAsync('jwtToken', token);
     }
 
-    const response = await apiClient.put(`/api/driver/acceptOrder?orderId=${orderId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await apiClient.put(
+      `/api/driver/acceptOrder?orderId=${orderId}`,
+      null,
+      {
+        headers: {
+          Authorization:`Bearer ${token}`,
+        },
+      }
+    );
+    
 
     return response.data;
   } catch (error: any) {
@@ -101,7 +106,7 @@ export const fetchDriverProfile = async ()  => {
       },
     })
 
-    return response.data;
+    return response.data.driver;
   } catch (error: any) {
     console.error("error", error.response?.data || error.message);
     throw error;

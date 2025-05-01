@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, RefreshControl } from 'react-native';
 import { useSelector } from 'react-redux';
 import { DriverData } from '../types/driver';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import colors from '../styles/colors';
-import { fetchDriverProfile, editDriverProfile } from '../endpoints/driverEndpoints';
-import OrderContainer from '../components/orderContainer';
+import { fetchDriverProfile } from '../endpoints/driverEndpoints';
 import { OrderDriver } from "../types/orderDriver"
 
 export default function ProfileView() {
     const [driverData, setDriverData] = useState<DriverData>(useSelector((state: any) => state.driver));
     const [refreshing, setRefreshing] = useState(false);
-    const [fetching, setFetching] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const [orderLog, setOrderLog] = useState<OrderDriver[]>([])
 
     useEffect(() => {
+        if(!fetching) return;
         const fetchProfile = async () => {
+            try {
             const response = await fetchDriverProfile();
-            console.log(JSON.stringify(response, null, 2));
+            console.log(response);
+            setDriverData(response);
+            } catch (error) {
+            console.error("Error fetching driver profile:", error);
+            } finally {
+                setFetching(false);
+                setRefreshing(false);
+            }
         }
-
         fetchProfile()
     }, [])
 
@@ -27,15 +33,6 @@ export default function ProfileView() {
         setRefreshing(true);
     };
 
-    const edit = async () => {
-        try {
-        console.log("going")
-        const response = await editDriverProfile(driverData)
-        console.log(response);
-        } catch(error) {
-            console.log(error)
-        }
-    } 
     return (
             <View style={styles.background}>
                 <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", padding: 10, width: "100%", alignItems: "center"}}>
@@ -57,8 +54,8 @@ export default function ProfileView() {
                     <View style={{padding: 10, paddingBottom: 0, gap: 5, height: 100, borderWidth: 1, borderColor: colors.primary, borderRadius: 10, backgroundColor: colors.offset}}>
                         <Text style={{fontSize: 24, marginBottom: 5, fontWeight: '700', color: colors.primary}}>Driver Statistics</Text>
                         <Text style={{fontSize: 12, fontWeight: '500', color: colors.primary}}>Total Orders Delivered: <Text style={{fontWeight: '500'}}>{driverData.deliveryStats.completed}</Text></Text>
+                        <Text style={{fontSize: 12, fontWeight: '500', color: colors.primary}}>Average Delivery Time: <Text style={{fontWeight: '500'}}>{driverData.deliveryStats.avgDeliveryTime}</Text></Text>
                     </View>
-
                 )}
                 </ScrollView>
             </View>
