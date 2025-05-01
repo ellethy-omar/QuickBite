@@ -33,26 +33,30 @@ const requireRole = (role) => (req, res, next) => {
 const checkForBan = async (req, res, next) => {
     switch (req.user.role) {
         case "user":
-            if (req.user.isBanned) {
-                const User = require('../models/User');
-                const user = User.findById(req.user._id)
-                if (user.isBanned) {
-                    return res.status(420).json({ error: "User is banned" });
-                }
+            const User = require('../models/User');
+            const user = User.findById(req.user._id)
+            if(!user)
+                return res.status(404).json({ error: "User not found" });
+            if (user.isBanned) {
+                return res.status(420).json({ error: "User is banned" });
             }
             break;
         case "restaurant":
             const Restaurant = require('../models/Restaurant');
-            const restaurant = User.findById(req.user._id)
+            const restaurant = Restaurant.findById(req.user._id)
+            if(!restaurant)
+                return res.status(404).json({ error: "Restaurant not found" });
             if (restaurant.isBanned) {
-                return res.status(420).json({ error: "User is banned" });
+                return res.status(420).json({ error: "Restaurant is banned" });
             }
             break;
         case "driver":
             const Driver = require('../models/Driver');
             const driver = Driver.findById(req.user._id)
+            if(!driver)
+                return res.status(404).json({ error: "Driver not found" });
             if (driver.isBanned) {
-                return res.status(420).json({ error: "User is banned" });
+                return res.status(420).json({ error: "Driver is banned" });
             }
             break;
         default:
