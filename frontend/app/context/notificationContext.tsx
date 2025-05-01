@@ -60,7 +60,7 @@ export const useNotification = (): NotificationContextType => {
 const styles = StyleSheet.create({
   notification: {
     position: 'absolute',
-    bottom: 20,
+    top: 60,
     left: '10%',
     right: '10%',
     flexDirection: 'row',

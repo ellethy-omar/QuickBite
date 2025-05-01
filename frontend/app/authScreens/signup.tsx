@@ -14,7 +14,7 @@ import colors from '../styles/colors';
 import { useNotification } from '../context/notificationContext';
 
 export default function SignupScreen() {
-    const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: {apartment: "", street: '', area: '', building: '', floor: ''} });
+    const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: {label: "", apartment: "", street: '', area: '', building: '', floor: '', isDefault: false} });
     const [restaurantFormData, setRestaurantFormData] = useState<RestaurantFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', cuisines: [], address: {city: "", street: "", area: ""}, description: '', image: '', openingHours: { Monday: { open: '', close: '' }, Tuesday: { open: '', close: '' }, Wednesday: { open: '', close: '' }, Thursday: { open: '', close: '' }, Friday: { open: '', close: '' }, Saturday: { open: '', close: '' }, Sunday: { open: '', close: '' } } });
     const [driverFormData, setDriverFormData] = useState<DriverFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', vehicleType: '', vehicleModel: '', vehiclePlateNumber: '' });
     const [currentSection, setCurrentSection] = useState(0);

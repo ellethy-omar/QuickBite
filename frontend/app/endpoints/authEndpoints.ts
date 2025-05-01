@@ -49,7 +49,7 @@ export const DriverSignupRoute = async (driverData: any) => {
         phone: driverData.phone,
         vehicle: {
             type: driverData.vehicleType,
-            //model: driverData.vehicleModel,
+            model: driverData.vehicleModel,
             plateNumber: driverData.vehiclePlateNumber,
         }
     }

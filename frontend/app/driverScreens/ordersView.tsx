@@ -35,7 +35,7 @@ export default function OrdersView() {
     setRefreshing(true);
     fetchOrders();
   };
-
+  
   return (
     <View style={styles.background}>
       <Text style={styles.titleText}>Active Orders</Text>

@@ -13,17 +13,17 @@ export default function OrderContainer({order}: {order: OrderDriver}) {
   return (
     <TouchableOpacity style={styles.container} onPress={handlePress}>
         <View style={styles.mainSection}>
-            <Image source={{uri: order.restaurantLogo}} style={styles.image} resizeMode="cover" />
+            <Image source={{uri: order.restaurantId.logo}} style={styles.image} resizeMode="cover" />
             <View style={{flex: 1, gap: 3}}>
-                <Text style={styles.mainText}>{order.restaurantName}</Text>
-                <Text style={{fontWeight: '500', color: colors.primary}}>Deliver to: <Text style={styles.infoText}>{order.userName}</Text></Text>
-                <Text style={{fontWeight: '500', color: colors.primary}}>Placed: <Text style={styles.infoText}>{Math.floor((Date.now() - new Date(order.createdOn).getTime()) / (1000 * 60))} minutes ago</Text></Text>
+                <Text style={styles.mainText}>{order.restaurantId.name}</Text>
+                <Text style={{fontSize: 13, fontWeight: '500', color: colors.primary}}>Deliver to: <Text style={styles.infoText}>{order.userId.name}</Text></Text>
+                <Text style={{fontSize: 13, fontWeight: '500', color: colors.primary}}>Placed: <Text style={styles.infoText}>{Math.floor((Date.now() - new Date(order.createdOn).getTime()) / (1000 * 60))} minutes ago</Text></Text>
             </View>
         </View>
         <View style={{marginTop: 10, gap:5}}>
-            <Text style={{fontWeight: '500', color: colors.primary}}>Delivery Address: <Text style={styles.infoText}>{order.deliveryAddress.area}, {order.deliveryAddress.street}, {order.deliveryAddress.building}</Text></Text>
-            <Text style={{fontWeight: '500', color: colors.primary}}>Restaurant Address: <Text style={styles.infoText}>{order.restaurantAddress.area}, {order.restaurantAddress.street}, {order.restaurantAddress.city}</Text></Text>
-            <Text style={{fontWeight: '500', color: colors.primary}}>Total Amount: <Text style={styles.infoText}>{order.totalAmount} EGP</Text></Text>
+            <Text style={{fontSize: 12, fontWeight: '500', color: colors.primary}}>Delivery Address: <Text style={styles.infoText}>{order.deliveryAddress.area}, {order.deliveryAddress.street}, {order.deliveryAddress.building}</Text></Text>
+            <Text style={{fontSize: 12, fontWeight: '500', color: colors.primary}}>Restaurant Address: <Text style={styles.infoText}>{order.restaurantId.address.area}, {order.restaurantId.address.street}, {order.restaurantId.address.city}</Text></Text>
+            <Text style={{fontSize: 12, fontWeight: '500', color: colors.primary}}>Total Amount: <Text style={styles.infoText}>{order.totalAmount} EGP</Text></Text>
         </View>
     </TouchableOpacity>
   );
@@ -49,13 +49,12 @@ const styles = StyleSheet.create({
         borderRadius: 100,
     },
     mainText: {
-        fontSize: 20,
+        fontSize: 19,
         fontWeight: '700',
         color: colors.primary,
         marginBottom: 4,
     },
     infoText: {
-        fontSize: 14,
         fontWeight: '500',
         color: 'gray',
     }

@@ -2,13 +2,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserState {
-  role: 'admin' | 'user' | 'restaurant' | 'driver'| null;
   name: string;
   email: string;
   phone: string;
-  password: string;
-  confirmPassword: string;
-  addresses: [{
+  password?: string;
+  confirmPassword?: string;
+  addresses: {
       label: string;
       area: string;
       street: string;
@@ -16,12 +15,11 @@ interface UserState {
       floor: string;
       apartment: string;
       isDefault: boolean;
-  }];
+  }[];
 
 }
 
 const initialState: UserState = {
-  role: null,
   name: '',
   email: '',
   phone: '',
@@ -42,9 +40,6 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setRole: (state, action: PayloadAction<'admin' | 'user' | 'restaurant' | 'driver'>) => {
-      state.role = action.payload;
-    },
     setUserDetails: (state, action: PayloadAction<UserState>) => {
       state.name = action.payload.name;
       state.email = action.payload.email;
@@ -53,11 +48,8 @@ const userSlice = createSlice({
       state.confirmPassword = action.payload.confirmPassword;
       state.addresses = action.payload.addresses;
     },
-    logout: (state) => {
-      state.role = null;
-    },
-  },
+  }
 });
 
-export const { setRole, logout, setUserDetails } = userSlice.actions;
+export const { setUserDetails } = userSlice.actions;
 export default userSlice.reducer;

@@ -50,7 +50,7 @@ const checkForBan = async (req, res, next) => {
             break;
         case "driver":
             const Driver = require('../models/Driver');
-            const driver = User.findById(req.user._id)
+            const driver = Driver.findById(req.user._id)
             if (driver.isBanned) {
                 return res.status(420).json({ error: "User is banned" });
             }

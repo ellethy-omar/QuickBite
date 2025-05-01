@@ -35,6 +35,7 @@ export default function DriverScreensLayout() {
         })}
       >
         <Tabs.Screen name="ordersView" options={{ title: 'Orders' }} />
+        <Tabs.Screen name="profileView" options={{ title: 'Profile' }} />
       </Tabs>
     </GestureHandlerRootView>
   );
