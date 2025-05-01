@@ -13,11 +13,11 @@ const DriverSchema = new Schema({
       model: String,
       cateogry:String 
     },
-   rating: Number,
+   rating: {type: Number, default: 0.0},
    deliveryStats: 
      {
-       completed: Number,
-       avgDeliveryTime: Number
+       completed:{type: Number, default: 0},
+       avgDeliveryTime:{type: Number, default: 0.0},
      },
    isBanned:{type: Boolean, default:false} ,
    profilePicture: String,
