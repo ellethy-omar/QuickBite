@@ -53,6 +53,20 @@ const cancelOrder = async (req, res) => {
     }
 }
 
+const getMyOrders = async (req, res) => {
+    try {
+        const orders = await Order.findOrdersByUserId(req.user._id)
+        res.status(200).json({
+            message: "All orders fetched successfully",
+            data: orders
+        });
+        console.log('orders:', orders);
+    } catch (error) {
+        console.error("Order fetching error:", error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });        
+    }
+}
+
 const getAllRestaurants  = async (req, res) => {
     const restaurants = await Restaurant.find({})
     if (!restaurants) {
@@ -106,6 +120,7 @@ module.exports = {
     createOrder,
     updateOrder,
     cancelOrder,
+    getMyOrders,
     getAllRestaurants,
     getProductsForRestaurant
 }
