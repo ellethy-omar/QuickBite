@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet, ActivityIndicator, Switch } from 'react-native';
 import { useNotification } from '@/app/context/notificationContext';
-import { GetRestaurantProfile, UpdateRestaurantProfile, UpdateRestaurantProfilePhoto } from '@/app/endpoints/restaurantEndpoints';
+import { GetRestaurantProfile, UpdateRestaurantProfile, UpdateRestaurantCover, UpdateRestaurantLogo } from '@/app/endpoints/restaurantEndpoints';
 import * as ImagePicker from 'expo-image-picker';
 import colors from '@/app/styles/colors';
 
@@ -37,22 +37,27 @@ export default function RestaurantSettingsScreen() {
       quality: 0.7,
       base64: true,
     });
-
+  
     if (!result.canceled && result.assets?.[0]?.base64) {
+      const rawBase64 = result.assets[0].base64;
+  
       try {
-        await UpdateRestaurantProfilePhoto({
-          imageBase64: result.assets[0].base64,
-          tags: [type],
-        });
-        showNotification(`${type === 'logo' ? 'Logo' : 'Cover image'} updated successfully!`, 'success');
-        if (type === 'logo') setLogo(`data:image/jpeg;base64,${result.assets[0].base64}`);
-        else setCoverImage(`data:image/jpeg;base64,${result.assets[0].base64}`);
+        if (type === 'logo') {
+          await UpdateRestaurantLogo({ imageBase64: rawBase64, tags: ['logo'] });
+          setLogo(`data:image/jpeg;base64,${rawBase64}`); // for preview
+          showNotification('Logo updated successfully!', 'success');
+        } else {
+          await UpdateRestaurantCover({ imageBase64: rawBase64, tags: ['cover'] });
+          setCoverImage(`data:image/jpeg;base64,${rawBase64}`);
+          showNotification('Cover image updated successfully!', 'success');
+        }
       } catch (error) {
-        showNotification('Failed to upload image.', 'error');
         console.error('Upload image error:', error);
+        showNotification('Failed to upload image.', 'error');
       }
     }
   };
+  
 
   const handleSave = async () => {
     if (!restaurant.name?.trim() || !restaurant.description?.trim()) {
