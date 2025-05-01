@@ -11,7 +11,8 @@ const {
     getRestaurantProducts,
     addRestaurantProduct,
     editRestaurantProduct,
-    editRestaurantProductImage
+    editRestaurantProductImage,
+    getRestaurantAllRequiredOrders
 } = require('../controllers/restaurant/menuController')
 
 // profile routes
@@ -26,5 +27,8 @@ router.get("/getRestaurantProducts", getRestaurantProducts)
 router.post("/addRestaurantProduct", addRestaurantProduct)
 router.put("/editRestaurantProduct", editRestaurantProduct)
 router.put("/editRestaurantProductImage", editRestaurantProductImage)
+
+// order routes
+router.get("/getRestaurantAllRequiredOrders", getRestaurantAllRequiredOrders);
 
 module.exports = router;

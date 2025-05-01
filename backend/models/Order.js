@@ -41,18 +41,14 @@ OrderSchema.statics.validateOrder = async function(orderData) {
     return { isValid: false, error: 'Restaurant not found' };
   }
 
-  // 2. Check all product IDs exist and belong to this restaurant
   const productIds = items.map(item => item.productId);
 
   const products = await mongoose.model('Product').find({
     _id: { $in: productIds },
     restaurantId: restaurantID
-  })
+  });
 
-  console.log('products*:', products);
-  console.log('productIds:', productIds);
-
-  // 3. Verify all products were found
+  // Verify all products were found
   if (products.length !== productIds.length) {
     const foundIds = products.map(p => p._id.toString());
     const missingIds = productIds.filter(id => !foundIds.includes(id.toString()));
@@ -62,6 +58,17 @@ OrderSchema.statics.validateOrder = async function(orderData) {
       missingProducts: missingIds
     };
   }
+
+  // Calculate totalAmount
+  let totalAmount = 0;
+  for (const item of items) {
+    const product = products.find(p => p._id.toString() === item.productId.toString());
+    if (!product) continue; // Just in case
+    totalAmount += product.price * (item.quantity || 1);
+  }
+
+  // Set totalAmount in orderData
+  orderData.totalAmount = totalAmount;
 
   return { isValid: true };
 };
@@ -80,10 +87,10 @@ OrderSchema.statics.createOrder = async function(orderData) {
  
 OrderSchema.statics.findOrdersNeedingDelivery = async function() {
   return this.find({
-    deliveryDriverID: { $exists: false },
+    deliveryDriverID: {  $in: [null, undefined] },
     status: { $ne: 'cancelled' }
   })
-  .populate('restaurantID', 'name address')
+  .populate('restaurantID', 'name address contact.phone')
   .populate('userID', 'name phone addresses')
   .populate('items.productId', 'name price');
 };
@@ -92,11 +99,11 @@ OrderSchema.statics.findOrdersNeedingDelivery = async function() {
 OrderSchema.statics.findOrdersByUserId = async function(userID) {
   return this.find({ userID })
     .populate('restaurantID', 'name logo')
-    .populate('items.productID', 'name image')
+    .populate('items.productId', 'name image')
     .sort({ timestamp: -1 }); // newest first
 };
 
-// find orders by restaurant id 
+// find orders by restaurant id   
 OrderSchema.statics.findOrdersByRestaurantId = async function(restaurantID) {
   return this.find({ restaurantID })
     .populate('userID', 'name addresses')
@@ -104,50 +111,34 @@ OrderSchema.statics.findOrdersByRestaurantId = async function(restaurantID) {
     .sort({ timestamp: -1 });
 };
 
-//find order by ID
-OrderSchema.statics.findOrderById = async function(orderId) {
-  return this.findById(orderId)
-    .populate('restaurantID')
-    .populate('userID')
-    .populate('deliveryDriverID')
-    .populate('items.productID');
+//resturant find new orders for a sepcfic restaurant with status pending 
+OrderSchema.statics.findNewRestaurantOrders = async function(restaurantID) {
+  return this.find({  restaurantID,
+    status: { $eq: 'pending' }  
+   })
+    .populate('userID', 'name addresses')
+    .populate('deliveryDriverID', 'name phone')
+    .sort({ timestamp: -1 });
 };
 
 
-//update status of order by id 
-const updateOrderStatus = async (orderId, newStatus) => {
-  return Order.findByIdAndUpdate(
-    orderId,
-    { 
-      $set: { status: newStatus },
-      $currentDate: { updatedAt: true } 
-    },
-    { new: true } // Return the updated document
-  );
-};
+//find order by ID not tested yet 
+// OrderSchema.statics.findOrderById = async function(orderId) {
+//   return this.findById(orderId)
+//     .populate('restaurantID')
+//     .populate('userID')
+//     .populate('deliveryDriverID')
+//     .populate('items.productID');
+// };
 
-const unassignDeliveryMan = async (orderId) => {
-  return Order.findByIdAndUpdate(
-    orderId,
-    { 
-      $unset: { deliveryManId: "" },
-      $set: { status: 'preparing' }
-    },
-    { new: true }
-  );
-};
 
-const assignDeliveryMan = async (orderId, deliveryManId) => {
-  return Order.findByIdAndUpdate(
-    orderId,
-    { 
-      $set: { 
-        deliveryDriverID: deliveryManId
-      }
-    },
-    { new: true } // Return the updated document
-  ).populate('deliveryManId', 'name phone vehicle');
-};
+//update status of order by id in test queries line 80
+
+
+// unassignDeliveryman by order id in test queries line 97
+
+
+//assign a delivery man by the order id and delivery man id in test queries line 115
 
 
 
