@@ -1,34 +1,23 @@
 const Order = require('../../models/Order')
-const Product = require('../../models/Product')
 const getAllAvailableOrders = async (req, res) => {
     try {
-      const availableOrders = await Order.find({ deliveryDriverID: null });
+      const availableOrders = await Order.findOrdersNeedingDelivery();
   
       if (availableOrders.length === 0) {
         console.log('No available orders found.');
         return res.status(404).json({ message: 'No available orders found.' });
       }
   
-      const allProductIds = availableOrders.flatMap(order => 
-        order.items.map(item => item.productId)
-      );
-  
-      const uniqueProductIds = [...new Set(allProductIds.map(id => id.toString()))];
-      const products = await Product.find({ _id: { $in: uniqueProductIds } });
-  
       res.status(200).json({
         data: availableOrders,
-        products: products
       });
   
-      console.log('availableOrders:', availableOrders);
-      console.log('products:', products);
-  
+      console.log('availableOrders:', availableOrders);  
     } catch (err) {
       console.log('Error fetching available orders:', err);
       res.status(500).json({ error: 'Failed to fetch available orders', details: err.message });
     }
-  };
+};
   
 
 const acceptOrder = async (req, res) => {

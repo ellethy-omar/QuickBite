@@ -1,12 +1,15 @@
 const Order = require('../../models/Order')
 const Restaurant = require('../../models/Restaurant')
 const Product = require('../../models/Product')
-const User = require('../../models/User')
 
 const createOrder = async (req, res) => {
     try {
-      const { restaurantID, items, address } = req.body;
+      const { restaurantID, items } = req.body;
       const userID = req.user._id;
+
+      req.body.userID = userID;
+
+      req.body.deliveryDriverID = null;
 
       if ( !restaurantID || !items || !Array.isArray(items) || items.length === 0) {
         console.log("Missing required fields or empty items list.");
@@ -16,61 +19,14 @@ const createOrder = async (req, res) => {
       const restaurant = await Restaurant.findById(restaurantID);
       if (!restaurant) return res.status(404).json({ error: 'Restaurant not found.' });
   
-      let totalAmount = 0;
-      for (let item of items) {
-        const product = await Product.findById(item.productId);
-        if (!product || product.restraurantID.toString() !== restaurantID) {
-
-          console.log("Product not found");
-          return res.status(400).json({ 
-            error: `Product ${item.productId} not found or doesn't belong to the specified restaurant.` 
-          });
-        }
-        totalAmount += product.price * item.quantity;
-      }
-
-      const user = await User.findById(userID);
-
-      const normalize = str => str?.toString().toLowerCase().trim();
-
-      console.log('User Addresses:', JSON.stringify(user.addresses, null, 2));
-      console.log('Incoming Address:', JSON.stringify(address, null, 2));
-
-      const addressMatch = user.addresses.find(a =>
-        normalize(a.label) === normalize(address.label) &&
-        normalize(a.area) === normalize(address.area) &&
-        normalize(a.street) === normalize(address.street) &&
-        normalize(a.building) === normalize(address.building) &&
-        normalize(a.floor) === normalize(address.floor) &&
-        normalize(a.apartment) === normalize(address.apartment)
-      );
-      
-      if (!addressMatch) {
-        console.log("Address not found in user's addresses.");
-        return res.status(404).json({ error: "Address not found." });
-      }
-      console.log('Matched Address:', addressMatch);
+      const newOrder = await Order.createOrder(req.body)
   
-      const newOrder = await Order.create({
-        userID,
-        userAddress: addressMatch,
-        userName: user.name,
-        restaurantID,
-        restaurantAddress: restaurant.address,
-        restaurantLogo: restaurant.logo,
-        items,
-        totalAmount
-      });
-  
-      const populatedOrder = await Order.findById(newOrder._id)
-        .populate('restaurantID', 'name')
-        .populate('userID', 'name phone')
-        .populate('items.productId', 'name price');
-  
-      return res.status(201).json(populatedOrder);
+      res.status(201).json(newOrder);
+
+      console.log('newOrder:', newOrder);
     } catch (error) {
       console.error("Order creation error:", error);
-      return res.status(500).json({ error: 'Internal server error', details: error });
+      res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 };
 
@@ -81,9 +37,20 @@ const updateOrder = async (req, res) => {
 }
 
 const cancelOrder = async (req, res) => {
-    res.status(505).json({
-        errror: "Not implmented yet"
-    })
+    const { orderID } = req.query;
+
+    if (!orderID) {
+        console.log("Order ID is required");
+        return res.status(403).json({ error: 'Order ID is required' });
+    }
+
+    try {
+        await Order.findByIdAndUpdate(orderID, { status: 'cancelled' }, { new: true });
+        res.status(200).json({ message: 'Order cancelled successfully' });
+    } catch (error) {
+        console.error("Order cancellation error:", error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
 }
 
 const getAllRestaurants  = async (req, res) => {
@@ -119,7 +86,7 @@ const getProductsForRestaurant = async (req, res) => {
 
     console.log('restaurant:', restaurant);
 
-    const products = await Product.find({ restraurantID });
+    const products = await Product.find({ restaurantId: restraurantID });
     if (!products) {
         console.log("No products found for this restaurant");
         return res.status(404).json({

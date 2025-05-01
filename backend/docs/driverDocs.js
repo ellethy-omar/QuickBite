@@ -13,52 +13,80 @@
  *       - Driver (JWT required)
  *     summary: Get the driver profile.
  *     description: Returns the profile of the authenticated driver.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: The driver profile was successfully retrieved.
+ *         description: Successfully retrieved driver profile.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 driver:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                     name:
- *                       type: string
- *                     email:
- *                       type: string
- *                     phone:
- *                       type: string
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *       401:
- *         description: Unauthorized, JWT missing or invalid.
+ *                   $ref: '#/components/schemas/Driver'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  * 
  * /api/driver/updateDriverProfile:
  *   put:
  *     tags:
  *       - Driver (JWT required)
- *     summary: Update the driver's profile.
- *     description: Updates the profile details of the authenticated driver.
+ *     summary: Update the driver's profile information.
+ *     description: Updates the profile details (name, email, phone, and vehicle) of the authenticated driver.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: The driver's name.
+ *               email:
+ *                 type: string
+ *                 description: The driver's email address.
+ *               phone:
+ *                 type: string
+ *                 description: The driver's phone number.
+ *               vehicle:
+ *                 type: object
+ *                 properties:
+ *                   plateNumber:
+ *                     type: string
+ *                     description: The driver's vehicle plate number.
+ *                   model:
+ *                     type: string
+ *                     description: The model of the driver's vehicle.
+ *                   category:
+ *                     type: string
+ *                     description: The category of the driver's vehicle (e.g., sedan, van).
  *     responses:
  *       200:
  *         description: Driver profile updated successfully.
- *       401:
- *         description: Unauthorized, JWT missing or invalid.
- *       505:
- *         description: Not implemented yet.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Driver profile updated successfully"
+ *                 driver:
+ *                   $ref: '#/components/schemas/Driver'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  * 
  * /api/driver/updateDriverProfilePhoto:
  *   put:
@@ -66,51 +94,142 @@
  *       - Driver (JWT required)
  *     summary: Update the driver's profile photo.
  *     description: Updates the profile photo of the authenticated driver.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UploadImagePayload'
  *     responses:
  *       200:
- *         description: Driver profile photo updated successfully.
- *       401:
- *         description: Unauthorized, JWT missing or invalid.
- *       505:
- *         description: Not implemented yet.
+ *         description: Driver profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ImageUploadResponse'
  *       420:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       469:
  *         $ref: '#/components/responses/ForbiddenError'
-* /api/driver/getAllAvailableOrders:
-*   get:
-*     tags:
-*       - Driver (JWT required)
-*     summary: Get all delivery orders.
-*     description: Retrieves all orders available for delivery.
-*     security:
-*       - bearerAuth: []
-*     responses:
-*       200:
-*         description: Get all orders available.
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 data:
-*                   type: array
-*                   items:
-*                     $ref: '#/components/schemas/Order'
-*                 products:
-*                   type: array
-*                   items:
-*                     $ref: '#/components/schemas/Product'
-*       403:
-*         $ref: '#/components/responses/ParameterRequiredError'
-*       404:
-*         $ref: '#/components/responses/InvalidCredentialsError'
-*       420:
-*         $ref: '#/components/responses/UnauthorizedError'
-*       469:
-*         $ref: '#/components/responses/ForbiddenError'
-*       500:
-*         $ref: '#/components/responses/ServerError'
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ * 
+ */
+/**
+ * @swagger
+ * /api/driver/getAllAvailableOrders:
+ *   get:
+ *     tags:
+ *       - Driver (JWT required)
+ *     summary: Get all delivery orders.
+ *     description: Retrieves all orders available for delivery, including detailed user, restaurant, address, and item data.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Get all orders available.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "680a54bb7a7698bbca9f46fe"
+ *                       status:
+ *                         type: string
+ *                         example: "pending"
+ *                       userID:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           phone:
+ *                             type: string
+ *                           addresses:
+ *                             type: array
+ *                             items:
+ *                               $ref: '#/components/schemas/UserAddress'
+ *                       userAddress:
+ *                         $ref: '#/components/schemas/UserAddress'
+ *                       restaurantID:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           address:
+ *                             type: object
+ *                             properties:
+ *                               street:
+ *                                 type: string
+ *                               city:
+ *                                 type: string
+ *                               area:
+ *                                 type: string
+ *                               _id:
+ *                                 type: string
+ *                       restaurantAddress:
+ *                         type: object
+ *                         properties:
+ *                           street:
+ *                             type: string
+ *                           city:
+ *                             type: string
+ *                           area:
+ *                             type: string
+ *                           _id:
+ *                             type: string
+ *                       items:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             productId:
+ *                               type: object
+ *                               properties:
+ *                                 _id:
+ *                                   type: string
+ *                                 name:
+ *                                   type: string
+ *                                 price:
+ *                                   type: number
+ *                             quantity:
+ *                               type: integer
+ *                             _id:
+ *                               type: string
+ *                       totalAmount:
+ *                         type: number
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                       __v:
+ *                         type: integer
+ *       403:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       404:
+ *         $ref: '#/components/responses/InvalidCredentialsError'
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
 
 * /api/driver/acceptOrder:
 *   put:

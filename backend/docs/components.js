@@ -104,23 +104,48 @@
  *   schemas:
  *     Admin:
  *       type: object
+ *       required:
+ *         - email
+ *         - password
  *       properties:
  *         _id:
  *           type: string
- *           description: The unique identifier for the admin.
+ *           readOnly: true
+ *           description: Unique identifier of the admin.
+ *           example: "605c3c2f1c9d440000a1b2c3"
  *         name:
  *           type: string
- *           description: The admin's name.
+ *           description: Admin’s full name.
+ *           example: "Alice Smith"
  *         email:
  *           type: string
- *           description: The admin's email address.
+ *           format: email
+ *           description: Admin’s unique email address.
+ *           example: "admin@example.com"
  *         phone:
  *           type: string
- *           description: The admin's phone number.
+ *           description: Admin’s contact phone number.
+ *           example: "+15551234567"
+ *         password:
+ *           type: string
+ *           writeOnly: true
+ *           description: Password for admin account (hashed in the database).
+ *           example: "P@ssw0rd!"
+ *         handledRequests:
+ *           type: integer
+ *           description: Number of requests this admin has handled.
+ *           example: 42
+ *         profilePicture:
+ *           type: string
+ *           format: uri
+ *           description: URL to the admin’s profile picture.
+ *           example: "https://cdn.example.com/avatars/admin123.png"
  *         createdAt:
  *           type: string
  *           format: date-time
- *           description: The timestamp of when the admin was created.
+ *           readOnly: true
+ *           description: Timestamp when the admin account was created.
+ *           example: "2025-04-30T14:20:00Z"
  */
 
 /**
@@ -288,59 +313,7 @@
 *         createdAt:
 *           type: string
 
-
- *     Order:
- *       type: object
- *       properties:
- *         status:
- *           type: string
- *           enum: [pending, processing, delivered, cancelled]
- *           default: pending
- *           example: pending
- *         userID:
- *           type: string
- *           format: objectId
- *           description: ID of the user who placed the order
- *           example: "60c72b2f5f1b2c001f58c1b4"
- *         userName:
- *           type: string
- *           description: The user we are dilvering the order to
- *           example: "Ahmed"
- *         restaurantID:
- *           type: string
- *           format: objectId
- *           description: ID of the restaurant
- *           example: "60c72b2f5f1b2c001f58c1b4"
- *         restaurantLogo:
- *           type: string
- *           format: URL
- *           description: Logo of the restaurant
- *           example: "some link from cloudinary"
- *         deliveryDriverID:
- *           type: string
- *           format: objectId
- *           description: ID of the delivery driver
- *           example: "60c72b2f5f1b2c001f58c1b4"
- *         items:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/Item'
- *         totalAmount:
- *           type: number
- *           example: 35.99
- *         userAddress:
- *           $ref: '#/components/schemas/UserAddress'
- *         restaurantAddress:
- *           $ref: '#/components/schemas/RestaurantAddress'
- *         createdAt:
- *           type: string
- *           format: date-time
- *           example: "2025-04-18T08:45:30.000Z"
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           example: "2025-04-18T09:45:30.000Z"
- */
+*/
 
 
 /**
@@ -412,7 +385,10 @@
  *         price:
  *           type: number
  *           example: 12.99
- *         restraurantID:
+ *         stockAvailable:
+ *           type: number
+ *           example: 12.99
+ *         restraurantId:
  *           type: string
  *           format: objectId
  *           description: "ID of the restaurant to which the product belongs"
@@ -538,4 +514,53 @@
  *           type: string
  *           format: date-time
  *           example: "2025-04-18T09:45:30.000Z"
+ */
+
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     UploadImagePayload:
+ *       type: object
+ *       required:
+ *         - imageBase64
+ *         - tags
+ *       properties:
+ *         imageBase64:
+ *           type: string
+ *           description: Base64-encoded image data
+ *         tags:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Tags to apply to the image
+ *
+ *     ImageUploadResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: Profile image updated successfully
+ *         imageURL:
+ *           type: string
+ *           format: uri
+ *           example: https://res.cloudinary.com/.../profile.jpg
+ *
+ *   requestBodies:
+ *     UploadImage:
+ *       description: Any endpoint that takes imageBase64 + tags
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UploadImagePayload'
+ *
+ *   responses:
+ *     ImageUploadSuccess:
+ *       description: Returned when the image is saved successfully
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ImageUploadResponse'
  */

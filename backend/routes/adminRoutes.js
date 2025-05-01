@@ -7,15 +7,18 @@ const {
 } = require('../controllers/admin/profileController');
 
 const {
-    sendwarningToUser,
+    getAllUsers,
+    getAllDrivers,
+    getAllRestaurants,
     banUser,
-    unBanUser,
-    sendWarningToDriver,
     banDriver,
-    unBanDriver,
-    sendWarningToRestaurant,
     banRestaurant,
-    unBanRestaurant,   
+    unBanUser,
+    unBanDriver,
+    unBanRestaurant,
+    sendWarningToUser,
+    sendWarningToDriver,
+    sendWarningToRestaurant
 } = require('../controllers/admin/dashboardController')
 
 // profile routes
@@ -24,9 +27,12 @@ router.put("/updateAdminProfile", updateAdminProfile);
 router.put("/updateAdminProfilePhoto", updateAdminProfilePhoto)
 router.post("/restAdminPassword", restAdminPassword)
 
-
 // dashboard routes
-router.post('/sendwarningToUser', sendwarningToUser);
+router.get('/getAllUsers', getAllUsers);
+router.get('/getAllDrivers', getAllDrivers);
+router.get('/getAllRestaurants', getAllRestaurants);
+
+router.post('/sendWarningToUser', sendWarningToUser);
 router.post('/sendWarningToDriver', sendWarningToDriver)
 router.post('/sendWarningToRestaurant', sendWarningToRestaurant)
 
