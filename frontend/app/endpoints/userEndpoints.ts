@@ -144,13 +144,21 @@ export const UpdateOrder = async (orderUpdateData: any): Promise<any> => {
   }
 };
 
-// --- PUT: Cancel an order ---
 export const CancelOrder = async (orderId: string): Promise<{ message: string }> => {
+  console.log('📦 Cancelling order with ID:', orderId);
+
   try {
-    const response = await apiClient.put('/api/user/cancelOrder', { orderId });
+    const response = await apiClient.put(
+      '/api/user/cancelOrder',
+      {}, // ✅ send empty object instead of `null`
+      {
+        params: { orderID: orderId },
+      }
+    );
+
     return response.data;
   } catch (error) {
-    console.error('Error cancelling order:', error);
+    console.error('❌ Error cancelling order:', error);
     throw error;
   }
 };

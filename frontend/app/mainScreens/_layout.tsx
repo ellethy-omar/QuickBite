@@ -14,6 +14,8 @@ export default function MainScreensLayout() {
             iconName = focused ? 'house.fill' : 'house.fill';
           } else if (route.name === 'settings') {
             iconName = focused ? 'chevron.left.forwardslash.chevron.right' : 'chevron.left.forwardslash.chevron.right';
+          } else if (route.name === 'orders') {
+            iconName = focused ? 'paperplane.fill' : 'paperplane.fill';
           }
           return <IconSymbol name={iconName} size={size} color={color} />;
         },
@@ -32,7 +34,7 @@ export default function MainScreensLayout() {
       })}
     >
       <Tabs.Screen name="home" options={{ title: 'Home' }} />
-      <Tabs.Screen name="orders" options={{ title: 'Orders', tabBarButton: () => null }} />
+      <Tabs.Screen name="orders" options={{ title: 'Orders' }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
     </Tabs>
   );

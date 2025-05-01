@@ -73,8 +73,8 @@ export default function HomeScreen() {
   
 
   const renderRestaurant = ({ item }: { item: RestaurantData }) => {
-    console.log('[index.tsx] 🔍 Rendering restaurant:', item.name);
-    console.log('[index.tsx] 📦 Full item:', item);
+    // console.log('[index.tsx] 🔍 Rendering restaurant:', item.name);
+    // console.log('[index.tsx] 📦 Full item:', item);
   
       const now = new Date();
       // console.log('🕒 Current time:', now);
