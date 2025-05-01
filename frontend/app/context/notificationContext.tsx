@@ -10,7 +10,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  const slideAnim = useRef(new Animated.Value(100)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -21,14 +21,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setNotification({ message, type });
 
     Animated.timing(slideAnim, {
-      toValue: 0,
+      toValue: 40,
       duration: 300,
       useNativeDriver: true,
     }).start();
 
     timeoutRef.current = setTimeout(() => {
       Animated.timing(slideAnim, {
-        toValue: 100,
+        toValue: 0,
         duration: 300,
         useNativeDriver: true,
       }).start(() => setNotification(null));
@@ -60,7 +60,7 @@ export const useNotification = (): NotificationContextType => {
 const styles = StyleSheet.create({
   notification: {
     position: 'absolute',
-    bottom: 20,
+    top: 10,
     left: '10%',
     right: '10%',
     flexDirection: 'row',

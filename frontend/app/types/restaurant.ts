@@ -24,7 +24,12 @@ export interface OpeningHourRange {
     bio: string;
     rating: number;
     ratingCount: number;
-    address: string;
+    address: {
+        street: string,
+        city: string,
+        area: string,
+        _id: string
+    },
     cuisines: string[];
     menu: MenuItem[];
     openingHours?: {

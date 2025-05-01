@@ -15,16 +15,14 @@ export default function UserContainer({userData}: {userData : userData}) {
             <Image source={{ uri: userData.profileImage }} style={{ width: 100, height: 100, borderRadius: 200, objectFit: 'cover' }} />
             <View style={styles.infoSection}>
                 <Text style={styles.titleText}>{userData.name}</Text>
-                <Text style={styles.infoText}>Phone number: {userData.phone}</Text>
-                <Text style={styles.infoText}>Email: {userData.email}</Text>
-                <Text style={[styles.infoText]}>Area: {userData.address[0].area}</Text>
-                <View style={{display: 'flex', flexDirection: 'row', justifyContent: "space-between"}}>
-                    <Text style={[styles.infoText]}>Street: {userData.address[0].street}</Text>
-                    <Text style={[styles.infoText]}>Building: {userData.address[0].building}</Text>
-                </View>
-                <View style={{display: 'flex', flexDirection: 'row', justifyContent: "space-between"}}>
-                    <Text style={[styles.infoText]}>Floor: {userData.address[0].floor}</Text>
-                    <Text style={[styles.infoText]}>Apartment: {userData.address[0].apartment}</Text>
+                <Text style={{fontSize: 12, fontWeight: "500" ,color: colors.primary}}>Email: <Text style={styles.infoText}>{userData.email}</Text></Text>
+                <Text style={{fontSize: 12, fontWeight: "500" ,color: colors.primary}}>Phone: <Text style={styles.infoText}>{userData.phone}</Text></Text>
+                <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', rowGap: 4, columnGap: 15, width: '80%' }}>
+                    <Text style={{fontSize: 12, fontWeight: "500" ,color: colors.primary}}>Area: <Text style={styles.infoText}>{userData.addresses[0].area}</Text></Text>
+                    <Text style={{fontSize: 12, fontWeight: "500" ,color: colors.primary}}>Street: <Text style={styles.infoText}>{userData.addresses[0].street}</Text></Text>
+                    <Text style={{fontSize: 12, fontWeight: "500" ,color: colors.primary}}>Building: <Text style={styles.infoText}>{userData.addresses[0].building}</Text></Text>
+                    <Text style={{fontSize: 12, fontWeight: "500" ,color: colors.primary}}>Floor: <Text style={styles.infoText}>{userData.addresses[0].floor}</Text></Text>
+                    <Text style={{fontSize: 12, fontWeight: "500" ,color: colors.primary}}>Apartment: <Text style={styles.infoText}>{userData.addresses[0].apartment}</Text></Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -66,7 +64,7 @@ const styles = StyleSheet.create({
         gap: 4
     },
     infoText: {
-        fontSize: 13,
-        color: colors.primary,
+        fontSize: 12,
+        color: 'gray',
     },
 })
