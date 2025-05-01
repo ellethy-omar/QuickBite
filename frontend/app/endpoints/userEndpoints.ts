@@ -1,6 +1,6 @@
 // userEndpoints.ts
 import apiClient from "../apiclient";
-import { OrderDetails } from "../types/orders"; // 🔥 importing your real type
+import { OrderDetails, RawOrder } from "../types/orders"; // 🔥 importing your real type
 
 // --- PUT: Update user profile ---
 export const UpdateUserProfile = async (profileData: {
@@ -52,6 +52,19 @@ export const GetUserProfile = async (): Promise<{
     throw error;
   }
 };
+
+export async function GetMyOrders(): Promise<{
+  message: string;
+  data: RawOrder[];
+}> {
+  try {
+    const response = await apiClient.get('/api/user/getMyOrders');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    throw error;
+  }
+}
 
 // --- PUT: Update user profile photo ---
 export const UpdateUserProfilePhoto = async (photoData: {

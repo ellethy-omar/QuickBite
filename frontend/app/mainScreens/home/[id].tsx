@@ -5,40 +5,100 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import { useNotification } from '@/app/context/notificationContext';
 import colors from '@/app/styles/colors';
-import { GetProductsForRestaurant, CreateOrder } from '@/app/endpoints/userEndpoints';
+import { GetProductsForRestaurant, CreateOrder, GetMyOrders } from '@/app/endpoints/userEndpoints';
 import { MenuItem } from '@/app/types/restaurant';
 
 export default function RestaurantDetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { showNotification } = useNotification();
+  const params = useLocalSearchParams();
   const user = useSelector((state: RootState) => state.user);
+  const { showNotification } = useNotification();
 
   const [products, setProducts] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState<{ [productId: string]: number }>({});
+  const [hasActiveOrder, setHasActiveOrder] = useState(false);
+
+  const restaurantID = params.id as string;
+  const name = params.name as string;
+  const banner = params.banner as string;
+  const logo = params.image as string;
+  const bio = params.bio as string;
+  const phone = params.phone as string;
+  const isActive = params.isActive === 'true';
+  const openingHours = params.openingHours ? JSON.parse(params.openingHours as string) : {};
+
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+  const now = new Date();
+  const todayHours = openingHours?.[today];
+
+  let isOpen = false;
+  if (todayHours) {
+    const [openH, openM] = todayHours.open.split(':').map(Number);
+    const [closeH, closeM] = todayHours.close.split(':').map(Number);
+    const openTime = new Date();
+    const closeTime = new Date();
+    openTime.setHours(openH, openM, 0);
+    closeTime.setHours(closeH, closeM, 0);
+    isOpen = now >= openTime && now <= closeTime;
+  }
+
+  const fetchProducts = async () => {
+    try {
+      const response = await GetProductsForRestaurant(restaurantID);
+      console.log('🛒 Products fetched:', response.data);
+  
+      const mapped = response.data.map((prod) => ({
+        id: prod._id,
+        name: prod.name,
+        price: prod.price,
+        description: prod.description,
+        image: prod.image || 'https://i.imgur.com/6VBx3io.png',
+      }));
+  
+      setProducts(mapped);
+    } catch (err) {
+      console.error('❌ Error fetching products:', err);
+      showNotification('Failed to load products.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+  const fetchOrders = async (restaurantID) => {
+    try {
+      const response = await GetMyOrders();
+      console.log('📦 Orders fetched:', response.data);
+  
+      const normalizeId = (rid: any): string =>
+        typeof rid === 'string' ? rid : String(rid?._id || '');
+      
+      const activeOrder = response.data.find(
+        (order) =>
+          normalizeId(order.restaurantID) === String(restaurantID) &&
+          (order.status === 'pending' || order.status === 'processing')
+      );
+            
+  
+      if (activeOrder) {
+        console.log('⚠️ Found active order:', activeOrder);
+        setHasActiveOrder(true);
+      } else {
+        console.log('✅ No active orders found');
+        setHasActiveOrder(false);
+      }
+    } catch (err) {
+      console.error('❌ Error checking active orders:', err);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await GetProductsForRestaurant(id as string);
-        const mappedProducts: MenuItem[] = response.data.map((prod: any) => ({
-          id: prod._id,
-          name: prod.name,
-          price: prod.price,
-          description: prod.description,
-          image: prod.image || 'https://via.placeholder.com/100',
-        }));
-        setProducts(mappedProducts);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        showNotification('Failed to load products.', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, [id]);
+    console.log('🍔 Route Params:', params);
+  
+    fetchProducts(restaurantID, setProducts, setLoading, showNotification);
+    fetchOrders(restaurantID);
+  }, [restaurantID]);
+  
 
   const addToCart = (productId: string) => {
     setCart(prev => ({
@@ -61,14 +121,10 @@ export default function RestaurantDetailsScreen() {
   };
 
   const calculateTotal = () => {
-    let total = 0;
-    for (const productId in cart) {
+    return Object.entries(cart).reduce((total, [productId, quantity]) => {
       const product = products.find(p => p.id === productId);
-      if (product) {
-        total += product.price * cart[productId];
-      }
-    }
-    return total;
+      return product ? total + product.price * quantity : total;
+    }, 0);
   };
 
   const confirmCheckout = () => {
@@ -83,7 +139,7 @@ export default function RestaurantDetailsScreen() {
   };
 
   const handleCheckout = async () => {
-    if (!id || Object.keys(cart).length === 0) {
+    if (!restaurantID || Object.keys(cart).length === 0) {
       showNotification('Cart is empty!', 'error');
       return;
     }
@@ -95,32 +151,28 @@ export default function RestaurantDetailsScreen() {
 
     const defaultAddress = user.addresses.find(addr => addr.isDefault) || user.addresses[0];
 
-    if (!defaultAddress) {
-      showNotification('No valid address found.', 'error');
-      return;
-    }
-
-    const orderItems = Object.keys(cart).map(productId => ({
+    const orderItems = Object.entries(cart).map(([productId, quantity]) => ({
       productId,
-      quantity: cart[productId],
+      quantity,
     }));
 
     try {
-      const orderData = {
-        restaurantID: id as string,
+      const response = await CreateOrder({
+        restaurantID,
         items: orderItems,
         address: defaultAddress,
-      };
-
-      const response = await CreateOrder(orderData);
-      console.log('Order created:', response);
+      });
+      console.log('✅ Order created:', response);
       showNotification('Order placed successfully!', 'success');
       setCart({});
+      fetchOrders(restaurantID);
     } catch (error) {
-      console.error('Error placing order:', error);
+      console.error('❌ Error placing order:', error);
       showNotification('Failed to place order. Try again.', 'error');
     }
   };
+
+  const orderingBlocked = !isActive || !isOpen || hasActiveOrder;
 
   if (loading) {
     return (
@@ -133,6 +185,19 @@ export default function RestaurantDetailsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.productsContainer}>
+        <Image source={{ uri: banner }} style={styles.banner} />
+        <View style={styles.header}>
+          <Image source={{ uri: logo }} style={styles.logo} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.statusText}>
+              {isActive ? (isOpen ? '🟢 Open Now' : '🔴 Closed') : '🚫 Temporarily Inactive'}
+            </Text>
+            {phone && <Text style={styles.phone}>📞 {phone}</Text>}
+          </View>
+        </View>
+        {bio && <Text style={styles.bio}>{bio}</Text>}
+
         {products.map(product => (
           <View key={product.id} style={styles.productCard}>
             <Image source={{ uri: product.image }} style={styles.productImage} />
@@ -156,9 +221,15 @@ export default function RestaurantDetailsScreen() {
       </ScrollView>
 
       {Object.keys(cart).length > 0 && (
-        <TouchableOpacity style={styles.cartBar} onPress={confirmCheckout}>
+        <TouchableOpacity
+          style={[styles.cartBar, orderingBlocked && { backgroundColor: '#ccc' }]}
+          disabled={orderingBlocked}
+          onPress={confirmCheckout}
+        >
           <Text style={styles.cartBarText}>
-            {Object.values(cart).reduce((a, b) => a + b, 0)} items • ${calculateTotal().toFixed(2)} ➔ Checkout
+            {hasActiveOrder
+              ? '🕒 Order already in progress'
+              : `${Object.values(cart).reduce((a, b) => a + b, 0)} items • $${calculateTotal().toFixed(2)} ➔ Checkout`}
           </Text>
         </TouchableOpacity>
       )}
@@ -168,8 +239,15 @@ export default function RestaurantDetailsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   productsContainer: { padding: 16, paddingBottom: 100 },
+  banner: { width: '100%', height: 160, borderRadius: 8, marginBottom: 12 },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  logo: { width: 60, height: 60, borderRadius: 30, marginRight: 12 },
+  name: { fontSize: 20, fontWeight: '700', color: colors.text },
+  statusText: { fontSize: 14, marginTop: 4 },
+  phone: { fontSize: 12, color: '#444', marginTop: 4 },
+  bio: { fontSize: 13, color: '#666', marginBottom: 16 },
   productCard: { backgroundColor: '#fff', marginBottom: 16, borderRadius: 10, overflow: 'hidden', flexDirection: 'row', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
   productImage: { width: 100, height: 100 },
   productInfo: { flex: 1, padding: 12 },
@@ -179,7 +257,7 @@ const styles = StyleSheet.create({
   cartActions: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
   quantityButton: { backgroundColor: colors.primary, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 4 },
   quantityButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  quantityText: { marginHorizontal: 8, fontSize: 16, fontWeight: '600', color: colors.text },
+  quantityText: { marginHorizontal: 8, fontSize: 16, fontWeight: '600' },
   cartBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.primary, padding: 16, alignItems: 'center', justifyContent: 'center' },
   cartBarText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

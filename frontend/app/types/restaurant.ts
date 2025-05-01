@@ -28,8 +28,10 @@ export interface OpeningHourRange {
     cuisines: string[];
     menu: MenuItem[];
     openingHours?: {
-        [key: string]: { open: string; close: string };
+        [day: string]: { open: string; close: string };
       };
+    isActive: boolean;
+    isBanned: boolean;
   }  
 
 export interface MenuItem {
