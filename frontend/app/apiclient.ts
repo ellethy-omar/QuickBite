@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as SecureStore from 'expo-secure-store'; // Secure storage for tokens
 
 const apiClient = axios.create({
   baseURL: 'http://quickbite.zapto.org', // Your local server
