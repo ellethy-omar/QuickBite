@@ -1,6 +1,6 @@
 const Order = require('../../models/Order');
 const Product = require('../../models/Product');
-
+const { uploadBase64Image } = require('../../controllers/cloudinaryController');
 const getRestaurantProducts = async (req, res) => {
     try {
         const products = await Product.find({ restaurantId: req.user._id });
@@ -112,7 +112,11 @@ const editRestaurantProductImage = async (req, res) => {
             return res.status(403).json({ error: 'Product ID, imageBase64, and tags are required.' });
         }
 
-        const product = await Product.findOne({ _id, restraurantID: req.user._id });
+        const product = await Product.findOne({
+            _id,
+            restaurantId: req.user._id
+          });
+          
 
         if (!product) {
             console.log("Product not found");
