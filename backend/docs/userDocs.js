@@ -169,6 +169,36 @@
 
 /**
  * @swagger
+ * /api/user/getMyOrders:
+ *   get:
+ *     tags:
+ *       - User (JWT required)
+ *     summary: Get all orders for the authenticated user.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all orders for the user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All orders fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
+
+/**
+ * @swagger
  * /api/user/getAllRestaurants:
  *   get:
  *     tags:
