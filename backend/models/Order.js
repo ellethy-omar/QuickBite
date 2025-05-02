@@ -92,15 +92,19 @@ OrderSchema.statics.findOrdersNeedingDelivery = async function() {
   })
   .populate('restaurantID', 'name address contact.phone')
   .populate('userID', 'name phone addresses')
-  .populate('items.productId', 'name price');
+  .populate('items.productId', 'name price category description image');
 };
 
 //find orders by user id
 OrderSchema.statics.findOrdersByUserId = async function(userID) {
   return this.find({ userID })
-    .populate('restaurantID', 'name logo')
+    .populate('restaurantID', 'name contact.phone logo')
     .populate('items.productId', 'name image')
-    .sort({ timestamp: -1 }); // newest first
+    .populate({
+      path: 'deliveryDriverID',
+      select: 'name phone vehicle rating profilePicture'
+    })
+    .sort({ createdAt: -1 });
 };
 
 // find orders by restaurant id   
@@ -108,6 +112,7 @@ OrderSchema.statics.findOrdersByRestaurantId = async function(restaurantID) {
   return this.find({ restaurantID })
     .populate('userID', 'name addresses')
     .populate('deliveryDriverID', 'name phone')
+    .populate('items.productId', 'name price category description image')
     .sort({ timestamp: -1 });
 };
 
@@ -118,6 +123,7 @@ OrderSchema.statics.findNewRestaurantOrders = async function(restaurantID) {
    })
     .populate('userID', 'name addresses')
     .populate('deliveryDriverID', 'name phone')
+    .populate('items.productId', 'name price category description image')
     .sort({ timestamp: -1 });
 };
 

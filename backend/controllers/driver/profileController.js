@@ -39,8 +39,10 @@ const updateDriverProfile = async (req, res) => {
             message: 'Driver profile updated successfully',
             driver: updatedDriver
         });
+
+        console.log('updatedDriver:', updatedDriver);
     } catch (error) {
-        console.error('Update error:', error);
+        console.log('Update error:', error);
         res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 };
@@ -71,7 +73,7 @@ const updateDriverProfilePhoto = async (req, res) => {
         });
         console.log('imageURL:', uploadResponse.secure_url);
     } catch (err) {
-        console.error('Error updating Driver image:', err);
+        console.log('Error updating Driver image:', err);
         res.status(500).json({ error: 'Failed to update Driver image', details: err.message });
     }
 }
