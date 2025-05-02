@@ -66,7 +66,7 @@ const updateUserProfile = async (req, res) => {
 
       console.log('user:', user);
     } catch (err) {
-      console.error('Error updating user profile:', err);
+      console.log('Error updating user profile:', err);
       res.status(500).json({ error: 'Failed to update user profile', details: err.message });
     }
 };
@@ -97,7 +97,7 @@ const updateUserProfilePhoto = async (req, res) => {
       });
       console.log('imageURL:', uploadResponse.secure_url);
     } catch (err) {
-        console.error('Error updating user image:', err);
+        console.log('Error updating user image:', err);
         res.status(500).json({ error: 'Failed to update user image', details: err.message });
     }
 }

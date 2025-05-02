@@ -267,4 +267,67 @@
 *         $ref: '#/components/responses/ForbiddenError'
 *       500:
 *         $ref: '#/components/responses/ServerError'
+*
+* /api/driver/leaveOrder:
+*   put:
+*     tags:
+*       - Driver (JWT required)
+*     summary: Leave an accepted delivery order.
+*     description: Allows a driver to unassign themselves from an order and revert it to pending.
+*     parameters:
+*       - name: orderId
+*         in: query
+*         description: The ID of the order to leave.
+*         required: true
+*         schema:
+*           type: string
+*     responses:
+*       200:
+*         description: Order left successfully.
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: "You have left the order successfully."
+*       403:
+*         $ref: '#/components/responses/ParameterRequiredError'
+*       404:
+*         $ref: '#/components/responses/InvalidCredentialsError'
+*       420:
+*         $ref: '#/components/responses/UnauthorizedError'
+*       469:
+*         $ref: '#/components/responses/ForbiddenError'
+*       500:
+*         $ref: '#/components/responses/ServerError'
+*
+* /api/driver/getTheOrderIneedToDeliver:
+*   get:
+*     tags:
+*       - Driver (JWT required)
+*     summary: Retrieve the current delivery order.
+*     description: Fetches the order with status `pending` or `processing` assigned to the authenticated driver.
+*     responses:
+*       200:
+*         description: The current order, or a message indicating none.
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: "Order found." 
+*                 existingOrder:
+*                   oneOf:
+*                     - $ref: '#/components/schemas/Order'
+*                     - type: "null"
+*       420:
+*         $ref: '#/components/responses/UnauthorizedError'
+*       469:
+*         $ref: '#/components/responses/ForbiddenError'
+*       500:
+*         $ref: '#/components/responses/ServerError'
 */

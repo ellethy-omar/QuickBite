@@ -48,7 +48,7 @@ const updateRestaurantProfile = async (req, res) => {
         restaurant,
       });
     } catch (err) {
-      console.error('Error updating restaurant profile:', err);
+      console.log('Error updating restaurant profile:', err);
       res.status(500).json({ error: 'Failed to update restaurant profile', details: err.message });
     }
 };
@@ -80,7 +80,7 @@ const updateRestaurantLogo = async (req, res) => {
         });
         console.log('imageURL:', uploadResponse.secure_url);
     } catch (err) {
-        console.error('Error updating Restaurant Logo:', err);
+        console.log('Error updating Restaurant Logo:', err);
         res.status(500).json({ error: 'Failed to update Restaurant Logo', details: err.message });
     }
 }
@@ -111,7 +111,7 @@ const updateRestaurantCoverImage = async (req, res) => {
         });
         console.log('imageURL:', uploadResponse.secure_url);
     } catch (err) {
-        console.error('Error updating Restaurant Cover image:', err);
+        console.log('Error updating Restaurant Cover image:', err);
         res.status(500).json({ error: 'Failed to update Restaurant Cover image', details: err.message });
     }
 }
