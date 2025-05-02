@@ -33,7 +33,7 @@ const updateAdminProfile = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Update admin profile error:", error);
+        console.log("Update admin profile error:", error);
         res.status(500).json({
             error: "Internal server error",
             details: error.message
@@ -66,7 +66,7 @@ const updateAdminProfilePhoto = async (req, res) => {
         });
         console.log('imageURL:', uploadResponse.secure_url);
     } catch (err) {
-        console.error('Error updating Admin image:', err);
+        console.log('Error updating Admin image:', err);
         res.status(500).json({ error: 'Failed to update Admin image', details: err.message });
     }
 }

@@ -11,7 +11,7 @@ const getAllUsers = async (req, res) => {
       const users = await User.find()
       res.json(users)
     } catch (err) {
-      console.error(err)
+      console.log(err)
       res.status(500).json({ error: 'Server error while fetching users.' })
     }
 }
@@ -22,7 +22,7 @@ const getAllDrivers = async (req, res) => {
       const drivers = await Driver.find()
       res.json(drivers)
     } catch (err) {
-      console.error(err)
+      console.log(err)
       res.status(500).json({ error: 'Server error while fetching drivers.' })
     }
 }
@@ -33,7 +33,7 @@ const getAllRestaurants = async (req, res) => {
       const restaurants = await Restaurant.find()
       res.json(restaurants)
     } catch (err) {
-      console.error(err)
+      console.log(err)
       res.status(500).json({ error: 'Server error while fetching restaurants.' })
     }
 }
@@ -57,7 +57,7 @@ const banUser = async (req, res) => {
   
       res.json({ message: 'User has been banned.' })
     } catch (err) {
-      console.error(err)
+      console.log(err)
       res.status(500).json({ error: 'Server error while banning user.' })
     }
 }
@@ -80,7 +80,7 @@ const banRestaurant = async (req, res) => {
   
       res.json({ message: 'Restaurant has been banned.' })
     } catch (err) {
-      console.error(err)
+      console.log(err)
       res.status(500).json({ error: 'Server error while banning restaurant.' })
     }
 }
@@ -103,7 +103,7 @@ const banDriver = async (req, res) => {
   
       res.json({ message: 'Driver has been banned.' })
     } catch (err) {
-      console.error(err)
+      console.log(err)
       res.status(500).json({ error: 'Server error while banning driver.' })
     }
 }
@@ -127,7 +127,7 @@ const unBanUser = async (req, res) => {
   
       res.json({ message: 'User has been banned.' })
     } catch (err) {
-      console.error(err)
+      console.log(err)
       res.status(500).json({ error: 'Server error while banning user.' })
     }
 }
@@ -150,7 +150,7 @@ const unBanDriver = async (req, res) => {
   
       res.json({ message: 'Driver has been banned.' })
     } catch (err) {
-      console.error(err)
+      console.log(err)
       res.status(500).json({ error: 'Server error while banning driver.' })
     }
 }
@@ -173,7 +173,7 @@ const unBanRestaurant = async (req, res) => {
   
       res.json({ message: 'Restaurant has been banned.' })
     } catch (err) {
-      console.error(err)
+      console.log(err)
       res.status(500).json({ error: 'Server error while banning restaurant.' })
     }
 }
@@ -198,7 +198,7 @@ const sendWarningToUser = async (req, res) => {
 
     res.json({ message: 'Warning sent to user.', warning: message })
     } catch (err) {
-    console.error(err)
+    console.log(err)
     res.status(500).json({ error: 'Server error while sending warning.' })
     }
 }
@@ -219,7 +219,7 @@ const sendWarningToDriver = async (req, res) => {
 
     res.json({ message: 'Warning sent to driver.', warning: message })
     } catch (err) {
-    console.error(err)
+    console.log(err)
     res.status(500).json({ error: 'Server error while sending warning.' })
     }
 }
@@ -241,7 +241,7 @@ const sendWarningToRestaurant = async (req, res) => {
 
     res.json({ message: 'Warning sent to restaurant.', warning: message })
     } catch (err) {
-    console.error(err)
+    console.log(err)
     res.status(500).json({ error: 'Server error while sending warning.' })
     }
 }
