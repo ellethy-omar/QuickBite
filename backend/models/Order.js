@@ -112,6 +112,7 @@ OrderSchema.statics.findOrdersByRestaurantId = async function(restaurantID) {
   return this.find({ restaurantID })
     .populate('userID', 'name addresses')
     .populate('deliveryDriverID', 'name phone')
+    .populate('items.productId', 'name price category description image')
     .sort({ timestamp: -1 });
 };
 
@@ -122,6 +123,7 @@ OrderSchema.statics.findNewRestaurantOrders = async function(restaurantID) {
    })
     .populate('userID', 'name addresses')
     .populate('deliveryDriverID', 'name phone')
+    .populate('items.productId', 'name price category description image')
     .sort({ timestamp: -1 });
 };
 
