@@ -39,6 +39,8 @@ const updateDriverProfile = async (req, res) => {
             message: 'Driver profile updated successfully',
             driver: updatedDriver
         });
+
+        console.log('updatedDriver:', updatedDriver);
     } catch (error) {
         console.log('Update error:', error);
         res.status(500).json({ error: 'Internal server error', details: error.message });

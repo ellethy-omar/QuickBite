@@ -141,6 +141,7 @@ const getTheOrderIneedToDeliver = async (req, res) => {
                 existingOrder: order
             });
         } else {
+            console.log('Found order:', order);
             res.status(200).json({
                 message: 'Order found.',
                 existingOrder: order

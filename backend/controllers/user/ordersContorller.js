@@ -85,6 +85,8 @@ const updateOrder = async (req, res) => {
 
         await order.save();
 
+        console.log('Updared order:', order);
+
         return res.status(200).json({ message: "Order updated successfully", order });
     } catch (error) {
         console.error("Order update error:", error);
@@ -103,6 +105,7 @@ const cancelOrder = async (req, res) => {
     try {
         await Order.findByIdAndUpdate(orderID, { status: 'cancelled' }, { new: true });
         res.status(200).json({ message: 'Order cancelled successfully' });
+        console.log('Order cancelled successfully:', orderID);
     } catch (error) {
         console.log("Order cancellation error:", error);
         res.status(500).json({ error: 'Internal server error', details: error.message });
