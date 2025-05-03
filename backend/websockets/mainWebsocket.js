@@ -39,7 +39,6 @@ const WebSocketRoutes = (ws, request) => {
         if(decoded.role !== 'user') {
           return ws.close(1008, 'Invalid token for user route, closing connection');
         }
-
         return userWs(ws, decoded);
     case '/driver':
         if(decoded.role !== 'driver') {
