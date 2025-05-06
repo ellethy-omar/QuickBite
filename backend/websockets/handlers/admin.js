@@ -1,5 +1,7 @@
 const Admin = require('../../models/Admin');
 const { chatWithAI } = require('../../services/aiAgent');
+
+
 const adminRoutes  = async (ws, adminPayload) => {
     global.adminClients.set(adminPayload._id.toString(), ws);
     ws.send(JSON.stringify({ type: 'connection', data: 'Admin connected' }));
@@ -40,7 +42,7 @@ const adminRoutes  = async (ws, adminPayload) => {
               data: aiResponse
             }));
           } catch (err) {
-            console.error('Error in AI handler:', err.response?.data || err.message);
+            console.log('Error in AI handler:', err.response?.data || err.message);
             ws.send(JSON.stringify({
               type: 'error',
               data: `AI service error: ${err.message}`

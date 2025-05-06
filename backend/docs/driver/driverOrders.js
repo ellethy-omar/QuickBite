@@ -1,124 +1,4 @@
-/**
- * @swagger
- * tags:
- *   - name: Driver (JWT required)
- *     description: Endpoints related to driver operations and orders. Only drivers can use these apis
- */
 
-/**
- * @swagger
- * /api/driver/getDriverProfile:
- *   get:
- *     tags:
- *       - Driver (JWT required)
- *     summary: Get the driver profile.
- *     description: Returns the profile of the authenticated driver.
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Successfully retrieved driver profile.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 driver:
- *                   $ref: '#/components/schemas/Driver'
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
- *       500:
- *         $ref: '#/components/responses/ServerError'
- * 
- * /api/driver/updateDriverProfile:
- *   put:
- *     tags:
- *       - Driver (JWT required)
- *     summary: Update the driver's profile information.
- *     description: Updates the profile details (name, email, phone, and vehicle) of the authenticated driver.
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: The driver's name.
- *               email:
- *                 type: string
- *                 description: The driver's email address.
- *               phone:
- *                 type: string
- *                 description: The driver's phone number.
- *               vehicle:
- *                 type: object
- *                 properties:
- *                   plateNumber:
- *                     type: string
- *                     description: The driver's vehicle plate number.
- *                   model:
- *                     type: string
- *                     description: The model of the driver's vehicle.
- *                   category:
- *                     type: string
- *                     description: The category of the driver's vehicle (e.g., sedan, van).
- *     responses:
- *       200:
- *         description: Driver profile updated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Driver profile updated successfully"
- *                 driver:
- *                   $ref: '#/components/schemas/Driver'
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
- *       500:
- *         $ref: '#/components/responses/ServerError'
- * 
- * /api/driver/updateDriverProfilePhoto:
- *   put:
- *     tags:
- *       - Driver (JWT required)
- *     summary: Update the driver's profile photo.
- *     description: Updates the profile photo of the authenticated driver.
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UploadImagePayload'
- *     responses:
- *       200:
- *         description: Driver profile updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ImageUploadResponse'
- *       420:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
- *         $ref: '#/components/responses/ForbiddenError'
- *       403:
- *         $ref: '#/components/responses/ParameterRequiredError'
- *       500:
- *         $ref: '#/components/responses/ServerError'
- * 
- */
 /**
  * @swagger
  * /api/driver/getAllAvailableOrders:
@@ -331,3 +211,132 @@
 *       500:
 *         $ref: '#/components/responses/ServerError'
 */
+
+/**
+ * @swagger
+ * /api/driver/getMyOrdersHistory:
+ *   get:
+ *     tags:
+ *       - Driver (JWT required)
+ *     summary: Get delivery driver’s order history
+ *     description: |
+ *       Retrieves all orders for the authenticated driver that have been **delivered** or **cancelled**, including full details on the restaurant, the end user, and each item in the order.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Order history retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Order found."  # or "You do not have any orders."
+ *                 existingOrder:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: "650a12bd2f4c3a1234d56789"
+ *                       status:
+ *                         type: string
+ *                         enum: [delivered, cancelled]
+ *                         example: "delivered"
+ *                       userID:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                             example: "640b98fa5e6a7b8c9d012345"
+ *                           name:
+ *                             type: string
+ *                             example: "Jane Doe"
+ *                           phone:
+ *                             type: string
+ *                             example: "+201234567890"
+ *                           addresses:
+ *                             type: array
+ *                             items:
+ *                               $ref: '#/components/schemas/UserAddress'
+ *                       restaurantID:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                             example: "630c76ab1d2e3f4a5b678901"
+ *                           name:
+ *                             type: string
+ *                             example: "Tasty Eats"
+ *                           address:
+ *                             type: object
+ *                             properties:
+ *                               street:
+ *                                 type: string
+ *                                 example: "123 Main St"
+ *                               city:
+ *                                 type: string
+ *                                 example: "Cairo"
+ *                               area:
+ *                                 type: string
+ *                                 example: "Zamalek"
+ *                               _id:
+ *                                 type: string
+ *                           contact:
+ *                             type: object
+ *                             properties:
+ *                               phone:
+ *                                 type: string
+ *                                 example: "+20111222333"
+ *                       items:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             productId:
+ *                               type: object
+ *                               properties:
+ *                                 _id:
+ *                                   type: string
+ *                                   example: "620d45ef9a8b7c6d5e4f3210"
+ *                                 name:
+ *                                   type: string
+ *                                   example: "Margherita Pizza"
+ *                                 price:
+ *                                   type: number
+ *                                   example: 7.5
+ *                                 category:
+ *                                   type: string
+ *                                   example: "Pizza"
+ *                                 description:
+ *                                   type: string
+ *                                   example: "Classic cheese and tomato"
+ *                                 image:
+ *                                   type: string
+ *                                   example: "https://cdn.example.com/pizza.jpg"
+ *                             quantity:
+ *                               type: integer
+ *                               example: 2
+ *                             _id:
+ *                               type: string
+ *                               example: "75ab12cd34ef56gh78ij90kl"
+ *                       totalAmount:
+ *                         type: number
+ *                         example: 15.0
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-04-30T12:34:56.789Z"
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-05-01T08:21:10.123Z"
+ *                       __v:
+ *                         type: integer
+ *                         example: 0
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */

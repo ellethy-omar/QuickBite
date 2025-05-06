@@ -9,10 +9,8 @@ const {
     registerRestaurant,
     loginRestaurant,
     forgotPassword,
-    resetPassword,
-    verifyToken
-  } = require('../controllers/authController');
-const { requireAuth } = require('../middleware/requireAuth');
+    resetPassword
+} = require('../controllers/authController');
 
 router.post('/registerUser', registerUser);
 router.post('/loginUser', loginUser);
@@ -29,7 +27,5 @@ router.post('/loginRestaurant', loginRestaurant);
 // to be documented
 router.post('/forgotPassword', forgotPassword);
 router.post('/resetPassword', resetPassword);
-
-router.get('/verify', requireAuth, verifyToken);
 
 module.exports = router;

@@ -2,6 +2,7 @@ const Message = require('../../models/Message');
 const User = require('../../models/User');
 const { chatWithAI } = require('../../services/aiAgent');
 
+
 const userRoute = async (ws, userPayload) => {
     global.userClients.set(userPayload._id.toString(), ws);
     ws.send(JSON.stringify({ type: 'connection', data: 'User connected' }));
@@ -36,7 +37,7 @@ const userRoute = async (ws, userPayload) => {
               data: aiResponse
             }));
           } catch (err) {
-            console.error('Error in AI handler:', err.response?.data || err.message);
+            console.log('Error in AI handler:', err.response?.data || err.message);
             ws.send(JSON.stringify({
               type: 'error',
               data: `AI service error: ${err.message}`

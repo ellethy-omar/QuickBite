@@ -2,8 +2,7 @@ const router = require('express').Router(); // require express and use the Route
 const {
     getDriverProfile,
     updateDriverProfile,
-    updateDriverProfilePhoto,
-    restDriverPassword
+    updateDriverProfilePhoto
 } = require('../controllers/driver/profileController');
 
 const {
@@ -17,10 +16,8 @@ const {
 router.get("/getDriverProfile", getDriverProfile);
 router.put("/updateDriverProfile", updateDriverProfile);
 router.put("/updateDriverProfilePhoto", updateDriverProfilePhoto)
-router.post("/restDriverPassword", restDriverPassword)
 
-// dilvery routes
-
+// delivery routes
 router.get("/getAllAvailableOrders", getAllAvailableOrders);
 router.put("/acceptOrder", acceptOrder);
 router.put("/leaveOrder", leaveOrder);

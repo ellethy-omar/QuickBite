@@ -357,19 +357,26 @@ const loginRestaurant = async (req, res) => {
   }
 };
 
-const verifyToken = (req, res) => {
-    res.status(200).json({ message: 'Token is valid', user: req.user });
-};
-
 const forgotPassword = async (req, res) => {
   const { email, role } = req.body;
 
   let Model;
+
+  if (!role || !email) {
+    console.log("Role or email is not available for password reset");
+
+    return res.status(403).json({ error: 'Role and email are required' });
+  }
+  if (!validator.isEmail(email)) {
+    console.log("Email is not valid");
+    return res.status(400).json({ error: 'Invalid email address' });
+  }
+
   switch (role) {
-      case 'user': Model = require('../models/User'); break;
-      case 'driver': Model = require('../models/Driver'); break;
-      case 'restaurant': Model = require('../models/Restaurant'); break;
-      case 'admin': Model = require('../models/Admin'); break;
+      case 'user': Model = User; break;
+      case 'driver': Model = Driver; break;
+      case 'restaurant': Model = Restaurant; break;
+      case 'admin': Model = Admin; break;
       default: return res.status(400).json({ error: 'Invalid role' });
   }
 
@@ -408,15 +415,24 @@ const resetPassword = async (req, res) => {
   const { token, password, role } = req.body;
 
   let Model;
+  if (!role || !token || !password) {
+    console.log("Role or token or password is not available for password reset");
+    return res.status(403).json({ error: 'Role, token and password are required' });
+  }
   switch (role) {
       case 'user': Model = User; break;
       case 'driver': Model = Driver; break;
       case 'restaurant': Model = Restaurant; break;
-      // case 'admin': Model = Admin; break;
-      default: return res.status(400).json({ error: 'Invalid role' });
+      case 'admin': Model = Admin; break;
+      default: return res.status(403).json({ error: 'Invalid role' });
   }
 
   try {
+
+    if (!validator.isStrongPassword(password)) {
+      console.log("Password is not strong enough");
+      return res.status(403).json({ error: 'Password is not strong enough' });
+    }
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -426,7 +442,7 @@ const resetPassword = async (req, res) => {
       console.log("Sucess response sent");
 
   } catch (err) {
-      res.status(400).json({ error: 'Invalid or expired token' });
+      res.status(420).json({ error: 'Invalid or expired token' });
   }
 };
   
@@ -441,6 +457,5 @@ module.exports = {
   registerRestaurant,
   loginRestaurant,
   forgotPassword,
-  resetPassword,
-  verifyToken
+  resetPassword
 };

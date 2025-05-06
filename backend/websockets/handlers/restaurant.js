@@ -1,6 +1,8 @@
 const Order = require('../../models/Order');
 const Restaurant = require('../../models/Restaurant');
 const { chatWithAI } = require('../../services/aiAgent');
+
+
 const restaurantRoutes = async (ws, restPayload) => {
     global.restaurantClients.set(restPayload._id.toString(), ws);
     ws.send(JSON.stringify({ type: 'connection', data: 'Restaurant connected' }));
@@ -46,7 +48,7 @@ const restaurantRoutes = async (ws, restPayload) => {
               data: aiResponse
             }));
           } catch (err) {
-            console.error('Error in AI handler:', err.response?.data || err.message);
+            console.log('Error in AI handler:', err.response?.data || err.message);
             ws.send(JSON.stringify({
               type: 'error',
               data: `AI service error: ${err.message}`

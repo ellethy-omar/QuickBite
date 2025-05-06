@@ -1,5 +1,7 @@
 const Driver = require('../../models/Driver')
 const { chatWithAI } = require('../../services/aiAgent');
+
+
 const driverRoutes = async (ws, driver) => {
     global.driverClients.set(driver._id, ws);
     ws.send(JSON.stringify({ type: 'connection', data: 'Driver connected' }));
@@ -51,7 +53,7 @@ const driverRoutes = async (ws, driver) => {
                 data: aiResponse
               }));
             } catch (err) {
-              console.error('Error in AI handler:', err.response?.data || err.message);
+              console.log('Error in AI handler:', err.response?.data || err.message);
               ws.send(JSON.stringify({
                 type: 'error',
                 data: `AI service error: ${err.message}`

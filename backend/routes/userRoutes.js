@@ -2,8 +2,7 @@ const router = require('express').Router(); // require express and use the Route
 const {
     getUserProfile,
     updateUserProfile,
-    updateUserProfilePhoto,
-    restUserPassword
+    updateUserProfilePhoto
 } = require('../controllers/user/profileController');
 
 const {
@@ -11,6 +10,7 @@ const {
     updateOrder,
     cancelOrder,
     getMyOrders,
+    getMyCurrentOrder,
     getAllRestaurants,
     getProductsForRestaurant
 } = require('../controllers/user/ordersContorller');
@@ -19,11 +19,11 @@ const {
 router.get("/getUserProfile", getUserProfile);
 router.put("/updateUserProfile", updateUserProfile);
 router.put("/updateUserProfilePhoto", updateUserProfilePhoto)
-router.post("/restUserPassword", restUserPassword)
 
 // order routes
 router.post("/createOrder", createOrder);
 router.get("/getMyOrders", getMyOrders);
+router.get("/getMyCurrentOrder", getMyCurrentOrder);
 router.put("/updateOrder", updateOrder);
 router.put("/cancelOrder", cancelOrder);
 router.get("/getAllRestaurants", getAllRestaurants);

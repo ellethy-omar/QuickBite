@@ -1,10 +1,4 @@
-
-process.env.ORT_LOG_SEVERITY_LEVEL = '5';
 const fetch = require('node-fetch');
-async function initAI() {
-    // No need for 'Xenova/distilgpt2' or custom pipeline if you're using GPT-3 API
-    console.log("AI Initialized");
-}
 
 async function chatWithAI(prompt) {
   if(!prompt) {
@@ -31,10 +25,9 @@ async function chatWithAI(prompt) {
       throw new Error(data.error);
     }
     console.log('response of AI:', data[0].generated_text);
-    return data[0].generated_text;  // Assuming the response is an array with the generated text
+    return data[0].generated_text;
 }
 
 module.exports = {
-    initAI,
     chatWithAI
 };

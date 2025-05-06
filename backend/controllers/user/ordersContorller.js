@@ -76,7 +76,7 @@ const updateOrder = async (req, res) => {
         // Validate and compute total using the static method
         const validation = await Order.validateOrder(updatedData);
         if (!validation.isValid) {
-            return res.status(400).json({ error: validation.error, missingProducts: validation.missingProducts });
+            return res.status(403).json({ error: validation.error, missingProducts: validation.missingProducts });
         }
 
         // Apply updates
@@ -126,11 +126,28 @@ const getMyOrders = async (req, res) => {
     }
 }
 
+const getMyCurrentOrder = async (req, res) => {
+    try {
+        const order = await Order.findOne({ userID: req.user._id, status: { $in: ['pending', 'processing'] } });
+        if (!order) {
+            return res.status(200).json({ message: 'No current order found.', order });
+        }
+        res.status(200).json({
+            message: "Current order fetched successfully",
+            order: order
+        });
+        console.log('order:', order);
+    } catch (error) {
+        console.log("Order fetching error:", error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });        
+    }
+}
+
 const getAllRestaurants  = async (req, res) => {
     const restaurants = await Restaurant.find({})
     if (!restaurants) {
         console.log("No restaurants found");
-        return res.status(404).json({
+        return res.status(200).json({
             message: "No restaurants found",
             data: []
         });
@@ -162,7 +179,7 @@ const getProductsForRestaurant = async (req, res) => {
     const products = await Product.find({ restaurantId: restraurantID });
     if (!products) {
         console.log("No products found for this restaurant");
-        return res.status(404).json({
+        return res.status(200).json({
             message: "No products found for this restaurant",
             data: []
         });
@@ -180,6 +197,7 @@ module.exports = {
     updateOrder,
     cancelOrder,
     getMyOrders,
+    getMyCurrentOrder,
     getAllRestaurants,
     getProductsForRestaurant
 }
