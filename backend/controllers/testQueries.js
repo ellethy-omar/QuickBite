@@ -138,10 +138,45 @@ const testQueries = async (req, res) => {
     //                   data: assignDeliveryMan
     //                 });
 
-    } catch (error) {
-        console.log('error:', error);
-        res.status(500).json({ error: "There is an error", details: error.message})
-    }
+
+    // const { rating, someDriverId} = req.body;
+    //    const driver = await Driver.findById(someDriverId);
+    //     await driver.updateRating(rating ); 
+    //     res.status(200).json({
+    //         success: true,
+    //         message: "Rating updated successfully",
+    //         newRating: driver.rating,
+    //         totalRatings: driver.ratingCount,
+    //       });
+
+    // const { rating, someRestId} = req.body;
+    // const restaurant = await Restaurant.findById(someRestId);
+    // await restaurant.updateRating(rating ); 
+    // res.status(200).json({
+    //             success: true,
+    //             message: "Rating updated successfully",
+    //             newRating: restaurant.rating,
+    //             totalRatings: restaurant.ratingCount,
+    //           });
+
+    // } catch (error) {
+    //     console.log('error:', error);
+    //     res.status(500).json({ error: "There is an error", details: error.message})
+    // }
+    const orderData = req.body;
+
+    const createdOrder = await Order.createOrder(orderData);
+    res.status(201).json({
+      message: 'Order created successfully',
+      order: createdOrder
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      message: 'Order creation failed',
+      error: err.message
+    });
+  }
 }
 
 module.exports = testQueries;
