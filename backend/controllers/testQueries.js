@@ -138,6 +138,27 @@ const testQueries = async (req, res) => {
     //                   data: assignDeliveryMan
     //                 });
 
+
+    // const { rating, someDriverId} = req.body;
+    //    const driver = await Driver.findById(someDriverId);
+    //     await driver.updateRating(rating ); 
+    //     res.status(200).json({
+    //         success: true,
+    //         message: "Rating updated successfully",
+    //         newRating: driver.rating,
+    //         totalRatings: driver.ratingCount,
+    //       });
+
+    const { rating, someRestId} = req.body;
+    const restaurant = await Restaurant.findById(someRestId);
+    await restaurant.updateRating(rating ); 
+    res.status(200).json({
+                success: true,
+                message: "Rating updated successfully",
+                newRating: restaurant.rating,
+                totalRatings: restaurant.ratingCount,
+              });
+
     } catch (error) {
         console.log('error:', error);
         res.status(500).json({ error: "There is an error", details: error.message})

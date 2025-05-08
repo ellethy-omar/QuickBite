@@ -4,25 +4,25 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const conversationSchema = new Schema({
-    participants: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User', // Reference to a User model
-      required: true,
-      validate: {
-        validator: function(participants) {
-          // Ensure at least 2 participants and no duplicates
-          return participants.length >= 2 && 
-                 new Set(participants.map(id => id.toString())).size === participants.length;
-        },
-        message: 'Conversation must have at least 2 unique participants'
+  participants: [{
+      _id: false, 
+      participantId: {
+          type: Schema.Types.ObjectId,
+          required: true,
+          refPath: 'participants.participantType'
+      },
+      participantType: {
+          type: String,
+          required: true,
+          enum: ['User', 'Driver']   //only allowed user w driver 
       }
-    }],
-    createdAt: {
+  }],
+  createdAt: {
       type: Date,
       default: Date.now
-    }
-  }, {
-    timestamps: true // Adds createdAt and updatedAt automatically
+  }
+}, {
+  timestamps: true
 });
 
 const Chat = mongoose.model('Chat', conversationSchema);
