@@ -41,8 +41,8 @@ export default function AdminScreensLayout() {
           tabBarInactiveTintColor: 'gray',
         })}
       >
-        <Tabs.Screen name="manageBusiness" options={{ title: 'Restaurants' }} />
         <Tabs.Screen name="dashboard" options={{ title: 'Dashboard' }} />
+        <Tabs.Screen name="manageBusiness" options={{ title: 'Restaurants' }} />
         <Tabs.Screen name="usersManage" options={{ title: 'Customers' }} />
       </Tabs>
     </GestureHandlerRootView>

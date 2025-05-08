@@ -3,14 +3,13 @@ const http = require('http');
 const WebSocket = require('ws');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-
+const path = require('path');
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 const {
-  intializeMongooseConnection,
-  intializeMongoClientConnection
+  intializeMongooseConnection
 } = require('./config/db');
 
 intializeMongooseConnection();
@@ -30,15 +29,21 @@ const swaggerConfigurations = {
 const swaggerSpec = swaggerJsdoc(swaggerConfigurations);
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+app.get('/wsComm', (req, res) =>
+  res.sendFile(path.join(__dirname, 'websockets', 'wsComm.html'))
+);
+
+const testQueries = require('./controllers/testQueries');
+app.use('/testQueries', testQueries);
+
 const integrationRouter = require('./routes/integrationRouter');
 app.use('/api', integrationRouter);
 
 // WebSockets setup
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
-const { WebSocketRoutes } = require('./websockets/mainWebsocket');
+const WebSocketRoutes = require('./websockets/mainWebsocket');
 wss.on('connection', (ws, request) => {
-  console.log('New WebSocket connection established');
   WebSocketRoutes(ws, request);
 });
 

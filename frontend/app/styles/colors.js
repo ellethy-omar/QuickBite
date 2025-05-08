@@ -1,6 +1,6 @@
 const colors = {
     background: '#fff',
-    offset: "#fbfbfb",
+    offset: "#fafafa",
     primary: '#2D336B',
     secondary: '#DCDFF9',
     primaryText: '#fefefe',

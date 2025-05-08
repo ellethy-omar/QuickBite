@@ -49,7 +49,7 @@ export const DriverSignupRoute = async (driverData: any) => {
         phone: driverData.phone,
         vehicle: {
             type: driverData.vehicleType,
-            //model: driverData.vehicleModel,
+            model: driverData.vehicleModel,
             plateNumber: driverData.vehiclePlateNumber,
         }
     }
@@ -105,7 +105,7 @@ export const LoginUserRoute = async (name: string, password: string) => {
 
 export const LoginAdminRoute = async (name:string, password: string) => {
     const reqBody = {
-        email: name,
+        usernameOrEmail: name,
         password: password,
     }
     try {

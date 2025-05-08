@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket API Docs</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; padding: 2rem; max-width: 900px; margin: auto; }
+    h1, h2, h3 { color: #333; }
+    code { background: #f5f5f5; padding: 2px 4px; border-radius: 4px; }
+    pre { background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+    ul { margin-left: 1.2rem; }
+    .section { margin-bottom: 2rem; }
+    input, select, textarea, button {
+      display: block;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      width: 100%;
+      padding: 0.5rem;
+      font-family: monospace;
+    }
+    button { width: auto; cursor: pointer; }
+    #log { background: #eee; padding: 1rem; border-radius: 4px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>WebSocket API Documentation</h1>
+
+  <div class="section">
+    <h2>Test WebSocket Connection</h2>
+
+    <label for="role">Select Role (Path):</label>
+    <select id="role">
+      <option value="driver">driver</option>
+      <option value="user">user</option>
+      <option value="admin">admin</option>
+      <option value="restaurant">restaurant</option>
+    </select>
+
+    <label for="token">Bearer Token (JWT):</label>
+    <input type="text" id="token" placeholder="Enter your JWT token" />
+
+    <button onclick="connectWs()">Connect</button>
+
+    <label for="jsonInput">Message to Send (JSON with type & data):</label>
+    <textarea id="jsonInput" rows="6" placeholder='{"type": "yourType", "data": {}}'></textarea>
+
+    <button onclick="sendMessage()">Send Message</button>
+
+    <h3>Server Responses</h3>
+    <div id="log"></div>
+  </div>
+
+  <div class="section">
+    <h2>Endpoints</h2>
+    <ul>
+      <li><code>/driver</code>: Driver → location updates, order accept</li>
+      <li><code>/user</code>: User → chat & order notifications</li>
+      <li><code>/admin</code>: Admin → all real‑time broadcasts</li>
+      <li><code>/restaurant</code>: Restaurant → new orders, accept/deny</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Connecting</h2>
+    <p>Open a socket to:</p>
+    <pre>ws://&lt;host&gt;:&lt;port&gt;/&lt;endpoint&gt;?token=&lt;JWT&gt;</pre>
+  </div>
+
+  <div class="section">
+    <h2>Driver &gt; Server</h2>
+    <pre>{
+  "type": "locationUpdate",
+  "data": { "orderId": "abc123", "latitude": 30.04, "longitude": 31.23, "userId": "user789" }
+}</pre>
+    <pre>{
+  "type": "acceptOrder",
+  "data": { "orderId": "abc123", "userId": "user789" }
+}</pre>
+  </div>
+
+  <div class="section">
+    <h2>Server &gt; User</h2>
+    <pre>{
+  "type": "locationUpdate",
+  "data": { "orderId": "abc123", "latitude": 30.04, "longitude": 31.23 }
+}</pre>
+    <pre>{
+  "type": "orderAccepted",
+  "data": { "orderId": "abc123", "driverId": "driver456", "eta": 10 }
+}</pre>
+  </div>
+
+  <div class="section">
+    <h2>User &gt; Server</h2>
+    <pre>{
+  "type": "chat",
+  "data": { "toId": "driver456", "toRole": "driver", "message": "Hi, where are you?" }
+}</pre>
+  </div>
+
+  <div class="section">
+    <h2>Admin</h2>
+    <h3>Server &gt; Admin</h3>
+    <pre>{
+  "type": "locationUpdate",
+  "data": { "orderId": "abc123", "latitude": 30.04, "longitude": 31.23 }
+}</pre>
+    <p>Admins receive every driver’s <code>locationUpdate</code> broadcast.</p>
+  </div>
+
+  <div class="section">
+    <h2>Restaurant</h2>
+    <h3>Server &gt; Restaurant</h3>
+    <pre>{
+  "type": "newOrder",
+  "data": {
+    "orderId": "abc123",
+    "items": [ /* … */ ],
+    "userId": "user789"
+  }
+}</pre>
+    <h3>Restaurant &gt; Server</h3>
+    <pre>{
+  "type": "respondOrder",
+  "data": { "orderId": "abc123", "accept": true, "userId": "user789" }
+}</pre>
+    <p>If <code>accept</code> is <code>false</code>, the restaurant has denied (e.g. too many open orders).</p>
+  </div>
+
+  <div class="section">
+    <h2>Notes</h2>
+    <ul>
+      <li>All messages are JSON.</li>
+      <li>Use ping/pong to detect disconnects.</li>
+      <li>Switch to <code>wss://</code> in production.</li>
+    </ul>
+  </div>
+  <script>
+    let socket;
+
+    function log(msg) {
+      const logDiv = document.getElementById("log");
+      logDiv.textContent += msg + "\n";
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function connectWs() {
+      const role = document.getElementById("role").value;
+      const token = document.getElementById("token").value;
+
+      if (!token) {
+        return alert("Please enter a token.");
+      }
+
+      const protocol = location.protocol === "https:" ? "wss" : "ws";
+      const host = location.host;
+      const wsUrl = `${protocol}://${host}/${role}?token=${token}`;
+
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
+
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => log("✅ Connected to " + wsUrl);
+      socket.onmessage = (e) => log("📨 Received: " + e.data);
+      socket.onerror = (err) => log("❌ Error: " + err.message);
+      socket.onclose = (e) => log(`🔌 Connection closed (code: ${e.code}, reason: ${e.reason})`);
+    }
+
+    function sendMessage() {
+      const rawInput = document.getElementById("jsonInput").value;
+
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        return alert("WebSocket is not connected.");
+      }
+
+      try {
+        const message = JSON.parse(rawInput);
+        if (typeof message.type !== "string" || !("data" in message)) {
+          return alert("Message must include a 'type' (string) and 'data'.");
+        }
+
+        socket.send(JSON.stringify(message));
+        log("📤 Sent: " + JSON.stringify(message));
+      } catch (err) {
+        alert("Invalid JSON: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

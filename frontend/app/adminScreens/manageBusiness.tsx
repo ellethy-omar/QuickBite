@@ -1,78 +1,36 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import RestaurantContainer from '@/app/components/restaurantContainer';
 import colors from '@/app/styles/colors';
 import { RestaurantData } from '@/app/types/restaurant';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { fetchAllRestaurants } from '../endpoints/adminEndpoints';
 
 export default function ManageBusinessScreen() {
-  const [restaurants, setRestaurants] = React.useState<RestaurantData[]>([
-    {
-      id: '1',
-      name: 'Restaurant A',
-      bio: 'offering the best italian, chinese hybrid in the world. food so good you will wish you were john cena',
-      address: '123 Main St, City A',
-      ordersDone: 50,
-      banner: 'https://www.shutterstock.com/image-photo/fried-salmon-steak-cooked-green-600nw-2489026949.jpg',
-      image: 'https://fastly.picsum.photos/id/125/200/300.jpg?hmac=yLvRBwUcr6LYWuGaGk05UjiU5vArBo3Idr3ap5tpSxU',
-      phone: '1234567890',
-      email: 'restauranta@gmail.com',
-      cuisines: ['Italian', 'Chinese'],
-      menu: [
-        {
-          id: '1',
-          name: 'Tacos',
-          price: 10,
-          description: 'Delicious tacos with fresh ingredients',
-          image: 'https://fastly.picsum.photos/id/125/200/300.jpg?hmac=yLvRBwUcr6LYWuGaGk05UjiU5vArBo3Idr3ap5tpSxU',
-        },
-        {
-          id: '2',
-          name: 'Biryani',
-          price: 15,
-          description: 'Spicy and flavorful biryani',
-          image: 'https://fastly.picsum.photos/id/125/200/300.jpg?hmac=yLvRBwUcr6LYWuGaGk05UjiU5vArBo3Idr3ap5tpSxU',
-        }
-      ],
-      rating: 4.5,
-      ratingCount: 100,
-    },
-    {
-      id: '2',
-      name: 'Restaurant B',
-      bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      address: '456 Elm St, City B',
-      ordersDone: 30,
-      banner: 'https://fastly.picsum.photos/id/125/200/300.jpg?hmac=yLvRBwUcr6LYWuGaGk05UjiU5vArBo3Idr3ap5tpSxU',
-      image: 'https://fastly.picsum.photos/id/125/200/300.jpg?hmac=yLvRBwUcr6LYWuGaGk05UjiU5vArBo3Idr3ap5tpSxU',
-      phone: '9876543210',
-      email: 'restaurantb@gmail.com',
-      cuisines: ['Mexican', 'Indian'],
-      menu: [
-        {
-          id: '1',
-          name: 'Tacos',
-          price: 10,
-          description: 'Delicious tacos with fresh ingredients',
-          image: 'https://fastly.picsum.photos/id/125/200/300.jpg?hmac=yLvRBwUcr6LYWuGaGk05UjiU5vArBo3Idr3ap5tpSxU',
-        },
-        {
-          id: '2',
-          name: 'Biryani',
-          price: 15,
-          description: 'Spicy and flavorful biryani',
-          image: 'https://fastly.picsum.photos/id/125/200/300.jpg?hmac=yLvRBwUcr6LYWuGaGk05UjiU5vArBo3Idr3ap5tpSxU',
-        },
-      ],
-      rating: 4.0,
-      ratingCount: 80,
-    },
-  ]);
-
+  const [restaurants, setRestaurants] = React.useState<RestaurantData[]>([]);
   const [filteredRestaurants, setFilteredRestaurants] = React.useState<RestaurantData[]>(restaurants);
+  const [loading, setLoading] = React.useState(true);
 
   const modalizeRef = useRef<Modalize>(null);
+
+  useEffect(() => {
+    if(!loading) return;
+
+    const fetchRestaurants = async () => {
+      try {
+        const response = await fetchAllRestaurants();
+        setRestaurants(response);
+        setFilteredRestaurants(response); // Initialize filtered restaurants with all restaurants
+      } catch (error) {
+        console.error('Error fetching restaurants:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+  }, [loading]);
 
   const openModal = () => {
     modalizeRef.current?.open();
@@ -132,12 +90,18 @@ export default function ManageBusinessScreen() {
       </View>
 
       <ScrollView style={styles.resultContainer} contentContainerStyle={{ gap: 15 }} bounces={true} showsVerticalScrollIndicator={true}>
-        {filteredRestaurants.length === 0 ? (
+        {loading ? (
+          <Text style={styles.noResultsText}>Loading...</Text>
+        ) : (
+          <>
+          {filteredRestaurants.length === 0 ? (
           <Text style={styles.noResultsText}>No Restaurants Found</Text>
         ) : (
           filteredRestaurants.map((item) => (
             <RestaurantContainer key={item.id} restaurantData={item} />
           ))
+        )}
+          </>
         )}
       </ScrollView>
 

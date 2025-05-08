@@ -5,18 +5,22 @@ const { Schema } = mongoose;
 const DriverSchema = new Schema({
    name: { type: String, required: true },
    email: { type: String, required: true, unique: true },
-   phone: { type: Number, required: true, unique: true },
+   phone: { type: String, required: true, unique: true },
    password: { type: String, required: true },
-   Vehicle: 
-   {type:String ,
-   plateNumber: String,
-   color: String},
-   rating: Number,
+   vehicle: 
+     {
+      plateNumber: String,
+      model: String,
+      cateogry:String 
+    },
+   rating: {type: Number, default: 0.0},
    deliveryStats: 
-   {completed: Number,
-   avgDeliveryTime: Number
-   },
-   isActive: Boolean,
+     {
+       completed:{type: Number, default: 0},
+       avgDeliveryTime:{type: Number, default: 0.0},
+     },
+   isBanned:{type: Boolean, default:false} ,
+   profilePicture: String,
    createdAt:  { type: Date, default: Date.now }
 
 });

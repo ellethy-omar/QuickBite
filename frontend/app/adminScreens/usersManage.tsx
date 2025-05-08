@@ -1,42 +1,35 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import colors from '@/app/styles/colors';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { userData } from '../types/user';
 import UserContainer from '../components/userContainer';
+import { fetchAllUsers } from '../endpoints/adminEndpoints';
 
 export default function UsersManageScreen() {
-      const [users, setUsers] = React.useState<userData[]>([
-        {
-            id: '1',
-            name: "john doe soliman",
-            profileImage: "https://fastly.picsum.photos/id/696/200/300.jpg?hmac=Ukxvga_1GYxgfAqzwDhBPfVta6-hJKUhayVlI1yMIdk",
-            email: "johndoe@gmail.com",
-            phone: "0111111111",
-            address: [{
-              street:"no",
-              apartment: "no",
-              building: "4",
-              floor: "3",
-              area: "giza",
-              isDefault: true,
-              label: "home",
-            },{
-              street:"no",
-              apartment: "no",
-              building: "4",
-              floor: "3",
-              area: "giza",
-              isDefault: false,
-              label: "work",
-            }],
-            banned: false
-        }
-      ]);
-    
+      const [users, setUsers] = React.useState<userData[]>([]);
+      const [loading, setLoading] = React.useState(true);
       const [filteredUsers, setFilteredUsers] = React.useState<userData[]>(users);
       const modalizeRef = useRef<Modalize>(null);
+
+      useEffect(() => {
+        if (!loading) return;
+
+        const fetchUsers = async () => {
+          try {
+            const response = await fetchAllUsers();
+            setUsers(response);
+            setFilteredUsers(response); // Initialize filtered users with all users
+          } catch (error) {
+            console.error('Error fetching users:', error);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        fetchUsers();
+      }, [loading]);
 
       const openModal = () => {
         modalizeRef.current?.open();
@@ -84,12 +77,18 @@ export default function UsersManageScreen() {
           </View>
     
           <ScrollView style={styles.resultContainer} contentContainerStyle={{ gap: 15 }} bounces={true} showsVerticalScrollIndicator={true}>
-            {filteredUsers.length === 0 ? (
+            {loading ? (
+              <Text style={styles.noResultsText}>Loading...</Text>
+            ) : (
+              <>
+              {filteredUsers.length === 0 ? (
               <Text style={styles.noResultsText}>No Restaurants Found</Text>
             ) : (
               filteredUsers.map((item) => (
-                <UserContainer key={item.id} userData={item}/>
+                <UserContainer key={item._id} userData={item}/>
               ))
+            )}
+              </>
             )}
           </ScrollView>
     
