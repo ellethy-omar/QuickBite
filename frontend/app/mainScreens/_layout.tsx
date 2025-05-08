@@ -11,9 +11,11 @@ export default function MainScreensLayout() {
         tabBarIcon: ({ color, size, focused }) => {
           let iconName: IconSymbolName = 'person';
           if (route.name === 'home') {
-            iconName = focused ? 'house.fill' : 'house';
+            iconName = focused ? 'house.fill' : 'house.fill';
           } else if (route.name === 'settings') {
-            iconName = focused ? 'gearshape.2.fill' : 'gearshape.2';
+            iconName = focused ? 'chevron.left.forwardslash.chevron.right' : 'chevron.left.forwardslash.chevron.right';
+          } else if (route.name === 'orders') {
+            iconName = focused ? 'paperplane.fill' : 'paperplane.fill';
           }
           return <IconSymbol name={iconName} size={size} color={color} />;
         },

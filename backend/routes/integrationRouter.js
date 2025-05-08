@@ -17,13 +17,17 @@ routesIntegrator.get("/", (req, res)=> {
 
 // before requireAuth
 routesIntegrator.use((req, res, next) => {
+    // 1) Always add the CORS headers…
+    res.header('Access-Control-Allow-Origin',  '*');
+    res.header('Access-Control-Allow-Methods','GET,POST,PUT,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers','Content-Type,Authorization');
+  
+    // 2) If it’s a preflight, short-circuit with 204
     if (req.method === 'OPTIONS') {
-      return res
-        .header('Access-Control-Allow-Origin',  '*')
-        .header('Access-Control-Allow-Methods','GET,POST,PUT,DELETE,OPTIONS')
-        .header('Access-Control-Allow-Headers','Content-Type,Authorization')
-        .sendStatus(204);
+      return res.sendStatus(204);
     }
+  
+    // otherwise go on to requireAuth → your PUT handler…
     next();
 });
   

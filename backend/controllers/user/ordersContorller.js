@@ -4,37 +4,95 @@ const Product = require('../../models/Product')
 
 const createOrder = async (req, res) => {
     try {
-      const { restaurantID, items } = req.body;
-      const userID = req.user._id;
+        const { restaurantID, items } = req.body;
+        const userID = req.user._id;
 
-      req.body.userID = userID;
+        req.body.userID = userID;
 
-      req.body.deliveryDriverID = null;
+        req.body.deliveryDriverID = null;
 
-      if ( !restaurantID || !items || !Array.isArray(items) || items.length === 0) {
-        console.log("Missing required fields or empty items list.");
-        return res.status(403).json({ error: 'Missing required order fields or empty items list.' });
-      }
+        if ( !restaurantID || !items || !Array.isArray(items) || items.length === 0) {
+            console.log("Missing required fields or empty items list.");
+            return res.status(403).json({ error: 'Missing required order fields or empty items list.' });
+        }
+
+        const existingOrder = await Order.findOne({
+            userID: userID,
+            status: { $in: ['pending', 'processing'] }
+        });
+
+        if (existingOrder) {
+            return res.status(400).json({
+                error: 'You already have an order with you, please cancel it first before creating other orders.',
+                existingOrder
+            });
+        }
   
-      const restaurant = await Restaurant.findById(restaurantID);
-      if (!restaurant) return res.status(404).json({ error: 'Restaurant not found.' });
-  
-      const newOrder = await Order.createOrder(req.body)
-  
-      res.status(201).json(newOrder);
+        const restaurant = await Restaurant.findById(restaurantID);
+        if (!restaurant) return res.status(404).json({ error: 'Restaurant not found.' });
+    
+        const newOrder = await Order.createOrder(req.body)
+    
+        res.status(201).json(newOrder);
 
-      console.log('newOrder:', newOrder);
+        console.log('newOrder:', newOrder);
     } catch (error) {
-      console.error("Order creation error:", error);
-      res.status(500).json({ error: 'Internal server error', details: error.message });
+        console.log("Order creation error:", error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 };
 
 const updateOrder = async (req, res) => {
-    res.status(505).json({
-        errror: "Not implmented yet"
-    })
-}
+    try {
+        const userID = req.user._id;
+        const {orderId, items} = req.body;
+
+        if (!orderId || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ error: "Missing order ID or items are invalid." });
+        }
+
+        // Fetch the order
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ error: "Order not found." });
+        }
+
+        if (order.userID.toString() !== userID.toString()) {
+            return res.status(403).json({ error: "You are not authorized to update this order." });
+        }
+
+        if (['delivered', 'cancelled'].includes(order.status)) {
+            return res.status(403).json({ error: `Cannot update an order that is ${order.status}.` });
+        }
+
+        // Only update items (user is not allowed to change delivery driver, status, etc.)
+        const updatedData = {
+            restaurantID: order.restaurantID,
+            userID: userID,
+            items: items
+        };
+
+        // Validate and compute total using the static method
+        const validation = await Order.validateOrder(updatedData);
+        if (!validation.isValid) {
+            return res.status(400).json({ error: validation.error, missingProducts: validation.missingProducts });
+        }
+
+        // Apply updates
+        order.items = items;
+        order.totalAmount = updatedData.totalAmount;
+
+        await order.save();
+
+        console.log('Updared order:', order);
+
+        return res.status(200).json({ message: "Order updated successfully", order });
+    } catch (error) {
+        console.error("Order update error:", error);
+        return res.status(500).json({ error: "Internal server error", details: error.message });
+    }
+};
 
 const cancelOrder = async (req, res) => {
     const { orderID } = req.query;
@@ -47,8 +105,9 @@ const cancelOrder = async (req, res) => {
     try {
         await Order.findByIdAndUpdate(orderID, { status: 'cancelled' }, { new: true });
         res.status(200).json({ message: 'Order cancelled successfully' });
+        console.log('Order cancelled successfully:', orderID);
     } catch (error) {
-        console.error("Order cancellation error:", error);
+        console.log("Order cancellation error:", error);
         res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 }
@@ -62,7 +121,7 @@ const getMyOrders = async (req, res) => {
         });
         console.log('orders:', orders);
     } catch (error) {
-        console.error("Order fetching error:", error);
+        console.log("Order fetching error:", error);
         res.status(500).json({ error: 'Internal server error', details: error.message });        
     }
 }

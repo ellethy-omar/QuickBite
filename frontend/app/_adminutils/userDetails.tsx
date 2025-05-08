@@ -78,7 +78,7 @@ export default function UserDetailsScreen() {
             </View>
             <View style={styles.section}>
                 <Text style={styles.subtitle}>User Addresses</Text>
-                {userData.address.map((address, index) => (
+                {userData.addresses.map((address, index) => (
                     <View key={index} style={styles.addressContainer}>
                         <View style={{display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center'}}>
                             <IconSymbol name="tag.fill" size={18} color={colors.primary} />

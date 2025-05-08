@@ -9,7 +9,8 @@ import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/rootStack';
 import { useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
-import { setRole, setUserDetails } from '../slices/userSlice';
+import { setUserDetails } from '../slices/userSlice';
+import { setDriverDetails } from '../slices/driverSlice';
 import colors from '../styles/colors';
 import { LoginUserRoute, LoginRestaurantRoute, LoginDriverRoute, LoginAdminRoute } from '../endpoints/authEndpoints';
 import { useNotification } from '../context/notificationContext';
@@ -38,12 +39,10 @@ export default function LoginScreen() {
 
         if (accType === 0) {
           const response = await LoginUserRoute(email, password);
-          console.log('Login response:', response?.data);
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
           showNotification('Login successful!', 'success');
-          dispatch(setRole('user'));
           dispatch(setUserDetails(response?.data.user));
           setTimeout(() => {
             navigation.navigate('mainScreens');
@@ -55,18 +54,17 @@ export default function LoginScreen() {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
           showNotification('Login successful!', 'success');
-          dispatch(setRole('restaurant'));
           setTimeout(() => {
             navigation.navigate('restaurantScreens');
             }, 1000);
 
         } else if (accType == 2){
           const response = await LoginDriverRoute(email, password);
+          dispatch(setDriverDetails(response.data.driver));
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
           showNotification('Login successful!', 'success');
-          dispatch(setRole('driver')); 
           setTimeout(() => {
             navigation.navigate('driverScreens' as never);
             }, 1000);
@@ -77,7 +75,6 @@ export default function LoginScreen() {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }
           showNotification('Login successful!', 'success');
-          dispatch(setRole("admin"));
           setTimeout(() => {
             navigation.navigate('adminScreens');
             }, 1000);
@@ -192,7 +189,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     width: '80%',
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 0,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,

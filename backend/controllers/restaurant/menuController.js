@@ -1,6 +1,6 @@
 const Order = require('../../models/Order');
 const Product = require('../../models/Product');
-
+const { uploadBase64Image } = require('../../controllers/cloudinaryController');
 const getRestaurantProducts = async (req, res) => {
     try {
         const products = await Product.find({ restaurantId: req.user._id });
@@ -112,7 +112,11 @@ const editRestaurantProductImage = async (req, res) => {
             return res.status(403).json({ error: 'Product ID, imageBase64, and tags are required.' });
         }
 
-        const product = await Product.findOne({ _id, restraurantID: req.user._id });
+        const product = await Product.findOne({
+            _id,
+            restaurantId: req.user._id
+          });
+          
 
         if (!product) {
             console.log("Product not found");
@@ -159,10 +163,31 @@ const getRestaurantAllRequiredOrders = async (req, res) => {
     }
 }
 
+const getRestaurantAllOrders = async (req, res) => {
+    try {
+        const orders = await Order.findNewRestaurantOrders(req.user._id);
+        if (!orders) {
+            console.log("No orders found");
+            return res.status(404).json({ error: 'No orders found' });
+        }
+
+        res.status(200).json({
+            message: "Orders fetched successfully",
+            data: orders
+        });
+
+        console.log('orders:', orders);
+    } catch (error) {
+        console.log('Error fetching required orders:', err);
+        res.status(500).json({ error: 'Failed to fetch required orders', details: err.message });        
+    }
+}
+
 module.exports = {
     getRestaurantProducts,
     addRestaurantProduct,
     editRestaurantProduct,
     editRestaurantProductImage,
-    getRestaurantAllRequiredOrders
+    getRestaurantAllRequiredOrders,
+    getRestaurantAllOrders
 }

@@ -291,7 +291,7 @@
 /**
  * @swagger
  * /api/user/cancelOrder:
- *   get:
+ *   put:
  *     tags:
  *       - User (JWT required)
  *     summary: Cancel an order

@@ -13,13 +13,13 @@ export default function RestaurantLayout() {
 
           switch (route.name) {
             case 'dashboard':
-              iconName = focused ? 'rectangle.grid.2x2.fill' : 'rectangle.grid.2x2';
+              iconName = focused ? 'house.fill' : 'house.fill';
               break;
             case 'orders':
               iconName = focused ? 'cart.fill' : 'cart';
               break;
             case 'settings':
-              iconName = focused ? 'gearshape.fill' : 'gearshape';
+              iconName = focused ? 'chevron.left.forwardslash.chevron.right' : 'chevron.left.forwardslash.chevron.right';
               break;
           }
 

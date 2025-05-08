@@ -1,11 +1,11 @@
 export interface userData {
-    id: string;
+    _id: string;
     name: string;
     email: string;
-    banned: boolean;
+    isBanned: boolean;
     profileImage: string;
     phone: string;
-    address:{
+    addresses: Array<{
         label: string;
         area: string;
         street: string;
@@ -13,5 +13,6 @@ export interface userData {
         floor: string;
         apartment: string;
         isDefault: boolean;
-    }[];
+    }>;
+    createdAt: string;
 }

@@ -1,10 +1,12 @@
 // filepath: d:\Projects\quickbite\QuickBite\frontend\store\store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './slices/userSlice';
+import driverReducer from './slices/driverSlice';
 
 const store = configureStore({
   reducer: {
     user: userReducer, // Add your reducers here
+    driver: driverReducer, // Add your reducers here
   },
 });
 
