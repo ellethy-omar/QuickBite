@@ -58,13 +58,38 @@ OrderSchema.statics.validateOrder = async function(orderData) {
       missingProducts: missingIds
     };
   }
+  const outOfStockItems = [];
+ 
 
-  // Calculate totalAmount
+  // Calculate totalAmount and check stock 
   let totalAmount = 0;
   for (const item of items) {
     const product = products.find(p => p._id.toString() === item.productId.toString());
     if (!product) continue; // Just in case
+    
+    
+     if (product.stockAvailable < (item.quantity || 1)) {
+      outOfStockItems.push({
+        productId: product._id,
+        productName: product.name,
+        requested: item.quantity || 1,
+        available: product.stockAvailable
+      });
+    }
+
+    
     totalAmount += product.price * (item.quantity || 1);
+  
+  }
+
+   //response in case no enough stock fro a product 
+  if (outOfStockItems.length > 0) {
+    return {
+      isValid: false,
+      error: 'Some products do not have sufficient stock',
+      outOfStockItems,
+      totalAmount 
+    };
   }
 
   // Set totalAmount in orderData
@@ -73,14 +98,39 @@ OrderSchema.statics.validateOrder = async function(orderData) {
   return { isValid: true };
 };
 
-// Create order with validation, order data must match schema
+// Create order with validation, order data must match schema and deduce the stock 
 OrderSchema.statics.createOrder = async function(orderData) {
+  
   const validation = await this.validateOrder(orderData);
   if (!validation.isValid) {
     throw new Error(validation.error);
   }
 
-  return this.create(orderData);
+  const session = await mongoose.startSession();
+  let order;
+  
+  try {
+    await session.withTransaction(async () => {
+      for (const item of orderData.items) {
+        const quantity = item.quantity || 1;
+        const product = await mongoose.model('Product').findOneAndUpdate(
+          { 
+            _id: item.productId, 
+            stockAvailable: { $gte: quantity }
+          },
+          { $inc: { stockAvailable: -quantity } },
+          { session, new: true }
+        );
+      }
+
+      order = await this.create([orderData], { session });
+    });
+    
+    return order[0];
+  }
+   finally {
+    session.endSession();
+  }
 };
 
 // Find orders needing delivery (no delivery man assigned and not cancelled)

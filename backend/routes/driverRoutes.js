@@ -2,28 +2,38 @@ const router = require('express').Router(); // require express and use the Route
 const {
     getDriverProfile,
     updateDriverProfile,
-    updateDriverProfilePhoto,
-    restDriverPassword
+    updateDriverProfilePhoto
 } = require('../controllers/driver/profileController');
 
 const {
     getAllAvailableOrders,
     acceptOrder,
     leaveOrder,
-    getTheOrderIneedToDeliver
+    getTheOrderIneedToDeliver,
+    getMyOrdersHistory
 } = require('../controllers/driver/deliveryController');
+
+const {
+    getActiveChatsDriver,
+    getMessagesDriver,
+    getAllChatsDriver
+}  = require('../controllers/driver/chatController');
 
 // profile routes
 router.get("/getDriverProfile", getDriverProfile);
 router.put("/updateDriverProfile", updateDriverProfile);
 router.put("/updateDriverProfilePhoto", updateDriverProfilePhoto)
-router.post("/restDriverPassword", restDriverPassword)
 
-// dilvery routes
-
+// delivery routes
 router.get("/getAllAvailableOrders", getAllAvailableOrders);
 router.put("/acceptOrder", acceptOrder);
 router.put("/leaveOrder", leaveOrder);
 router.get("/getTheOrderIneedToDeliver", getTheOrderIneedToDeliver);
+router.get("/getMyOrdersHistory", getMyOrdersHistory);
+
+// chat routes
+router.get("/getActiveChatsDriver", getActiveChatsDriver);
+router.get("/getMessagesDriver", getMessagesDriver);
+router.get("/getAllChatsDriver", getAllChatsDriver);
 
 module.exports = router;

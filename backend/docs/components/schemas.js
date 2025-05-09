@@ -1,103 +1,4 @@
 
-//  *         $ref: '#/components/responses/InvalidCredentialsError'
-/*
-    ? COMMON RESPONSES
-    ? 420                $ref: '#/components/responses/UnauthorizedError'
-    ? 469                $ref: '#/components/responses/ForbiddenError'
-    ? 403                $ref: '#/components/responses/ParameterRequiredError'
-    ? 410                $ref: '#/components/responses/UserAlreadyExistsError'
-    ? 404                $ref: '#/components/responses/InvalidCredentialsError'
-    ? 500                $ref: '#/components/responses/ServerError'
-
-    ! COMMON SCHEMAS
-    !                    $ref: '#/components/schemas/User'
-    !                    $ref: '#/components/schemas/Driver'
-    !                    $ref: '#/components/schemas/Restaurant'
-    !                    $ref: '#/components/schemas/Admin'
-    !                    $ref: '#/components/schemas/Product'
-    !                    $ref: '#/components/schemas/Order'
-    !                    $ref: '#/components/schemas/Message'
-    !                    $ref: '#/components/schemas/Chat'
-    !                    $ref: '#/components/schemas/restaurantAddress'
-    !                    $ref: '#/components/schemas/UserAddress'
-*/
-
-/**
- * @swagger
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- *   responses:
- *     UnauthorizedError:
- *       description: Authorization token required or invalid
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               error:
- *                 type: string
- *                 example: Authorization token required
- *     ForbiddenError:
- *       description: Forbidden. Role not authorized.
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               error:
- *                 type: string
- *                 example: Access denied, you don't have the authority to do this!
- *     ParameterRequiredError:
- *       description: A required parameter is missing in the request
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               error:
- *                 type: string
- *                 example: Any thing can be required, I have tried
- *     UserAlreadyExistsError:
- *       description: The user already exists in the system
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               error:
- *                 type: string
- *                 example: User already exists
- *     InvalidCredentialsError:
- *       description: Invalid login credentials provided
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               error:
- *                 type: string
- *                 example: Invalid credentials
- */
-
-/**
- * @swagger
- * components:
- *   responses:
- *     ServerError:
- *       description: Server error. Call Omar
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               error:
- *                 type: string
- *                 example: "If you see status 500 tell me, thsi is not an example"
- */
 /**
  * @swagger
  * components:
@@ -465,57 +366,99 @@
  * @swagger
  * components:
  *   schemas:
- *     Message:
+ *     Conversation:
  *       type: object
- *       properties:
- *         chatId:
- *           type: string
- *           format: objectId
- *           description: "ID of the Chat the message belongs to"
- *           example: "60c72b2f5f1b2c001f58c1b4"
- *         senderId:
- *           type: string
- *           format: objectId
- *           description: "ID of the user who sent the message"
- *           example: "60c72b2f5f1b2c001f58c1b4"
- *         content:
- *           type: string
- *           description: "The message content"
- *           example: "Hello, how are you?"
- *         timestamp:
- *           type: string
- *           format: date-time
- *           default: "2025-04-18T08:45:30.000Z"
- *           example: "2025-04-18T08:45:30.000Z"
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Chat:
- *       type: object
+ *       required:
+ *         - participants
+ *         - orderId
  *       properties:
  *         participants:
  *           type: array
- *           items:
- *             type: string
- *             format: objectId
- *             description: "IDs of the users participating in the Chat"
- *             example: "60c72b2f5f1b2c001f58c1b4"
+ *           description: List of participants in this conversation
  *           minItems: 2
- *           uniqueItems: true
- *           description: "At least two unique participants are required for a Chat."
+ *           items:
+ *             type: object
+ *             required:
+ *               - participantId
+ *               - participantType
+ *             properties:
+ *               participantId:
+ *                 type: string
+ *                 format: objectId
+ *                 description: ID of the participant (user or driver)
+ *                 example: "60c72b2f5f1b2c001f58c1b4"
+ *               participantType:
+ *                 type: string
+ *                 enum: [user, driver]
+ *                 description: Role of the participant
+ *                 example: "user"
+ *         orderId:
+ *           type: string
+ *           format: objectId
+ *           description: Reference to the Order that initiated this chat
+ *           example: "60d82c3e6f2b4a2d4c8e1234"
+ *         isActive:
+ *           type: boolean
+ *           description: Whether the conversation is currently active
+ *           default: true
+ *         lastActivity:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp of the last message or update
+ *           example: "2025-04-18T09:45:30.000Z"
  *         createdAt:
  *           type: string
  *           format: date-time
+ *           description: When this conversation was created
  *           example: "2025-04-18T08:45:30.000Z"
  *         updatedAt:
  *           type: string
  *           format: date-time
+ *           description: When this conversation was last modified
  *           example: "2025-04-18T09:45:30.000Z"
+ *
+ *     Message:
+ *       type: object
+ *       required:
+ *         - chatId
+ *         - senderId
+ *         - senderType
+ *         - content
+ *       properties:
+ *         chatId:
+ *           type: string
+ *           format: objectId
+ *           description: ID of the Conversation this message belongs to
+ *           example: "60c72b2f5f1b2c001f58c1b4"
+ *         senderId:
+ *           type: string
+ *           format: objectId
+ *           description: ID of the user or driver who sent the message
+ *           example: "60d82c3e6f2b4a2d4c8e1234"
+ *         senderType:
+ *           type: string
+ *           enum: [user, driver]
+ *           description: Role of the sender
+ *           example: "driver"
+ *         content:
+ *           type: string
+ *           description: The body of the message
+ *           example: "Your order is on its way!"
+ *         isRead:
+ *           type: boolean
+ *           description: Whether the recipient has read the message
+ *           default: false
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: When this message was created
+ *           example: "2025-04-18T08:50:15.000Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: When this message was last updated
+ *           example: "2025-04-18T08:50:15.000Z"
  */
-
 
 /**
  * @swagger
@@ -555,12 +498,5 @@
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/UploadImagePayload'
- *
- *   responses:
- *     ImageUploadSuccess:
- *       description: Returned when the image is saved successfully
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/ImageUploadResponse'
+ *     
  */

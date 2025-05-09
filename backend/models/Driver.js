@@ -13,8 +13,19 @@ const DriverSchema = new Schema({
       model: String,
       cateogry:String 
     },
-   rating: {type: Number, default: 0.0},
-   deliveryStats: 
+   rating: 
+     {
+       type: Number,
+       min: 0,
+       max: 5,
+       default: 0
+     },
+    ratingCount: 
+     {  
+      type: Number,
+      default: 0
+     },
+    deliveryStats: 
      {
        completed:{type: Number, default: 0},
        avgDeliveryTime:{type: Number, default: 0.0},
@@ -55,6 +66,25 @@ DriverSchema.statics.driverExists = async function (email, phone) {
     return await this.findOne({ email: input });
   }
 };
+
+//tested in test queries line 142
+// Method to update driver's rating
+DriverSchema.methods.updateRating = function(newRating) {
+  
+  if (newRating < 0 || newRating > 5) {
+     throw new Error('Rating must be between 0 and 5');
+  }
+
+  const currentTotal = this.rating * this.ratingCount;
+  this.ratingCount += 1;
+  this.rating = (currentTotal + newRating) / this.ratingCount;
+
+  this.rating = Math.round(this.rating * 10) / 10;
+
+  return this.save();
+};
+
+
 
 const Driver = mongoose.model('Driver', DriverSchema);
 module.exports = Driver;

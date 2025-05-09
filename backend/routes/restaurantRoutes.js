@@ -3,25 +3,26 @@ const {
     getRestaurantProfie,
     updateRestaurantProfile,
     updateRestaurantLogo,
-    updateRestaurantCoverImage,
-    resetRestaurantPassword
+    updateRestaurantCoverImage
 } = require('../controllers/restaurant/profileContorller');
 
 const {
     getRestaurantProducts,
     addRestaurantProduct,
     editRestaurantProduct,
-    editRestaurantProductImage,
+    editRestaurantProductImage
+} = require('../controllers/restaurant/menuController')
+
+const {
     getRestaurantAllRequiredOrders,
     getRestaurantAllOrders
-} = require('../controllers/restaurant/menuController')
+} = require('../controllers/restaurant/ordersContorller')
 
 // profile routes
 router.get("/getRestaurantProfie", getRestaurantProfie);
 router.put("/updateRestaurantProfile", updateRestaurantProfile);
 router.put("/updateRestaurantLogo", updateRestaurantLogo)
 router.put("/updateRestaurantCoverImage", updateRestaurantCoverImage)
-router.post("/resetRestaurantPassword", resetRestaurantPassword)
 
 // menu routes
 router.get("/getRestaurantProducts", getRestaurantProducts)
