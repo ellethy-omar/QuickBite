@@ -102,19 +102,8 @@ const updateUserProfilePhoto = async (req, res) => {
     }
 }
 
-const restUserPassword = async (req, res) => {
-    const user = User.findById(req.user._id);
-
-    // I need some updating logic here
-
-    res.status(505).json({
-        errror: "Not implmented yet"
-    })
-}
-
 module.exports = {
     getUserProfile,
     updateUserProfile,
-    updateUserProfilePhoto,
-    restUserPassword
+    updateUserProfilePhoto
 }

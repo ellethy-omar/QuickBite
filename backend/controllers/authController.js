@@ -17,12 +17,12 @@ const registerUser = async (req, res) => {
 
     if (!validator.isEmail(email)) {
       console.log("Email is not valid");
-      return res.status(400).json({ error: 'Invalid email address' });
+      return res.status(403).json({ error: 'Invalid email address' });
     }
 
     if (!validator.isStrongPassword(password)) {
       console.log("Password is not strong enough");
-      return res.status(400).json({ error: 'Password is not strong enough' });
+      return res.status(403).json({ error: 'Password is not strong enough' });
     }
 
     try {
@@ -47,7 +47,7 @@ const registerUser = async (req, res) => {
       console.log('savedUser:', savedUser);
 
     } catch (error) {
-      console.error('Registration error:', error);
+      console.log('Registration error:', error);
       res.status(500).json({ error: 'Server error during registration', details: error });
     }
 };
@@ -94,7 +94,7 @@ const loginUser = async (req, res) => {
       console.log('user:', user);
 
     } catch (error) {
-      console.error('Login error:', error);
+      console.log('Login error:', error);
       res.status(500).json({ error: 'Server error during login', details: error });
     }
 };
@@ -110,12 +110,12 @@ const registerDriver = async (req, res) => {
 
   if (!validator.isEmail(email)) {
     console.log("Email is not valid");
-    return res.status(400).json({ error: 'Invalid email address' });
+    return res.status(403).json({ error: 'Invalid email address' });
   }
 
   if (!validator.isStrongPassword(password)) {
     console.log("Password is not strong enough");
-    return res.status(400).json({ error: 'Password is not strong enough' });
+    return res.status(403).json({ error: 'Password is not strong enough' });
   }
   
 
@@ -140,7 +140,7 @@ const registerDriver = async (req, res) => {
     console.log('newDriver:', newDriver);
 
   } catch (error) {
-    console.error('Driver registration error:', error);
+    console.log('Driver registration error:', error);
     res.status(500).json({ error: 'Server error during registration', details: error });
   }
 };
@@ -182,7 +182,7 @@ const loginDriver = async (req, res) => {
     console.log('driver:', driver);
 
   } catch (error) {
-    console.error('Driver login error:', error);
+    console.log('Driver login error:', error);
     res.status(500).json({ error: 'Server error during login', details: error });
   }
 };
@@ -197,12 +197,12 @@ const registerAdmin = async (req, res) => {
 
   if (!validator.isEmail(email)) {
     console.log("Email is not valid");
-    return res.status(400).json({ error: 'Invalid email address' });
+    return res.status(403).json({ error: 'Invalid email address' });
   }
 
   if (!validator.isStrongPassword(password)) {
     console.log("Password is not strong enough");
-    return res.status(400).json({ error: 'Password is not strong enough' });
+    return res.status(403).json({ error: 'Password is not strong enough' });
   }
 
   try {
@@ -228,7 +228,7 @@ const registerAdmin = async (req, res) => {
     console.log('savedAdmin:', adminData);
 
   } catch (error) {
-    console.error('Admin registration error:', error);
+    console.log('Admin registration error:', error);
     res.status(500).json({ error: 'Server error during admin registration', details: error });
   }
 };
@@ -268,7 +268,7 @@ const loginAdmin = async (req, res) => {
     console.log('admin:', adminData);
 
   } catch (error) {
-    console.error('Admin login error:', error);
+    console.log('Admin login error:', error);
     res.status(500).json({ error: 'Server error during admin login', details: error });
   }
 };
@@ -286,12 +286,12 @@ const registerRestaurant = async (req, res) => {
 
   if (!validator.isEmail(contact.email)) {
     console.log("Email is not valid");
-    return res.status(400).json({ error: 'Invalid email address' });
+    return res.status(403).json({ error: 'Invalid email address' });
   }
 
   if (!validator.isStrongPassword(contact.password)) {
     console.log("Password is not strong enough");
-    return res.status(400).json({ error: 'Weak password' });
+    return res.status(403).json({ error: 'Weak password' });
   }
 
   try {
@@ -316,7 +316,7 @@ const registerRestaurant = async (req, res) => {
     console.log("newRestaurant:", newRestaurant);
 
   } catch (err) {
-    console.error('Register error:', err);
+    console.log('Register error:', err);
     res.status(500).json({ error: 'Server error during registration', details: err});
   }
 };
@@ -352,25 +352,32 @@ const loginRestaurant = async (req, res) => {
     });
     console.log('restaurant:', restaurant);
   } catch (err) {
-    console.error('Login error:', err);
+    console.log('Login error:', err);
     res.status(500).json({ error: 'Server error during login', details: err });
   }
-};
-
-const verifyToken = (req, res) => {
-    res.status(200).json({ message: 'Token is valid', user: req.user });
 };
 
 const forgotPassword = async (req, res) => {
   const { email, role } = req.body;
 
   let Model;
+
+  if (!role || !email) {
+    console.log("Role or email is not available for password reset");
+
+    return res.status(403).json({ error: 'Role and email are required' });
+  }
+  if (!validator.isEmail(email)) {
+    console.log("Email is not valid");
+    return res.status(403).json({ error: 'Invalid email address' });
+  }
+
   switch (role) {
-      case 'user': Model = require('../models/User'); break;
-      case 'driver': Model = require('../models/Driver'); break;
-      case 'restaurant': Model = require('../models/Restaurant'); break;
-      case 'admin': Model = require('../models/Admin'); break;
-      default: return res.status(400).json({ error: 'Invalid role' });
+      case 'user': Model = User; break;
+      case 'driver': Model = Driver; break;
+      case 'restaurant': Model = Restaurant; break;
+      case 'admin': Model = Admin; break;
+      default: return res.status(403).json({ error: 'Invalid role' });
   }
 
   const user = await Model.findOne({ email });
@@ -408,15 +415,24 @@ const resetPassword = async (req, res) => {
   const { token, password, role } = req.body;
 
   let Model;
+  if (!role || !token || !password) {
+    console.log("Role or token or password is not available for password reset");
+    return res.status(403).json({ error: 'Role, token and password are required' });
+  }
   switch (role) {
       case 'user': Model = User; break;
       case 'driver': Model = Driver; break;
       case 'restaurant': Model = Restaurant; break;
-      // case 'admin': Model = Admin; break;
-      default: return res.status(400).json({ error: 'Invalid role' });
+      case 'admin': Model = Admin; break;
+      default: return res.status(403).json({ error: 'Invalid role' });
   }
 
   try {
+
+    if (!validator.isStrongPassword(password)) {
+      console.log("Password is not strong enough");
+      return res.status(403).json({ error: 'Password is not strong enough' });
+    }
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -426,7 +442,7 @@ const resetPassword = async (req, res) => {
       console.log("Sucess response sent");
 
   } catch (err) {
-      res.status(400).json({ error: 'Invalid or expired token' });
+      res.status(420).json({ error: 'Invalid or expired token' });
   }
 };
   
@@ -441,6 +457,5 @@ module.exports = {
   registerRestaurant,
   loginRestaurant,
   forgotPassword,
-  resetPassword,
-  verifyToken
+  resetPassword
 };

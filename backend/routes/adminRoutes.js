@@ -2,8 +2,7 @@ const router = require('express').Router(); // require express and use the Route
 const {
     getAdminProfile,
     updateAdminProfile,
-    updateAdminProfilePhoto,
-    restAdminPassword
+    updateAdminProfilePhoto
 } = require('../controllers/admin/profileController');
 
 const {
@@ -25,7 +24,6 @@ const {
 router.get("/getAdminProfile", getAdminProfile);
 router.put("/updateAdminProfile", updateAdminProfile);
 router.put("/updateAdminProfilePhoto", updateAdminProfilePhoto)
-router.post("/restAdminPassword", restAdminPassword)
 
 // dashboard routes
 router.get('/getAllUsers', getAllUsers);

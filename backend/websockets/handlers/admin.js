@@ -1,5 +1,6 @@
 const Admin = require('../../models/Admin');
 const { chatWithAI } = require('../../services/aiAgent');
+
 const adminRoutes  = async (ws, adminPayload) => {
     global.adminClients.set(adminPayload._id.toString(), ws);
     ws.send(JSON.stringify({ type: 'connection', data: 'Admin connected' }));
@@ -24,6 +25,8 @@ const adminRoutes  = async (ws, adminPayload) => {
         return;
       }
 
+      console.log('Admin route heard a message:', { type, data });
+
       switch (type) {
         case 'ping': {
           ws.send(JSON.stringify({ type: 'pong', data: 'pong' }));
@@ -32,15 +35,15 @@ const adminRoutes  = async (ws, adminPayload) => {
         case 'ai':
           try {
 
-
             const aiResponse = await chatWithAI(data.prompt);
         
             ws.send(JSON.stringify({
-              type: 'ai_response',
+              type: 'aiResponse',
               data: aiResponse
             }));
+            console.log("Responded with: ", aiResponse)
           } catch (err) {
-            console.error('Error in AI handler:', err.response?.data || err.message);
+            console.log('Error in AI handler:', err.response?.data || err.message);
             ws.send(JSON.stringify({
               type: 'error',
               data: `AI service error: ${err.message}`

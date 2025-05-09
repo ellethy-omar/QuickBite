@@ -116,18 +116,9 @@ const updateRestaurantCoverImage = async (req, res) => {
     }
 }
 
-const resetRestaurantPassword = async (req, res) => {
-    const restaurant = await Restaurant.findById(req.user._id);
-
-    res.status(505).json({
-        errror: "Not implmented yet"
-    });
-}
-
 module.exports = {
     getRestaurantProfie,
     updateRestaurantProfile,
     updateRestaurantLogo,
-    updateRestaurantCoverImage,
-    resetRestaurantPassword
+    updateRestaurantCoverImage
 }

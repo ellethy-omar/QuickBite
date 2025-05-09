@@ -1,4 +1,9 @@
 const Order = require('../../models/Order')
+const Chat = require('../../models/Chat')
+
+const { sendWSMessage } = require('../../websockets/utils/wsUtils')
+const { getOrCreateChat, getMessages, getActiveChats, markMessagesAsRead } = require('../../services/chatService')
+
 const getAllAvailableOrders = async (req, res) => {
     try {
       const availableOrders = await Order.findOrdersNeedingDelivery();
@@ -80,6 +85,20 @@ const acceptOrder = async (req, res) => {
 
         console.log('updatedOrder:', updatedOrder);
 
+        const pushed = sendWSMessage(
+            'user',
+            updatedOrder.userID,
+            'orderAccepted',
+            { orderId: updatedOrder._id, status: updatedOrder.status }
+        );
+
+
+        getOrCreateChat(updatedOrder.userID, driverId, updatedOrder._id);
+        
+        if(!pushed) {
+            console.log('Failed to send order accepted message to user.');
+        }
+
     } catch (err) {
         console.log('Error accepting order:', err);
         res.status(500).json({ error: 'Failed to accept the order', details: err.message });
@@ -118,6 +137,26 @@ const leaveOrder = async (req, res) => {
         res.status(200).json({
             message: 'You have left the order successfully.'
         });
+
+        const pushed = sendWSMessage(
+            'user',
+            existingOrder.userID,
+            'orderLeft',
+            { orderId: existingOrder._id, status: existingOrder.status }
+        );
+
+        await Chat.findOneAndUpdate(
+            { orderId: existingOrder._id },
+            { $set: { isActive: false } }
+        );
+
+        sendWSMessage('driver', driverId, 'chatClosed', { orderId });
+
+
+        if(!pushed) {
+            console.log('Failed to send order left message to user.');
+        }
+
     } catch (error) {
         console.log('Error leaving order:', err);
         res.status(500).json({ error: 'Failed to leave the order, guess you are stuck with it', details: err.message });        
@@ -149,7 +188,37 @@ const getTheOrderIneedToDeliver = async (req, res) => {
         }
     }
     catch (error) {
-        console.log('Error leaving order:', err);
+        console.log('Error finding order:', err);
+        res.status(500).json({ error: 'Error getting the order????????? How did you reach this point?', details: err.message });        
+    }
+}
+
+const getMyOrdersHistory = async (req, res) => {
+    const driverId = req.user._id;    
+    try {
+        const orders = await Order.find({
+            deliveryDriverID: driverId,
+            status: { $in: ['delivered', 'cancelled'] }
+        }).populate('restaurantID', 'name address contact.phone')
+        .populate('userID', 'name phone addresses')
+        .populate('items.productId', 'name price category description image');
+
+        if(!orders) {
+            console.log('You do not have any order.');
+            return res.status(200).json({
+                message: 'You do not have any orders.',
+                existingOrder: orders
+            });
+        } else {
+            console.log('Found order:', orders);
+            res.status(200).json({
+                message: 'Order found.',
+                existingOrder: orders
+            });
+        }
+    }
+    catch (error) {
+        console.log('Error finding order:', err);
         res.status(500).json({ error: 'Error getting the order????????? How did you reach this point?', details: err.message });        
     }
 }
@@ -158,5 +227,6 @@ module.exports = {
     getAllAvailableOrders,
     acceptOrder,
     leaveOrder,
-    getTheOrderIneedToDeliver
+    getTheOrderIneedToDeliver,
+    getMyOrdersHistory
 }

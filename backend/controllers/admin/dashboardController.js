@@ -37,6 +37,38 @@ const getAllRestaurants = async (req, res) => {
       res.status(500).json({ error: 'Server error while fetching restaurants.' })
     }
 }
+
+const getAllProductsOfCertainRestaurant = async (req, res) => {
+  const { restraurantID } = req.query;
+  
+      if(!restraurantID) {
+          console.log("Restaurant ID is required");
+          return res.status(403).json({ error: 'Restaurant ID is required' });
+      }
+  
+      const restaurant = await Restaurant.findById(restraurantID);
+      if (!restaurant) {
+        console.log("Invalid restaurant _id");
+        return res.status(404).json({ error: 'Restaurant not found.' });
+      }
+  
+      console.log('restaurant:', restaurant);
+  
+      const products = await Product.find({ restaurantId: restraurantID });
+      if (!products) {
+          console.log("No products found for this restaurant");
+          return res.status(200).json({
+              message: "No products found for this restaurant",
+              data: []
+          });
+      }
+  
+      res.status(200).json({
+          message: "All products fetched successfully",
+          data: products
+      });
+      console.log('products:', products);
+}
   
 // Ban a user by setting isBanned = true
 const banUser = async (req, res) => { 
