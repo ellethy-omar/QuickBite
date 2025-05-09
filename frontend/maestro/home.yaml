@@ -1,0 +1,8 @@
+appId: host.exp.exponent
+---
+- launchApp
+- tapOn: "Login"
+- inputText: "test@example.com"
+- inputText: "password123"
+- tapOn: "Submit"
+- assertVisible: "Welcome, User!"
