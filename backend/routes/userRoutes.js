@@ -12,12 +12,21 @@ const {
     getMyOrders,
     getMyCurrentOrder,
     getAllRestaurants,
-    getProductsForRestaurant,
+    getProductsForRestaurant
+} = require('../controllers/user/ordersContorller');
+
+const {
     rateDriver,
     rateRestaurant,
+    rateProduct
+} = require('../controllers/user/ratingController');
+
+const {
     getActiveChatsUser,
-    getMessagesUser
-} = require('../controllers/user/ordersContorller');
+    getMessagesUser,
+    getAllChatsUser
+} = require('../controllers/user/chatController');
+
 
 // profile routes
 router.get("/getUserProfile", getUserProfile);
@@ -32,9 +41,15 @@ router.put("/updateOrder", updateOrder);
 router.put("/cancelOrder", cancelOrder);
 router.get("/getAllRestaurants", getAllRestaurants);
 router.get("/getProductsForRestaurant", getProductsForRestaurant);
-router.put("/rateDriver", rateDriver);
-router.put("/rateRestaurant", rateRestaurant);
+
+// chat routes
 router.get("/getActiveChatsUser", getActiveChatsUser);
 router.get("/getMessagesUser", getMessagesUser);
+router.get("/getAllChatsUser", getAllChatsUser);
+
+// rating routes
+router.put("/rateDriver", rateDriver);
+router.put("/rateRestaurant", rateRestaurant);
+router.put("/rateProduct", rateProduct);
 
 module.exports = router;

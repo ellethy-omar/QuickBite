@@ -68,6 +68,8 @@ const userRoute = async (ws, userPayload) => {
                 messages
               }
             }));
+            console.log("Responed with ", messages)
+
           } catch (err) {
             console.log('Error initializing chat:', err);
             ws.send(JSON.stringify({
@@ -104,6 +106,9 @@ const userRoute = async (ws, userPayload) => {
                 timestamp: message.createdAt
               }
             }));
+            await markMessagesAsRead(chat._id, userPayload._id);
+
+            console.log("Responded with: ", message)
           } catch (err) {
             console.error('Error sending message:', err);
             ws.send(JSON.stringify({
@@ -137,6 +142,9 @@ const userRoute = async (ws, userPayload) => {
                 hasMore: messages.length === limit
               }
             }));
+            await markMessagesAsRead(chat._id, userPayload._id);
+
+            console.log("Responded with: ", messages)
           } catch (err) {
             console.log('Error loading messages:', err);
             ws.send(JSON.stringify({
@@ -146,36 +154,6 @@ const userRoute = async (ws, userPayload) => {
           }
           break;
           
-        case 'chatMarkRead':
-          try {
-            if (!data.chatId) {
-              throw new Error('Missing chatId');
-            }
-            
-            const chatId = new mongoose.Types.ObjectId(data.chatId);
-
-            if (!mongoose.Types.ObjectId.isValid(data.chatId)) {
-                throw new Error('Invalid chatId');
-            }
-            
-            const count = await markMessagesAsRead(chatId, userPayload._id);
-            
-            ws.send(JSON.stringify({
-              type: 'messagesMarkedRead',
-              data: {
-                chatId,
-                count
-              }
-            }));
-          } catch (err) {
-            console.log('Error marking messages as read:', err);
-            ws.send(JSON.stringify({
-              type: 'error',
-              data: `Failed to mark messages as read: ${err.message}`
-            }));
-          }
-          break;
-
         case 'ai':
           try {
             const aiResponse = await chatWithAI(data.prompt);
@@ -184,6 +162,8 @@ const userRoute = async (ws, userPayload) => {
               type: 'aiResponse',
               data: aiResponse
             }));
+
+            console.log("Responded with: ", aiResponse)
           } catch (err) {
             console.log('Error in AI handler:', err.response?.data || err.message);
             ws.send(JSON.stringify({

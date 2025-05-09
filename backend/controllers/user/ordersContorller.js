@@ -1,10 +1,7 @@
 const Order = require('../../models/Order')
 const Restaurant = require('../../models/Restaurant')
 const Product = require('../../models/Product')
-const Driver = require('../../models/Driver')
-const Message = require('../../models/Message')
-const mongoose = require('mongoose')
-const { markMessagesAsRead, getMessages, getActiveChats } = require('../../services/chatService')
+
 
 const createOrder = async (req, res) => {
     try {
@@ -196,156 +193,6 @@ const getProductsForRestaurant = async (req, res) => {
     console.log('products:', products);
 }
 
-const rateDriver = async (req, res) => {
-    const { driverId, rating } = req.body;
-    if(!driverId || !rating) {
-        console.log("Driver ID & rating are required");
-        return res.status(403).json({ error: 'Driver ID & rating are required' });
-    }
-
-    if(isNaN(rating) || rating < 0 || rating > 5) {
-        console.log("Invalid rating value");
-        return res.status(403).json({ error: 'Invalid rating value' });
-    }
-
-    try {
-        const driver = await Driver.findById(driverId);
-
-        if(!driver)
-            return res.status(404).json({ error: 'Driver not found.' });
-    
-        await driver.updateRating(rating);
-
-        res.status(200).json({
-            message: "Driver rated successfully",
-            newRating: driver.rating,
-            totalRatings: driver.ratingCount,
-        });
-    } catch (error) {
-        console.log("Error while rating driver:", error);
-        return res.status(500).json({ error: 'Internal server error', details: error.message });
-        
-    }
-}
-
-const rateRestaurant = async (req, res) => {
-    const { restaurantId, rating } = req.body;
-    if(!restaurantId || !rating) {
-        console.log("Restaurant ID & rating are required");
-        return res.status(403).json({ error: 'Driver ID & rating are required' });
-    }
-
-    if(isNaN(rating) || rating < 0 || rating > 5) {
-        console.log("Invalid rating value");
-        return res.status(403).json({ error: 'Invalid rating value' });
-    }
-
-    try {
-        const restaurant = await Restaurant.findById(restaurantId);
-
-        if(!restaurant)
-            return res.status(404).json({ error: 'Restaurant not found.' });
-    
-        await restaurant.updateRating(rating);
-
-        res.status(200).json({
-            message: "Restaurant rated successfully",
-            newRating: restaurant.rating,
-            totalRatings: restaurant.ratingCount,
-        });
-    } catch (error) {
-        console.log("Error while rating restaurant:", error);
-        return res.status(500).json({ error: 'Internal server error', details: error.message });
-        
-    }
-}
-
-const getActiveChatsUser = async(req,res )=> {
-    try {
-        const chats = await getActiveChats(req.user._id, 'user');
-        
-        // Get last message for each chat
-        const chatsWithPreview = await Promise.all(chats.map(async (chat) => {
-          const lastMessage = await Message.findOne({ chatId: chat._id })
-            .sort({ createdAt: -1 })
-            .limit(1);
-            
-          // Find the driver participant
-          const driverParticipant = chat.participants.find(p => p.participantType === 'driver');
-          const driver = driverParticipant ? 
-            await Driver.findById(driverParticipant.participantId, 'name profilePicture vehicle') : 
-            null;
-            
-          // Count unread messages
-          const unreadCount = await Message.countDocuments({
-            chatId: chat._id,
-            senderId: { $ne: req.user._id },
-            isRead: false
-          });
-          
-          // Get order details
-          const order = await Order.findById(chat.orderId, 'status totalAmount');
-          
-          return {
-            _id: chat._id,
-            driver: driver ? {
-              _id: driver._id,
-              name: driver.name,
-              profilePicture: driver.profilePicture,
-              vehicle: driver.vehicle,
-              phone: driver.phone
-            } : null,
-            order: order ? {
-              _id: order._id,
-              status: order.status,
-              totalAmount: order.totalAmount
-            } : null,
-            lastMessage: lastMessage ? {
-              content: lastMessage.content,
-              createdAt: lastMessage.createdAt,
-              isFromUser: lastMessage.senderId.toString() === req.user._id.toString()
-            } : null,
-            unreadCount
-          };
-        }));
-        
-        res.json(chatsWithPreview);
-
-        console.log('chatsWithPreview:', chatsWithPreview);
-      } catch (err) {
-        console.error('Error getting user chats:', err);
-        res.status(500).json({ message: 'Failed to get chats', details: err.message });
-      }
-}
-
-const getMessagesUser = async (req, res) => {
-    const chatIdStr = req.query.chatId;
-    if (!chatIdStr) {
-        console.log("Chat ID is required");
-        return res.status(403).json({ error: 'Chat ID is required' });
-    }
-
-    try {
-        const chatId = new mongoose.Types.ObjectId(chatIdStr);
-
-        const before = req.query.before ? new Date(req.query.before) : null;
-        const limit  = parseInt(req.query.limit, 10) || 20;
-
-        const messages = await getMessages(chatId, limit, before);
-
-        await markMessagesAsRead(chatId, req.user._id);
-
-        return res.json({
-            messages,
-            hasMore: messages.length === limit
-        });
-
-    } catch (err) {
-        console.error('Error getting chat messages:', err);
-        return res.status(500).json({ message: 'Failed to get messages' });
-    }
-};
-
 module.exports = {
     createOrder,
     updateOrder,
@@ -353,9 +200,5 @@ module.exports = {
     getMyOrders,
     getMyCurrentOrder,
     getAllRestaurants,
-    getProductsForRestaurant,
-    rateDriver,
-    rateRestaurant,
-    getActiveChatsUser,
-    getMessagesUser
+    getProductsForRestaurant
 }

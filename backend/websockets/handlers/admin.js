@@ -41,6 +41,7 @@ const adminRoutes  = async (ws, adminPayload) => {
               type: 'aiResponse',
               data: aiResponse
             }));
+            console.log("Responded with: ", aiResponse)
           } catch (err) {
             console.log('Error in AI handler:', err.response?.data || err.message);
             ws.send(JSON.stringify({

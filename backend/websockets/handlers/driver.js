@@ -87,6 +87,7 @@ const driverRoutes = async (ws, driver) => {
                 messages
               }
             }));
+            console.log("Responed with ", messages)
           } catch (err) {
             console.log('Error initializing chat:', err);
             ws.send(JSON.stringify({
@@ -123,6 +124,8 @@ const driverRoutes = async (ws, driver) => {
                 timestamp: message.createdAt
               }
             }));
+            await markMessagesAsRead(chatId, driver._id);
+            console.log("Responed with ", message)
           } catch (err) {
             console.log('Error sending message:', err);
             ws.send(JSON.stringify({
@@ -157,6 +160,9 @@ const driverRoutes = async (ws, driver) => {
                 hasMore: messages.length === limit
               }
             }));
+            await markMessagesAsRead(chatId, driver._id);
+
+            console.log("Responded with: ", messages)
           } catch (err) {
             console.log('Error loading messages:', err);
             ws.send(JSON.stringify({
@@ -195,58 +201,6 @@ const driverRoutes = async (ws, driver) => {
             }));
           }
           break;
-          
-        case 'getActiveChats':
-          try {
-            const chats = await getActiveChats(driver._id, 'driver');
-            
-            const chatsWithPreview = await Promise.all(chats.map(async (chat) => {
-              const lastMessage = await Message.findOne({ chatId: chat._id })
-                .sort({ createdAt: -1 })
-                .limit(1);
-                
-              // Find the user participant
-              const userParticipant = chat.participants.find(p => p.participantType === 'user');
-              const user = userParticipant ? 
-                await User.findById(userParticipant.participantId, 'name profilePicture') : 
-                null;
-                
-              // Count unread messages
-              const unreadCount = await Message.countDocuments({
-                chatId: chat._id,
-                senderId: { $ne: driver._id },
-                isRead: false
-              });
-              
-              return {
-                _id: chat._id,
-                user: user ? {
-                  _id: user._id,
-                  name: user.name,
-                  profilePicture: user.profilePicture
-                } : null,
-                orderId: chat.orderId,
-                lastMessage: lastMessage ? {
-                  content: lastMessage.content,
-                  createdAt: lastMessage.createdAt,
-                  isFromDriver: lastMessage.senderId.toString() === driver._id.toString()
-                } : null,
-                unreadCount
-              };
-            }));
-            
-            ws.send(JSON.stringify({
-              type: 'activeChats',
-              data: chatsWithPreview
-            }));
-          } catch (err) {
-            console.log('Error getting active chats:', err);
-            ws.send(JSON.stringify({
-              type: 'error',
-              data: `Failed to get active chats: ${err.message}`
-            }));
-          }
-          break;
 
         case 'ai':
             try {
@@ -256,6 +210,7 @@ const driverRoutes = async (ws, driver) => {
                 type: 'aiResponse',
                 data: aiResponse
               }));
+              console.log("Responded with: ", aiResponse)
             } catch (err) {
               console.log('Error in AI handler:', err.response?.data || err.message);
               ws.send(JSON.stringify({
