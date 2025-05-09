@@ -9,7 +9,10 @@ const {
     getAllAvailableOrders,
     acceptOrder,
     leaveOrder,
-    getTheOrderIneedToDeliver
+    getTheOrderIneedToDeliver,
+    getMyOrdersHistory,
+    getActiveChatsDriver,
+    getMessagesDriver
 } = require('../controllers/driver/deliveryController');
 
 // profile routes
@@ -22,5 +25,8 @@ router.get("/getAllAvailableOrders", getAllAvailableOrders);
 router.put("/acceptOrder", acceptOrder);
 router.put("/leaveOrder", leaveOrder);
 router.get("/getTheOrderIneedToDeliver", getTheOrderIneedToDeliver);
+router.get("/getActiveChatsDriver", getActiveChatsDriver);
+router.get("/getMessagesDriver", getMessagesDriver);
+router.get("/getMyOrdersHistory", getMyOrdersHistory);
 
 module.exports = router;

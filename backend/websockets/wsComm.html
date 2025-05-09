@@ -67,51 +67,288 @@
   </div>
 
   <div class="section">
-    <h2>Driver &gt; Server</h2>
-    <pre>{
+  <h2>Driver → Server</h2>
+  <pre>{
   "type": "locationUpdate",
-  "data": { "orderId": "abc123", "latitude": 30.04, "longitude": 31.23, "userId": "user789" }
+  "data": {
+    "orderId": "abc123",
+    "latitude": 30.04,
+    "longitude": 31.23,
+    "userId": "user789"
+  }
 }</pre>
-    <pre>{
+
+  <pre>{
   "type": "acceptOrder",
-  "data": { "orderId": "abc123", "userId": "user789" }
+  "data": {
+    "orderId": "abc123",
+    "userId": "user789"
+  }
 }</pre>
-  </div>
 
-  <div class="section">
-    <h2>Server &gt; User</h2>
-    <pre>{
-  "type": "locationUpdate",
-  "data": { "orderId": "abc123", "latitude": 30.04, "longitude": 31.23 }
+  <pre>{
+  "type": "leaveOrder",
+  "data": {
+    "orderId": "abc123"
+  }
 }</pre>
-    <pre>{
+
+  <pre>{
+  "type": "chatInit",
+  "data": {
+    "userId": "user789",
+    "orderId": "abc123"
+  }
+}</pre>
+
+  <pre>{
+  "type": "chatSend",
+  "data": {
+    "chatId":   "chat456",
+    "content":  "On my way!"
+  }
+}</pre>
+
+  <pre>{
+  "type": "chatLoadMore",
+  "data": {
+    "chatId":   "chat456",
+    "before":   "2025-05-09T12:34:56.789Z",  <!-- optional -->
+    "limit":    20                         <!-- optional -->
+  }
+}</pre>
+
+  <pre>{
+  "type": "chatMarkRead",
+  "data": {
+    "chatId": "chat456"
+  }
+}</pre>
+
+  <pre>{
+  "type": "getActiveChats",
+  "data": {}
+}</pre>
+  <pre>{
+  "type": "ai",
+  "data": { "prompt": "????????" }
+}</pre>
+</div>
+
+<div class="section">
+  <h2>Server → Driver</h2>
+  <pre>{
+  "type": "locationUpdate",
+  "data": {
+    "orderId": "abc123",
+    "latitude": 30.04,
+    "longitude": 31.23
+  }
+}</pre>
+
+  <pre>{
   "type": "orderAccepted",
-  "data": { "orderId": "abc123", "driverId": "driver456", "eta": 10 }
+  "data": {
+    "orderId":  "abc123",
+    "driverId": "driver456",
+    "status":   "processing"
+    /* optional: "eta": 10 */
+  }
 }</pre>
-  </div>
 
-  <div class="section">
-    <h2>User &gt; Server</h2>
-    <pre>{
-  "type": "chat",
-  "data": { "toId": "driver456", "toRole": "driver", "message": "Hi, where are you?" }
+  <pre>{
+  "type": "orderLeft",
+  "data": {
+    "orderId": "abc123",
+    "status":  "pending"
+  }
 }</pre>
-  </div>
 
-  <div class="section">
-    <h2>Admin</h2>
-    <h3>Server &gt; Admin</h3>
-    <pre>{
+  <pre>{
+  "type": "chat_initialized",
+  "data": {
+    "chatId":   "chat456",
+    "messages": [ /* { _id, senderType, content, createdAt, isRead }… */ ]
+  }
+}</pre>
+
+  <pre>{
+  "type": "messageSent",
+  "data": {
+    "messageId": "msg789",
+    "chatId":    "chat456",
+    "timestamp": "2025-05-09T12:35:01.234Z"
+  }
+}</pre>
+
+  <pre>{
+  "type": "newMessage",
+  "data": {
+    "chatId": "chat456",
+    "message": {
+      "_id":       "msg790",
+      "senderId":  "user789",
+      "senderType":"user",
+      "content":   "Thanks!",
+      "createdAt": "2025-05-09T12:35:10.000Z"
+    }
+  }
+}</pre>
+
+  <pre>{
+  "type": "chatMessages",
+  "data": {
+    "chatId":  "chat456",
+    "messages":[ /* older messages… */ ],
+    "hasMore": true
+  }
+}</pre>
+
+  <pre>{
+  "type": "messagesMarkedRead",
+  "data": {
+    "chatId": "chat456",
+    "count":  5
+  }
+}</pre>
+
+  <pre>{
+  "type": "activeChats",
+  "data": [
+    {
+      "_id":        "chat456",
+      "user":       { "_id": "user789", "name": "Alice", "profilePicture": "…" },
+      "orderId":    "abc123",
+      "lastMessage":{
+         "content":"On my way",
+         "createdAt":"…",
+         "isFromDriver": true
+      },
+      "unreadCount": 2
+    }
+    /* … */
+  ]
+}</pre>
+  <pre>{
+    "type": "aiResponse",
+    "data": { /* AI reply */ }
+  }</pre>
+</div>
+
+<div class="section">
+  <h2>User → Server</h2>
+  <pre>{
+  "type": "chatInit",
+  "data": {
+    "driverId": "driver456",
+    "orderId":  "abc123"
+  }
+}</pre>
+
+  <pre>{
+  "type": "chatSend",
+  "data": {
+    "chatId":  "chat456",
+    "content": "Hi, where are you?"
+  }
+}</pre>
+
+  <pre>{
+  "type": "chatLoadMore",
+  "data": {
+    "chatId":  "chat456",
+    "before":  "2025-05-09T12:34:56.789Z",
+    "limit":   20
+  }
+}</pre>
+
+  <pre>{
+  "type": "chatMarkRead",
+  "data": {
+    "chatId": "chat456"
+  }
+}</pre>
+
+  <pre>{
+  "type": "ai",
+  "data": {
+    "prompt": "What’s my order status?"
+  }
+}</pre>
+  <pre>{
+  "type": "ai",
+  "data": { "prompt": "????????" }
+}</pre>
+</div>
+
+<div class="section">
+  <h2>Server → User</h2>
+  <pre>{
+  "type": "orderAccepted",
+  "data": {
+    "orderId": "abc123",
+    "status":  "processing"
+  }
+}</pre>
+
+  <pre>{
+  "type": "orderLeft",
+  "data": {
+    "orderId": "abc123",
+    "status":  "pending"
+  }
+}</pre>
+
+  <pre>{
   "type": "locationUpdate",
-  "data": { "orderId": "abc123", "latitude": 30.04, "longitude": 31.23 }
+  "data": {
+    "orderId": "abc123",
+    "latitude": 30.04,
+    "longitude": 31.23
+  }
 }</pre>
-    <p>Admins receive every driver’s <code>locationUpdate</code> broadcast.</p>
-  </div>
+  <pre>{
+    "type": "aiResponse",
+    "data": { /* AI reply */ }
+  }</pre>
 
-  <div class="section">
-    <h2>Restaurant</h2>
-    <h3>Server &gt; Restaurant</h3>
-    <pre>{
+  <pre>{
+  "type": "chat_initialized",
+  "data": { /* same as above */ }
+}</pre>
+<!--  plus the same newMessage, messageSent, chatMessages, messagesMarkedRead -->
+</div>
+
+<div class="section">
+  <h2>Admin</h2>
+  <h3>Admin → Server</h3>
+  <pre>{
+  "type": "ping",
+  "data": {}
+}</pre>
+  <pre>{
+  "type": "ai",
+  "data": { "prompt": "Give me system stats" }
+}</pre>
+  <h3>Server → Admin</h3>
+  <pre>{
+  "type": "pong",
+  "data": "pong"
+}</pre>
+  <pre>{
+  "type": "aiResponse",
+  "data": { /* AI reply */ }
+}</pre>
+  <pre>{
+  "type": "locationUpdate",
+  "data": { /* every driver update */ }
+}</pre>
+</div>
+
+<div class="section">
+  <h2>Restaurant</h2>
+  <h3>Server → Restaurant</h3>
+  <pre>{
   "type": "newOrder",
   "data": {
     "orderId": "abc123",
@@ -119,22 +356,24 @@
     "userId": "user789"
   }
 }</pre>
-    <h3>Restaurant &gt; Server</h3>
-    <pre>{
-  "type": "respondOrder",
-  "data": { "orderId": "abc123", "accept": true, "userId": "user789" }
+  <pre>{
+  "type": "ai",
+  "data": { "prompt": "????????" }
 }</pre>
-    <p>If <code>accept</code> is <code>false</code>, the restaurant has denied (e.g. too many open orders).</p>
-  </div>
-
-  <div class="section">
-    <h2>Notes</h2>
-    <ul>
-      <li>All messages are JSON.</li>
-      <li>Use ping/pong to detect disconnects.</li>
-      <li>Switch to <code>wss://</code> in production.</li>
-    </ul>
-  </div>
+  <h3>Restaurant → Server</h3>
+  <pre>{
+  "type": "respondOrder",
+  "data": {
+    "orderId": "abc123",
+    "accept":  true,
+    "userId":  "user789"
+  }
+}</pre>
+  <pre>{
+    "type": "aiResponse",
+    "data": { /* AI reply */ }
+  }</pre>
+</div>
   <script>
     let socket;
 

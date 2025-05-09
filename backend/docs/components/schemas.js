@@ -366,57 +366,99 @@
  * @swagger
  * components:
  *   schemas:
- *     Message:
+ *     Conversation:
  *       type: object
- *       properties:
- *         chatId:
- *           type: string
- *           format: objectId
- *           description: "ID of the Chat the message belongs to"
- *           example: "60c72b2f5f1b2c001f58c1b4"
- *         senderId:
- *           type: string
- *           format: objectId
- *           description: "ID of the user who sent the message"
- *           example: "60c72b2f5f1b2c001f58c1b4"
- *         content:
- *           type: string
- *           description: "The message content"
- *           example: "Hello, how are you?"
- *         timestamp:
- *           type: string
- *           format: date-time
- *           default: "2025-04-18T08:45:30.000Z"
- *           example: "2025-04-18T08:45:30.000Z"
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Chat:
- *       type: object
+ *       required:
+ *         - participants
+ *         - orderId
  *       properties:
  *         participants:
  *           type: array
- *           items:
- *             type: string
- *             format: objectId
- *             description: "IDs of the users participating in the Chat"
- *             example: "60c72b2f5f1b2c001f58c1b4"
+ *           description: List of participants in this conversation
  *           minItems: 2
- *           uniqueItems: true
- *           description: "At least two unique participants are required for a Chat."
+ *           items:
+ *             type: object
+ *             required:
+ *               - participantId
+ *               - participantType
+ *             properties:
+ *               participantId:
+ *                 type: string
+ *                 format: objectId
+ *                 description: ID of the participant (user or driver)
+ *                 example: "60c72b2f5f1b2c001f58c1b4"
+ *               participantType:
+ *                 type: string
+ *                 enum: [user, driver]
+ *                 description: Role of the participant
+ *                 example: "user"
+ *         orderId:
+ *           type: string
+ *           format: objectId
+ *           description: Reference to the Order that initiated this chat
+ *           example: "60d82c3e6f2b4a2d4c8e1234"
+ *         isActive:
+ *           type: boolean
+ *           description: Whether the conversation is currently active
+ *           default: true
+ *         lastActivity:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp of the last message or update
+ *           example: "2025-04-18T09:45:30.000Z"
  *         createdAt:
  *           type: string
  *           format: date-time
+ *           description: When this conversation was created
  *           example: "2025-04-18T08:45:30.000Z"
  *         updatedAt:
  *           type: string
  *           format: date-time
+ *           description: When this conversation was last modified
  *           example: "2025-04-18T09:45:30.000Z"
+ *
+ *     Message:
+ *       type: object
+ *       required:
+ *         - chatId
+ *         - senderId
+ *         - senderType
+ *         - content
+ *       properties:
+ *         chatId:
+ *           type: string
+ *           format: objectId
+ *           description: ID of the Conversation this message belongs to
+ *           example: "60c72b2f5f1b2c001f58c1b4"
+ *         senderId:
+ *           type: string
+ *           format: objectId
+ *           description: ID of the user or driver who sent the message
+ *           example: "60d82c3e6f2b4a2d4c8e1234"
+ *         senderType:
+ *           type: string
+ *           enum: [user, driver]
+ *           description: Role of the sender
+ *           example: "driver"
+ *         content:
+ *           type: string
+ *           description: The body of the message
+ *           example: "Your order is on its way!"
+ *         isRead:
+ *           type: boolean
+ *           description: Whether the recipient has read the message
+ *           default: false
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: When this message was created
+ *           example: "2025-04-18T08:50:15.000Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: When this message was last updated
+ *           example: "2025-04-18T08:50:15.000Z"
  */
-
 
 /**
  * @swagger

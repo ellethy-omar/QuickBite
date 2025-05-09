@@ -27,6 +27,8 @@ const restaurantRoutes = async (ws, restPayload) => {
         return;
       }
 
+      console.log('Restaurant route heard a message:', { type, data });
+
       switch (type) {
         case 'respondOrder':
           // data = { orderId, accept: true|false, userId }
@@ -44,7 +46,7 @@ const restaurantRoutes = async (ws, restPayload) => {
             const aiResponse = await chatWithAI(data.prompt);
         
             ws.send(JSON.stringify({
-              type: 'ai_response',
+              type: 'aiResponse',
               data: aiResponse
             }));
           } catch (err) {
