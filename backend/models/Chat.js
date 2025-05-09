@@ -4,26 +4,51 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const conversationSchema = new Schema({
-    participants: [{
+  participants: [{
+    _id: false,
+    participantId: {
       type: Schema.Types.ObjectId,
-      ref: 'User', // Reference to a User model
       required: true,
-      validate: {
-        validator: function(participants) {
-          // Ensure at least 2 participants and no duplicates
-          return participants.length >= 2 && 
-                 new Set(participants.map(id => id.toString())).size === participants.length;
-        },
-        message: 'Conversation must have at least 2 unique participants'
-      }
-    }],
-    createdAt: {
-      type: Date,
-      default: Date.now
+      refPath: 'participants.participantType'
+    },
+    participantType: {
+      type: String,
+      required: true,
+      enum: ['user', 'driver']
     }
-  }, {
-    timestamps: true // Adds createdAt and updatedAt automatically
+  }],
+  // Reference to the order that initiated this chat
+  orderId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Order',
+    required: true
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  lastActivity: {
+    type: Date,
+    default: Date.now
+  }
+}, {
+  timestamps: true
 });
+
+conversationSchema.index({ 'participants.participantId': 1 });
+conversationSchema.index({ orderId: 1 });
+
+conversationSchema.statics.findByParticipants = async function(userId, driverId) {
+  return this.findOne({
+    participants: {
+      $all: [
+        { $elemMatch: { participantId: userId, participantType: 'user' } },
+        { $elemMatch: { participantId: driverId, participantType: 'driver' } }
+      ]
+    }
+  });
+};
+
 
 const Chat = mongoose.model('Chat', conversationSchema);
 module.exports = Chat;

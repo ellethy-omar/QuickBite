@@ -23,7 +23,7 @@ const swaggerConfigurations = {
       version: '1.0.0',
     },
   },
-  apis: ['./docs/*.js'],
+  apis: ['./docs/*.js', './docs/*/*.js'],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerConfigurations);

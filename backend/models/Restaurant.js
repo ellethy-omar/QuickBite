@@ -60,6 +60,11 @@ const restaurantSchema = new Schema({
       max: 5,
       default: 0
     },
+    ratingCount: 
+     {  
+      type: Number,
+      default: 0
+     },
     address: addressSchema,
     contact: contactSchema,
     openingHours: openingHoursSchema,
@@ -98,6 +103,23 @@ restaurantSchema.statics.findByEmailOrPhone = async function (identifier) {
 
 restaurantSchema.methods.isPasswordMatch = async function (password) {
   return await bcrypt.compare(password, this.contact.password);
+};
+
+
+// Method to update restaurant's rating
+restaurantSchema.methods.updateRating = function(newRating) {
+  
+  if (newRating < 0 || newRating > 5) {
+     throw new Error('Rating must be between 0 and 5');
+  }
+
+  const currentTotal = this.rating * this.ratingCount;
+  this.ratingCount += 1;
+  this.rating = (currentTotal + newRating) / this.ratingCount;
+
+  this.rating = Math.round(this.rating * 10) / 10;
+
+  return this.save();
 };
 
 const Restaurant = mongoose.model('Restaurant', restaurantSchema);
