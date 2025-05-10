@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Animated, TouchableOpacity, SafeAreaView } from "react-native";
 import colors from "../styles/colors";
 import { ScrollView } from "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -56,7 +56,7 @@ export default function OrderConfirm() {
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <MaterialIcons name="arrow-back" size={24} style={{height: "100%"}} color="white" onPress={() => navigation.goBack()} />
                 <Text style={styles.titleText}>Order Confirmation</Text>
@@ -85,7 +85,7 @@ export default function OrderConfirm() {
                     <Text style={{fontWeight: '500', color: colors.primary}}>Address: <Text style={styles.infoText}>{orderData.restaurantId.address.area}, {orderData.restaurantId.address.street}, {orderData.restaurantId.address.city}</Text></Text>
                 </View>
             </ScrollView>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignItems: 'center', paddingBottom: 10, position: 'absolute', bottom: 30}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignItems: 'center', paddingBottom: 10, position: 'absolute', bottom: 15}}>
                 <Text style={{fontSize: 20, marginBottom: 5, fontWeight: '700', color: colors.primary}}>Total Amount: {orderData.totalAmount}</Text>
                 <View style={{ overflow: 'hidden', borderRadius: 10 }}>
                     <TouchableOpacity style={{ backgroundColor: submitting ? "gray" : colors.primary, padding: 10, borderRadius: 50, alignItems: 'center', justifyContent: 'center', overflow: 'hidden',}} onPress={() => setSubmitting(true)}>
@@ -94,7 +94,7 @@ export default function OrderConfirm() {
                     </TouchableOpacity>
                     </View>
             </View>
-        </View>
+        </SafeAreaView>
         </GestureHandlerRootView>           
     )
 }
@@ -122,13 +122,14 @@ const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: colors.primary,
-        paddingTop: 60,
-        paddingBottom: 20,
+        paddingVertical: 15,
         width: '100%',
         paddingHorizontal: 10,
         justifyContent: 'space-between',
-        flexDirection: 'row',
+        display: 'flex',
+        flexDirection: "row",
         alignItems: 'center',
+        alignContent: 'center',
     },
     section: {
         backgroundColor: colors.background,
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white',
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: '700',
         zIndex: 1,
     },

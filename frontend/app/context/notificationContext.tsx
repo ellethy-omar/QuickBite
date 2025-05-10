@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, SafeAreaView } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 
 interface NotificationContextType {
@@ -40,7 +40,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       {children}
       {notification && (
         <Animated.View style={[ styles.notification, { transform: [{ translateY: slideAnim }] },]}>
-          <View style={[styles.leftEdge, styles[notification.type]]} />
+          <SafeAreaView style={[styles.leftEdge, styles[notification.type]]} />
             <IconSymbol name={notification.type === 'success' ? 'checkmark.circle.fill' : notification.type === 'error' ? 'xmark.circle.fill' : 'info.circle.fill'} size={21} color={notification.type == "success" ? "#4CAF50" : notification.type === "error" ? "#F44336" : "#2196F3"} style={{marginLeft: 5}}/>
           <Text style={styles.notificationText}>{notification.message}</Text>
         </Animated.View>
@@ -60,7 +60,6 @@ export const useNotification = (): NotificationContextType => {
 const styles = StyleSheet.create({
   notification: {
     position: 'absolute',
-    top: 10,
     left: '10%',
     right: '10%',
     flexDirection: 'row',

@@ -1,14 +1,11 @@
 import { OrderDriver } from '../types/orderDriver';
 import apiClient from '../apiclient';
-import { isTokenExpired, refreshAuthToken } from '@/app/utils/authHelpers';
-import * as SecureStore from 'expo-secure-store';
 import { DriverData } from '../types/driver';
 
 export const fetchUserOrders = async () => {
   try {      
       const response = await apiClient.get('/api/driver/getAllAvailableOrders');
   
-      console.log("response", JSON.stringify(response.data.data, null,2));
       const orders: OrderDriver[] = response.data.data.map((order: any) => ({
         orderId: order._id,
         deliveryAddress: order.userID.addresses.find((address: any) => address.isDefault == true),
@@ -22,7 +19,6 @@ export const fetchUserOrders = async () => {
           itemQuantity: item.quantity,
         })),
         createdOn: order.createdAt,
-        restaurantLogo: order.restaurantLogo,
       }));
       
       return orders;
@@ -71,6 +67,45 @@ export const editDriverProfile = async (driverData: DriverData) => {
   try {
     const response = await apiClient.put('/api/driver/updateDriverProfile', body);
 
+    return response.data;
+  } catch (error: any) {
+    console.error("error", error.response?.data || error.message);
+    throw error;
+  }
+}
+
+export const fetchCurrentOrder = async () => {
+  try {
+    const response = await apiClient.get('/api/driver/getTheOrderIneedToDeliver');
+    const orderData = response.data.existingOrder;
+    if(!orderData) {
+      return null;
+    }
+    const order: OrderDriver = {
+        orderId: orderData._id,
+        deliveryAddress: orderData.userID.addresses.find((address: any) => address.isDefault == true),
+        userId: orderData.userID == null ? {name: "Guest", phone: "333", email: "none", _id: "fmfnjnwdoi"} : orderData.userID,
+        totalAmount: orderData.totalAmount,
+        restaurantId: {...orderData.restaurantID, logo: orderData.restaurantLogo, phone: orderData.restaurantID.contact.phone},
+        items: orderData.items.map((item: any) => ({
+          itemId: item.productId._id,
+          itemPrice: item.productId.price,
+          itemName: item.productId.name,
+          itemQuantity: item.quantity,
+        })),
+        createdOn: orderData.createdAt,
+      }
+    
+  return order;
+  } catch (error: any) {
+    console.error("error", error.response?.data || error.message);
+    throw error;
+  }
+}
+
+export const cancelOrder = async (orderId: string) => {
+  try {
+    const response = await apiClient.put(`/api/driver/leaveOrder?orderId=${orderId}`, {});
     return response.data;
   } catch (error: any) {
     console.error("error", error.response?.data || error.message);
