@@ -148,7 +148,7 @@ OrderSchema.statics.findOrdersNeedingDelivery = async function() {
     deliveryDriverID: {  $in: [null, undefined] },
     status: { $ne: 'cancelled' }
   })
-  .populate('restaurantID', 'name address contact.phone')
+  .populate('restaurantID', 'name address logo contact.phone')
   .populate('userID', 'name phone addresses')
   .populate('items.productId', 'name price category description image');
 };

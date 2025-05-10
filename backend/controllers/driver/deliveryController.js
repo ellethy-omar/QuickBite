@@ -2,7 +2,7 @@ const Order = require('../../models/Order')
 const Chat = require('../../models/Chat')
 
 const { sendWSMessage } = require('../../websockets/utils/wsUtils')
-const { getOrCreateChat, sendMessage } = require('../../services/chatService');
+const { getOrCreateChat } = require('../../services/chatService');
 const Driver = require('../../models/Driver');
 
 const getAllAvailableOrders = async (req, res) => {
@@ -173,7 +173,7 @@ const getTheOrderIneedToDeliver = async (req, res) => {
         const order = await Order.findOne({
             deliveryDriverID: driverId,
             status: { $in: ['pending', 'processing'] }
-        }).populate('restaurantID', 'name address contact.phone')
+        }).populate('restaurantID', 'name address logo contact.phone')
         .populate('userID', 'name phone addresses')
         .populate('items.productId', 'name price category description image');
 
@@ -203,7 +203,7 @@ const getMyOrdersHistory = async (req, res) => {
         const orders = await Order.find({
             deliveryDriverID: driverId,
             status: { $in: ['delivered', 'cancelled'] }
-        }).populate('restaurantID', 'name address contact.phone')
+        }).populate('restaurantID', 'name address logo contact.phone')
         .populate('userID', 'name phone addresses')
         .populate('items.productId', 'name price category description image');
 
