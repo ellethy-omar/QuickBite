@@ -2,7 +2,8 @@ const Order = require('../../models/Order')
 const Chat = require('../../models/Chat')
 
 const { sendWSMessage } = require('../../websockets/utils/wsUtils')
-const { getOrCreateChat, getMessages, getActiveChats, markMessagesAsRead } = require('../../services/chatService')
+const { getOrCreateChat, sendMessage } = require('../../services/chatService');
+const Driver = require('../../models/Driver');
 
 const getAllAvailableOrders = async (req, res) => {
     try {
@@ -73,9 +74,13 @@ const acceptOrder = async (req, res) => {
         const updatedOrder = await Order.findByIdAndUpdate(
             orderId,
             {
-                $set: { deliveryDriverID: driverId, status: 'processing' }, // Assign the driver and update status
+                $set: { 
+                    deliveryDriverID: driverId, 
+                    status: 'processing',
+                    processingStartedAt: new Date()
+                 },
             },
-            { new: true } // Return the updated document
+            { new: true }
         ).populate('deliveryDriverID', 'name phone vehicle');
 
         res.status(200).json({
@@ -152,7 +157,6 @@ const leaveOrder = async (req, res) => {
 
         sendWSMessage('driver', driverId, 'chatClosed', { orderId });
 
-
         if(!pushed) {
             console.log('Failed to send order left message to user.');
         }
@@ -223,10 +227,70 @@ const getMyOrdersHistory = async (req, res) => {
     }
 }
 
+const markDeliveryAsDone = async (req, res) => {
+    const driverId = req.user._id;
+    try {
+        const order = await Order.findOne({
+            deliveryDriverID: driverId,
+            status: { $in: ['processing'] }
+        });
+
+        if(!order) {
+            console.log('You do not have any order.');
+            return res.status(404).json({
+                message: 'You do not have any orders.',
+                existingOrder: order
+            });
+        }
+
+        const now = new Date();
+        const start = order.processingStartedAt || order.updatedAt;  
+
+        const elapsedMs = now.getTime() - start.getTime();
+        const elapsedMinutes = elapsedMs / 1000 / 60;
+
+        order.status = 'delivered';
+        order.deliveredAt = now;
+        await order.save();
+
+        sendWSMessage('user', order.userID, "orderCompleted", {order : order});
+        console.log("Dilvery done");
+
+        const driver = await Driver.findById(driverId);
+
+        if(!driver.deliveryStats) {
+            driver.deliveryStats.completed = 0;
+            driver.deliveryStats.avgDeliveryTime = 0.0;
+        }
+        const prevCount = driver.deliveryStats.completed;
+        const prevAvg   = driver.deliveryStats.avgDeliveryTime;
+
+        const newCount = prevCount + 1;
+        const newAvg = ((prevAvg * prevCount) + elapsedMinutes) / newCount;
+
+        driver.deliveryStats.completed = newCount;
+        driver.deliveryStats.avgDeliveryTime = newAvg;
+        await driver.save();
+        
+        const chat = await getOrCreateChat(order.userID, driverId, order._id);
+        chat.isActive = false;
+        await chat.save();
+
+        sendWSMessage('user', order.userID, "chatClosed", {});
+
+        console.log("chat closed for the order");
+        res.status(200).json({ message: "Dilvery Done!" });
+    } catch (error) {
+        console.log('Error finishing order:', error);
+        res.status(500).json({ error: 'Error marking order as done.', details: error.message });  
+    }
+}
+
 module.exports = {
     getAllAvailableOrders,
     acceptOrder,
     leaveOrder,
     getTheOrderIneedToDeliver,
-    getMyOrdersHistory
+    getMyOrdersHistory,
+    markDeliveryAsDone
 }

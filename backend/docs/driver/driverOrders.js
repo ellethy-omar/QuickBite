@@ -346,3 +346,46 @@
  * 
  * 
  */
+
+/**
+ * @swagger
+ * /api/driver/markDeliveryAsDone:
+ *   put:
+ *     tags:
+ *       - Driver (JWT required)
+ *     summary: Mark delivery as completed
+ *     description: |
+ *       Marks the driver’s currently **processing** order as **delivered**, computes the elapsed delivery time (in minutes), updates the driver’s `deliveryStats.completed` and `deliveryStats.avgDeliveryTime`, closes the chat, and notifies the user via WebSocket.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Delivery marked as done.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Delivery Done!"
+ *       404:
+ *         description: No active “processing” order for this driver.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "You do not have any orders."
+ *                 existingOrder:
+ *                   type: null
+ *                   example: null
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ */

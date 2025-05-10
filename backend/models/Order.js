@@ -7,7 +7,7 @@ const ItemSchema = new Schema({
       ref: 'Product', 
       required: true}, // product id should be present
     quantity: Number
-  });
+});
 
 const OrderSchema = new Schema({
     status: {
@@ -15,19 +15,27 @@ const OrderSchema = new Schema({
       enum: ['pending', 'processing', 'delivered', 'cancelled'],
       default: 'pending'
     },
-    userID: {type: Schema.Types.ObjectId,
+    userID: {
+      type: Schema.Types.ObjectId,
       ref: 'User', 
-      required: true},
-    restaurantID: {type: Schema.Types.ObjectId,
+      required: true
+    },
+    restaurantID: {
+      type: Schema.Types.ObjectId,
       ref: 'Restaurant', 
-      required: true},
-    deliveryDriverID:{type: Schema.Types.ObjectId,
-      ref: 'Driver'},
+      required: true
+    },
+    deliveryDriverID:{
+      type: Schema.Types.ObjectId,
+      ref: 'Driver'
+    },
     items: [ItemSchema],
-    totalAmount: Number
+    totalAmount: Number,
+    processingStartedAt: { type: Date }, 
+    deliveredAt:{ type: Date }
   },{ 
     timestamps: true // Adds createdAt and updatedAt automatically
-  });
+});
 
 
 

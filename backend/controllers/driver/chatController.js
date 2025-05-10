@@ -3,6 +3,7 @@ const User = require('../../models/User')
 const mongoose = require('mongoose')
 const Message = require('../../models/Message')
 const Chat = require('../../models/Chat')
+const Order = require('../../models/Order')
 
 const getActiveChatsDriver = async (req, res) => {
     try {
@@ -95,8 +96,7 @@ const getAllChatsDriver = async(req, res)=> {
                     participantId: req.user._id, 
                     participantType: 'driver' 
                 }
-                },
-                isActive: true
+                }
             }).sort({ lastActivity: -1 });
         
         // Get last message for each chat

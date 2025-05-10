@@ -360,6 +360,14 @@
  *           type: string
  *           format: date-time
  *           example: "2025-04-18T09:45:30.000Z"
+ *         processingStartedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-04-18T08:45:30.000Z"
+ *         deliveredAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-04-18T09:45:30.000Z"
  */
 
 /**
