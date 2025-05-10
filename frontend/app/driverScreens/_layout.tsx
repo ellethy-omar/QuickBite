@@ -17,6 +17,8 @@ export default function DriverScreensLayout() {
               iconName = focused ? 'receipt-long' : 'home';
             } else if (route.name === 'profile') {
               iconName = focused ? 'person' : 'person-outline';
+            } else if (route.name === 'currentOrderView') {
+              iconName = focused ? 'directions-car' : 'directions-car';
             }
             return <MaterialIcons name={iconName as keyof typeof MaterialIcons.glyphMap} size={size} color={color} />;
           },
@@ -36,6 +38,7 @@ export default function DriverScreensLayout() {
       >
         <Tabs.Screen name="ordersView" options={{ title: 'Orders' }} />
         <Tabs.Screen name="profileView" options={{ title: 'Profile' }} />
+        <Tabs.Screen name="currentOrderView" options={{ title: 'Tracking' }} />
       </Tabs>
     </GestureHandlerRootView>
   );

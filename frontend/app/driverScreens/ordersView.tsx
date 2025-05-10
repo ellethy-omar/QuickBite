@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
+import { Text, StyleSheet, View, ScrollView, SafeAreaView, RefreshControl } from 'react-native';
 import colors from '../styles/colors';
 import { OrderDriver } from '../types/orderDriver';
 import OrderContainer from '../components/orderContainer';
@@ -37,7 +37,7 @@ export default function OrdersView() {
   };
   
   return (
-    <View style={styles.background}>
+    <SafeAreaView style={styles.background}>
       <Text style={styles.titleText}>Active Orders</Text>
       <Text style={styles.subTitleText}>
         Please select the most suitable order and head to the restaurant for pickup
@@ -67,7 +67,7 @@ export default function OrdersView() {
           )}
         </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     backgroundColor: colors.primary,
-    paddingTop: 50,
+    paddingTop: 15,
   },
   titleText: {
     fontSize: 24,
