@@ -50,6 +50,8 @@
  *                             type: string
  *                           name:
  *                             type: string
+ *                           logo:
+ *                             type: string
  *                           address:
  *                             type: object
  *                             properties:
@@ -183,34 +185,99 @@
 *       500:
 *         $ref: '#/components/responses/ServerError'
 *
-* /api/driver/getTheOrderIneedToDeliver:
-*   get:
-*     tags:
-*       - Driver (JWT required)
-*     summary: Retrieve the current delivery order.
-*     description: Fetches the order with status `pending` or `processing` assigned to the authenticated driver.
-*     responses:
-*       200:
-*         description: The current order, or a message indicating none.
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 message:
-*                   type: string
-*                   example: "Order found." 
-*                 existingOrder:
-*                   oneOf:
-*                     - $ref: '#/components/schemas/Order'
-*                     - type: "null"
-*       420:
-*         $ref: '#/components/responses/UnauthorizedError'
-*       469:
-*         $ref: '#/components/responses/ForbiddenError'
-*       500:
-*         $ref: '#/components/responses/ServerError'
 */
+/**
+ * @swagger
+ * /api/driver/getTheOrderIneedToDeliver:
+ *   get:
+ *     tags:
+ *       - Driver (JWT required)
+ *     summary: Retrieve the current delivery order.
+ *     description: Fetches the order with status `pending` or `processing` assigned to the authenticated driver.
+ *     responses:
+ *       200:
+ *         description: The current order, or a message indicating none.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Order found."
+ *                 existingOrder:
+ *                   oneOf:
+ *                     - $ref: '#/components/schemas/Order'
+ *                     - type: "null"
+ *             examples:
+ *               orderFound:
+ *                 summary: An order was found and is returned in full detail
+ *                 value:
+ *                   message: "Order found."
+ *                   existingOrder:
+ *                     _id: "681c7beea5123d1981851fad"
+ *                     status: "processing"
+ *                     userID:
+ *                       _id: "64a1b8c7f2d12e001f3e5203"
+ *                       name: "Layla Al-Ghanim"
+ *                       phone: "+96553355779"
+ *                       addresses:
+ *                         - _id: "681f8dff5bce1b993b8a0e80"
+ *                           label: "Home"
+ *                           area: "Jabriya"
+ *                           street: "Street 5"
+ *                           building: "Building 12"
+ *                           floor: "2"
+ *                           apartment: "5"
+ *                           isDefault: true
+ *                     restaurantID:
+ *                       _id: "607f1f77bcf86cd799439021"
+ *                       name: "Burger King"
+ *                       address:
+ *                         _id: "681c72d5c186fd6e5f00a056"
+ *                         street: "Gulf Road"
+ *                         city: "Kuwait City"
+ *                         area: "Salmiya"
+ *                       contact:
+ *                         phone: "+96512345678"
+ *                       logo: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/01/4d/38/burger-restaurant.jpg?w=900&h=500&s=1"
+ *                     items:
+ *                       - _id: "681c7beea5123d1981851fae"
+ *                         productId:
+ *                           _id: "64a1b8c7f2d12e001f3e5222"
+ *                           name: "Chicken Nuggets (10pc)"
+ *                           description: "Crispy chicken nuggets with dipping sauce"
+ *                           price: 2.75
+ *                           category: "Chicken"
+ *                           image: "https://s7d1.scene7.com/is/image/mcdonalds/mcdonalds-10-chicken-mcnuggets-1:1-3-product-tile-desktop?wid=829&hei=515&dpr=off"
+ *                         quantity: 2
+ *                       - _id: "681c7beea5123d1981851faf"
+ *                         productId:
+ *                           _id: "707f1f77bcf86cd799439031"
+ *                           name: "Whopper Meal"
+ *                           description: "Our signature Whopper with fries and drink"
+ *                           price: 3.5
+ *                           category: "Burgers"
+ *                           image: "https://burgerkingks.com/wp-content/uploads/2020/08/new-whopper-meal-ks-web-offer-v.png"
+ *                         quantity: 5
+ *                     totalAmount: 23
+ *                     createdAt: "2025-05-08T09:39:58.917Z"
+ *                     updatedAt: "2025-05-10T09:20:17.967Z"
+ *                     __v: 0
+ *                     deliveryDriverID: "68134265dcd931f93ef915b9"
+ *               noOrder:
+ *                 summary: No order currently assigned
+ *                 value:
+ *                   message: "No current order assigned."
+ *                   existingOrder: null
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
+
 
 /**
  * @swagger
@@ -268,6 +335,9 @@
  *                           _id:
  *                             type: string
  *                             example: "630c76ab1d2e3f4a5b678901"
+ *                           logo:
+ *                             type: string
+ *                             example: "some URl"
  *                           name:
  *                             type: string
  *                             example: "Tasty Eats"
