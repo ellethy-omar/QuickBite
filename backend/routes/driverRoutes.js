@@ -10,7 +10,8 @@ const {
     acceptOrder,
     leaveOrder,
     getTheOrderIneedToDeliver,
-    getMyOrdersHistory
+    getMyOrdersHistory,
+    markDeliveryAsDone
 } = require('../controllers/driver/deliveryController');
 
 const {
@@ -30,6 +31,7 @@ router.put("/acceptOrder", acceptOrder);
 router.put("/leaveOrder", leaveOrder);
 router.get("/getTheOrderIneedToDeliver", getTheOrderIneedToDeliver);
 router.get("/getMyOrdersHistory", getMyOrdersHistory);
+router.put("/markDeliveryAsDone", markDeliveryAsDone);
 
 // chat routes
 router.get("/getActiveChatsDriver", getActiveChatsDriver);

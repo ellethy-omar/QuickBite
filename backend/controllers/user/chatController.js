@@ -2,6 +2,8 @@ const Driver = require('../../models/Driver')
 const Message = require('../../models/Message')
 const mongoose = require('mongoose')
 const { markMessagesAsRead, getMessages, getActiveChats } = require('../../services/chatService')
+const Order = require('../../models/Order')
+const Chat = require('../../models/Chat')
 
 const getActiveChatsUser = async(req,res )=> {
     try {
@@ -16,7 +18,7 @@ const getActiveChatsUser = async(req,res )=> {
           // Find the driver participant
           const driverParticipant = chat.participants.find(p => p.participantType === 'driver');
           const driver = driverParticipant ? 
-            await Driver.findById(driverParticipant.participantId, 'name profilePicture vehicle') : 
+            await Driver.findById(driverParticipant.participantId, 'name profilePicture vehicle phone') : 
             null;
             
           // Count unread messages
@@ -69,8 +71,7 @@ const getAllChatsUser = async(req, res)=> {
                     participantId: req.user._id, 
                     participantType: 'user' 
                 }
-                },
-                isActive: true
+                }
             }).sort({ lastActivity: -1 });
         
         // Get last message for each chat
@@ -82,7 +83,7 @@ const getAllChatsUser = async(req, res)=> {
           // Find the driver participant
           const driverParticipant = chat.participants.find(p => p.participantType === 'driver');
           const driver = driverParticipant ? 
-            await Driver.findById(driverParticipant.participantId, 'name profilePicture vehicle') : 
+            await Driver.findById(driverParticipant.participantId, 'name profilePicture vehicle phone') : 
             null;
             
           // Count unread messages

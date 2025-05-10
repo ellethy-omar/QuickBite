@@ -3,9 +3,12 @@ const Admin = require('../models/Admin'); // Assuming you have an Admin model
 const Driver = require('../models/Driver'); // Assuming you have a Driver model
 const Restaurant = require('../models/Restaurant');
 const validator = require('validator');
+const nodemailer = require('nodemailer');
 const { generateToken } = require('../middleware/requireAuth'); // Import your JWT generator
+const { decode } = require('jsonwebtoken');
+const jwt     = require('jsonwebtoken');
+const bcrypt      = require('bcrypt'); 
 
-// Register a new user
 const registerUser = async (req, res) => {
     const { username, email, password, phone, addresses } = req.body;
 
@@ -51,9 +54,7 @@ const registerUser = async (req, res) => {
       res.status(500).json({ error: 'Server error during registration', details: error });
     }
 };
-  
 
-// Login an existing user
 const loginUser = async (req, res) => {
     const { usernameOrEmail, password } = req.body;
     
@@ -99,7 +100,6 @@ const loginUser = async (req, res) => {
     }
 };
 
-// Register a new Driver
 const registerDriver = async (req, res) => {
   const { name, email, phone, password, vehicle } = req.body;
 
@@ -145,7 +145,6 @@ const registerDriver = async (req, res) => {
   }
 };
 
-// Login existing Driver
 const loginDriver = async (req, res) => {
   const { emailOrPhone, password } = req.body;
 
@@ -173,6 +172,8 @@ const loginDriver = async (req, res) => {
     }
 
     const token = generateToken(driver._id, 'driver');
+
+    delete driver.password
 
     res.status(200).json({
       message: 'Login successful',
@@ -306,7 +307,9 @@ const registerRestaurant = async (req, res) => {
       address, contact, openingHours
     });
 
-    const token = generateToken(newRestaurant._id, 'restaurant');    
+    const token = generateToken(newRestaurant._id, 'restaurant'); 
+
+    delete newRestaurant.contact.password;
 
     res.status(201).json({
       message: 'Restaurant registered successfully',
@@ -321,7 +324,6 @@ const registerRestaurant = async (req, res) => {
   }
 };
 
-// Login an existing restaurant
 const loginRestaurant = async (req, res) => {
   const { emailOrPhone, password } = req.body;
 
@@ -344,6 +346,8 @@ const loginRestaurant = async (req, res) => {
     }
 
     const token = generateToken(restaurant._id, 'restaurant');
+
+    delete newRestaurant.contact.password;
 
     res.status(200).json({
       message: 'Login successful',
@@ -389,9 +393,6 @@ const forgotPassword = async (req, res) => {
       { expiresIn: '15m' }
   );
 
-  const resetUrl = `http://yourdomain.com/resetPassword?token=${resetToken}&role=${role}`;
-
-  // Send email (setup nodemailer)
   const transporter = nodemailer.createTransport({ 
       service: 'gmail',
       auth: {
@@ -404,12 +405,17 @@ const forgotPassword = async (req, res) => {
       from: process.env.EMAIL,
       to: email,
       subject: 'Password Reset Request',
-      html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. Link expires in 15 minutes.</p>`
+      html: `<p>
+        Here is the token you need 
+        <br>
+        ${resetToken}
+        <br>
+        Token expires in 15 minutes.
+      </p>`
   });
 
-  res.json({ message: 'Password reset link sent' });
+  res.json({ message: 'Password reset link sent, check spam folder' });
 };
-
 
 const resetPassword = async (req, res) => {
   const { token, password, role } = req.body;
@@ -419,6 +425,7 @@ const resetPassword = async (req, res) => {
     console.log("Role or token or password is not available for password reset");
     return res.status(403).json({ error: 'Role, token and password are required' });
   }
+
   switch (role) {
       case 'user': Model = User; break;
       case 'driver': Model = Driver; break;
@@ -436,9 +443,21 @@ const resetPassword = async (req, res) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await Model.findByIdAndUpdate(decoded._id, { password: hashedPassword });
+      const user = await Model.findById(decoded._id);
+      if(!user)
+        return res.status(404).json({error: 'user not found'});
 
-      res.json({ message: 'Password reset successful' });
+      if(Model !== Restaurant) {
+        await Model.findByIdAndUpdate(decoded._id, { password: hashedPassword });
+
+      } else {
+        
+        const changedContact = user.contact;
+        changedContact.password = hashedPassword
+        await Model.findByIdAndUpdate(decoded._id, { contact : changedContact })
+      }
+
+      res.json({ message: 'Password reset successful, please login again' });
       console.log("Sucess response sent");
 
   } catch (err) {
