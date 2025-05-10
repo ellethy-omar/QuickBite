@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, RefreshControl, SafeAreaView } from 'react-native';
 import { useSelector } from 'react-redux';
 import { DriverData } from '../types/driver';
 import colors from '../styles/colors';
@@ -34,7 +34,7 @@ export default function ProfileView() {
     };
 
     return (
-            <View style={styles.background}>
+            <SafeAreaView style={styles.background}>
                 <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", padding: 10, width: "100%", alignItems: "center"}}>
                     <Image source={{uri: driverData.image || "https://fastly.picsum.photos/id/137/200/300.jpg?hmac=5vAnK2h9wYgvt2769Z9D1XYb8ory9_zB0bqDgVjgAnk"}} style={{width: 100, height: 100, borderRadius: 100}} resizeMode="cover" />
                     <View style={{paddingRight: 20, gap: 5}}>
@@ -59,7 +59,7 @@ export default function ProfileView() {
                 )}
                 </ScrollView>
             </View>
-            </View>
+            </SafeAreaView>
     );
 }
 
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     background: {
         flex: 1,
         backgroundColor: colors.primary,
-        paddingTop: 50,
+        paddingTop: 10,
     },
     ordersListContainer: {
         backgroundColor: "white",

@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, ScrollView, StyleSheet, Animated, TouchableOpacity, Vibration } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useNavigation } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
 const TickMark = require("@/assets/images/tick.png");
 import colors from '../styles/colors';
 
 export default function OrderAcceptedView() {
-    const navigation = useNavigation();
+    const navigation = useRouter();
     const { order } = useLocalSearchParams();
     const [orderData] = useState(JSON.parse(order));
     const tiltAnim = useRef(new Animated.Value(0)).current; // Animation value for tilting
@@ -48,7 +48,7 @@ export default function OrderAcceptedView() {
                     />
                     <Text style={styles.mainText}>The order has been accepted</Text>
                 </View>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.push("driverScreens/currentOrderView")}>
                     <Text style={styles.buttonText}>View Order</Text>
                 </TouchableOpacity>
             </ScrollView>
@@ -70,13 +70,13 @@ const styles = StyleSheet.create({
         fontWeight: '800',
     },
     buttonText: {
-        fontSize: 20,
+        fontSize: 14,
         fontWeight: '500',
         color: 'white',
     },
     button: {
         position: 'absolute',
-        bottom: 80,
+        bottom: 60,
         borderRadius: 100,
         paddingHorizontal: 30,
         paddingVertical: 10,
