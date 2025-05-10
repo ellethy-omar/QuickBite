@@ -10,7 +10,7 @@ export const UserSignupRoute = async (userData: UserFormData) => {
         addresses: [{...userData.address, isDefault: true}]
     }
     try {
-        const response = await apiClient.post('/api/auth/registerUser', reqBody);
+        const response = await apiClient.post('/api/auth/registerUser', reqBody, {skipAuth: true});
         return response;
     } catch (error) {
         console.error('Error:', error);
@@ -33,7 +33,7 @@ export const RestaurantSignupRoute = async (restaurantData: RestaurantFormData) 
         openingHours: restaurantData.openingHours
     }
     try {
-        const response = await apiClient.post('/api/auth/registerRestaurant', reqBody);
+        const response = await apiClient.post('/api/auth/registerRestaurant', reqBody, {skipAuth: true});
         return response;
     } catch (error) {
         console.error('Error:', error);
@@ -49,12 +49,12 @@ export const DriverSignupRoute = async (driverData: any) => {
         phone: driverData.phone,
         vehicle: {
             type: driverData.vehicleType,
-            model: driverData.vehicleModel,
+            //model: driverData.vehicleModel,
             plateNumber: driverData.vehiclePlateNumber,
         }
     }
     try {
-        const response = await apiClient.post('/api/auth/registerDriver', reqBody);
+        const response = await apiClient.post('/api/auth/registerDriver', reqBody, {skipAuth: true});
         return response;
     } catch (error) {
         console.error('Error:', error);
@@ -67,7 +67,7 @@ export const LoginRestaurantRoute = async (name: string, password: string) => {
         password: password,
     }
     try {
-        const response = await apiClient.post('/api/auth/loginRestaurant', reqBody);
+        const response = await apiClient.post('/api/auth/loginRestaurant', reqBody, {skipAuth: true});
         return response;
     } catch (error) {
         console.error('Error:', error);
@@ -81,7 +81,7 @@ export const LoginDriverRoute = async (name: string, password: string) => {
         password: password,
     }
     try {
-        const response = await apiClient.post('/api/auth/loginDriver', reqBody);
+        const response = await apiClient.post('/api/auth/loginDriver', reqBody, {skipAuth: true});
         return response;
     } catch (error) {
         console.error('Error:', error);
@@ -95,7 +95,7 @@ export const LoginUserRoute = async (name: string, password: string) => {
         password: password,
     }
     try {
-        const response = await apiClient.post('/api/auth/loginUser', reqBody);
+        const response = await apiClient.post('/api/auth/loginUser', reqBody, {skipAuth: true});
         return response;
     } catch (error) {
         console.error('Error:', error);
@@ -109,7 +109,7 @@ export const LoginAdminRoute = async (name:string, password: string) => {
         password: password,
     }
     try {
-        const response = await apiClient.post('/api/auth/loginAdmin', reqBody);
+        const response = await apiClient.post('/api/auth/loginAdmin', reqBody, {skipAuth: true});
         return response;
     } catch (error) {
         console.error('Error:', error);
