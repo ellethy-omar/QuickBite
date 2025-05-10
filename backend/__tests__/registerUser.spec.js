@@ -80,7 +80,7 @@ it('should return 403 if required fields are missing', async () => {
     }
   });
 
-it('should return 400 for invalid email', async () => {
+it('should return 403 for invalid email', async () => {
     validator.isEmail.mockReturnValue(false);
     const invalidEmailReq = {
       body: {
@@ -92,11 +92,11 @@ it('should return 400 for invalid email', async () => {
       }
     };
     await registerUser(invalidEmailReq, res);
-    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({ error: 'Invalid email address' });
   });
 
-  it('should return 400 for weak password', async () => {
+  it('should return 403 for weak password', async () => {
     validator.isEmail.mockReturnValue(true);
     validator.isStrongPassword.mockReturnValue(false);
     const invalidPassReq = {
@@ -109,7 +109,7 @@ it('should return 400 for invalid email', async () => {
       }
     };
     await registerUser(invalidPassReq, res);
-    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({ error: 'Password is not strong enough' });
   });
 

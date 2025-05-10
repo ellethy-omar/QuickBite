@@ -80,7 +80,7 @@ const res = {
       jest.clearAllMocks();
     }
   });
-  it('should return 400 for invalid email', async () => {
+  it('should return 403 for invalid email', async () => {
     validator.isEmail.mockReturnValue(false);
     const req = {
         body: {
@@ -91,11 +91,11 @@ const res = {
         }
       };
     await registerAdmin(req, res);
-    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({ error: 'Invalid email address' });
   });
 
-  it('should return 400 for weak password', async () => {
+  it('should return 403 for weak password', async () => {
     const req = {
         body: {
           username: 'adminUser',
@@ -107,7 +107,7 @@ const res = {
     validator.isStrongPassword.mockReturnValue(false);
     validator.isEmail.mockReturnValue(true);
     await registerAdmin(req, res);
-    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({ error: 'Password is not strong enough' });
   });
 

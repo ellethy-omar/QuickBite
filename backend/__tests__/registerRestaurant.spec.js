@@ -133,22 +133,22 @@ describe('registerRestaurant', () => {
     }
   });
 
-  it('should return 400 for invalid email format', async () => {
+  it('should return 403 for invalid email format', async () => {
     req.body.contact.email = 'invalid-email';
     validator.isEmail.mockReturnValue(false);
 
     await registerRestaurant(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({ error: 'Invalid email address' });
   });
 
-  it('should return 400 for weak password', async () => {
+  it('should return 403 for weak password', async () => {
     validator.isStrongPassword.mockReturnValue(false);
 
     await registerRestaurant(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({ error: 'Weak password' });
   });
 
