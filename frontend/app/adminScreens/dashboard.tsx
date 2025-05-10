@@ -1,19 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Text, StyleSheet, View, Image, TouchableOpacity, FlatList, TextInput } from 'react-native';
+import { Text, StyleSheet, View, Image, TouchableOpacity, FlatList, TextInput, SafeAreaView } from 'react-native';
 import { AdminData, DriverMailData } from '@/app/types/admin';
 import DriverMail from '@/app/components/driverMail';
 import colors from '@/app/styles/colors';
 import { Modalize } from 'react-native-modalize';
+import { useSelector } from 'react-redux';
 
 export default function DashboardScreen() {
-    const [user, setUser] = useState<AdminData|null>({
-        id: '1',
-        name: 'John Doe',
-        email: 'annasalaa597@gmail.com',
-        image: 'https://fastly.picsum.photos/id/125/200/300.jpg?hmac=yLvRBwUcr6LYWuGaGk05UjiU5vArBo3Idr3ap5tpSxU',
-        phone: '1234567890',
-        handledRequests: 43
-    });
+    const adminData = useSelector((state: { admin: AdminData }) => state.admin);
+    const [user, setUser] = useState<AdminData>(adminData);
+
     const [driverMails, setDriverMails] = useState<DriverMailData[]>([
         {
             id: '1',
@@ -101,7 +97,7 @@ export default function DashboardScreen() {
     }
 
     return (
-        <View style={styles.background}>
+        <SafeAreaView style={styles.background}>
             <Text style={styles.titleText}>Dashboard</Text>
             <View style={styles.infoSection}>
                 <View style={styles.credentialsSection}>
@@ -146,7 +142,7 @@ export default function DashboardScreen() {
                 </View>
             </View>
             </Modalize>
-        </View>
+        </SafeAreaView>
     )
 }
 
@@ -154,7 +150,7 @@ const styles = StyleSheet.create({
     background: {
         flex: 1,
         justifyContent: 'flex-start',
-        paddingTop: 50,
+        paddingTop: 10,
         alignItems: 'stretch',
         backgroundColor: colors.primary,
     },

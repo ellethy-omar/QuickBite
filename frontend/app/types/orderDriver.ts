@@ -44,6 +44,7 @@ export interface OrderDriver {
         itemPrice: number;
         itemName: string;
         itemQuantity: number;
+        itemDescription?: string;
     }[];
     totalAmount: number;
 }

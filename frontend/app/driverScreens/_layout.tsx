@@ -14,7 +14,7 @@ export default function DriverScreensLayout() {
           tabBarIcon: ({ color, size, focused }) => {
             let iconName = 'person';
             if (route.name === 'ordersView') {
-              iconName = focused ? 'receipt-long' : 'home';
+              iconName = focused ? 'receipt-long' : 'receipt-long';
             } else if (route.name === 'profile') {
               iconName = focused ? 'person' : 'person-outline';
             } else if (route.name === 'currentOrderView') {
@@ -26,7 +26,7 @@ export default function DriverScreensLayout() {
             backgroundColor: colors.background,
             borderTopWidth: 1,
             borderColor: colors.secondary,
-            height: 80,
+            height: 60,
           },
           tabBarLabelStyle: {
             fontSize: 10,
