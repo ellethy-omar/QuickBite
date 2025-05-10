@@ -68,7 +68,8 @@ export default function OrderConfirm() {
                     {orderData.items.map((item, index: number) => (
                         <View key={index} style={{paddingVertical: 5}}>
                             <Text style={{fontSize: 14, fontWeight: '600', marginBottom: 5}}>{item.itemName}</Text>
-                            <Text style={{fontSize: 14, fontWeight: '500', color: 'gray'}}>{item.itemPrice} EGP</Text>
+                            <Text style={{fontSize: 12, color: 'gray', fontWeight: '500', marginBottom: 5}}>{item.itemDescription}</Text>
+                            <Text style={{fontSize: 12, fontWeight: '500', color: 'gray'}}>{item.itemPrice} EGP</Text>
                         </View>
                     ))}
                 </View>

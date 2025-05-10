@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import { setUserDetails } from '../slices/userSlice';
 import { setDriverDetails } from '../slices/driverSlice';
+import { setAdminDetails } from '../slices/adminSlice';
 import colors from '../styles/colors';
 import { LoginUserRoute, LoginRestaurantRoute, LoginDriverRoute, LoginAdminRoute } from '../endpoints/authEndpoints';
 import { useNotification } from '../context/notificationContext';
@@ -71,6 +72,8 @@ export default function LoginScreen() {
 
        } else {
           const response = await LoginAdminRoute(email,password);
+          console.log(response.data.admin)
+          dispatch(setAdminDetails(response.data.admin));
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
           }

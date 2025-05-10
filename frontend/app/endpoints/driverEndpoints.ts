@@ -5,7 +5,6 @@ import { DriverData } from '../types/driver';
 export const fetchUserOrders = async () => {
   try {      
       const response = await apiClient.get('/api/driver/getAllAvailableOrders');
-  
       const orders: OrderDriver[] = response.data.data.map((order: any) => ({
         orderId: order._id,
         deliveryAddress: order.userID.addresses.find((address: any) => address.isDefault == true),
@@ -17,6 +16,7 @@ export const fetchUserOrders = async () => {
           itemPrice: item.productId.price,
           itemName: item.productId.name,
           itemQuantity: item.quantity,
+          itemDescription: item.productId.description,
         })),
         createdOn: order.createdAt,
       }));
@@ -92,6 +92,7 @@ export const fetchCurrentOrder = async () => {
           itemPrice: item.productId.price,
           itemName: item.productId.name,
           itemQuantity: item.quantity,
+          itemDescription: item.productId.description,
         })),
         createdOn: orderData.createdAt,
       }
@@ -103,9 +104,50 @@ export const fetchCurrentOrder = async () => {
   }
 }
 
+export const fetchDriverHistory = async () => {
+  try {
+    const response = await apiClient.get('/api/driver/getMyOrdersHistory');
+    const orderData = response.data.existingOrder;
+    if(!orderData) {
+      return null;
+    }
+
+    const orders: OrderDriver[] = orderData.map((order: any) => ({
+      orderId: order._id,
+      deliveryAddress: order.userID.addresses.find((address: any) => address.isDefault == true),
+      userId: order.userID == null ? {name: "Guest", phone: "333", email: "none", _id: "fmfnjnwdoi"} : order.userID,
+      totalAmount: order.totalAmount,
+      restaurantId: {...order.restaurantID, logo: order.restaurantLogo, phone: order.restaurantID.contact.phone},
+      items: order.items.map((item: any) => ({
+        itemId: item.productId._id,
+        itemPrice: item.productId.price,
+        itemName: item.productId.name,
+        itemQuantity: item.quantity,
+        itemDescription: item.productId.description,
+      })),
+      createdOn: order.createdAt,
+    }));
+    
+  return orders;
+  } catch (error: any) {
+    console.error("error", error.response?.data || error.message);
+    throw error;
+  }
+}
+
 export const cancelOrder = async (orderId: string) => {
   try {
     const response = await apiClient.put(`/api/driver/leaveOrder?orderId=${orderId}`, {});
+    return response.data;
+  } catch (error: any) {
+    console.error("error", error.response?.data || error.message);
+    throw error;
+  }
+}
+
+export const markOrderAsDelivered = async () => {
+  try {
+    const response = await apiClient.put(`/api/driver/markDeliveryAsDone`, {});
     return response.data;
   } catch (error: any) {
     console.error("error", error.response?.data || error.message);

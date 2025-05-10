@@ -4,11 +4,14 @@ import { useNavigation } from 'expo-router';
 import colors from '../styles/colors';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { RestaurantData } from '../types/restaurant';
+import { fetchRestaurantProducts } from '../endpoints/adminEndpoints';
 
 export default function RestaurantContainer({ restaurantData }: {restaurantData: RestaurantData }) {
   const navigation = useNavigation();
 
-  const handlePress = () => {
+  const handlePress = async () => {
+    const menuData = await fetchRestaurantProducts();
+    console.log(restaurantData)
     navigation.navigate('_adminutils/restaurantDetails', { restaurant: JSON.stringify(restaurantData) });
     };
 

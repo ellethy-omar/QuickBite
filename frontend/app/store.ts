@@ -2,11 +2,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './slices/userSlice';
 import driverReducer from './slices/driverSlice';
+import adminReducer from './slices/adminSlice';
 
 const store = configureStore({
   reducer: {
     user: userReducer, // Add your reducers here
     driver: driverReducer, // Add your reducers here
+    admin: adminReducer, // Add your reducers here
   },
 });
 

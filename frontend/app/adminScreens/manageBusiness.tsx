@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { Text, StyleSheet, View, TouchableOpacity, TextInput, ScrollView, SafeAreaView } from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import RestaurantContainer from '@/app/components/restaurantContainer';
 import colors from '@/app/styles/colors';
@@ -72,7 +72,7 @@ export default function ManageBusinessScreen() {
   };
 
   return (
-    <View style={styles.background}>
+    <SafeAreaView style={styles.background}>
       <Text style={styles.titleText}>Restaurants</Text>
       <TextInput
         placeholder="Search"
@@ -128,7 +128,7 @@ export default function ManageBusinessScreen() {
           </TouchableOpacity>
         </View>
       </Modalize>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     backgroundColor: colors.primary,
-    paddingTop: 50,
+    paddingTop: 10,
   },
   titleText: {
     fontSize: 24,

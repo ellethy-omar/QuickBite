@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { Text, StyleSheet, View, TouchableOpacity, TextInput, ScrollView, SafeAreaView } from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import colors from '@/app/styles/colors';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -59,7 +59,7 @@ export default function UsersManageScreen() {
       };
 
     return (
-        <View style={styles.background}>
+        <SafeAreaView style={styles.background}>
           <Text style={styles.titleText}>Users</Text>
           <TextInput
             placeholder="Search"
@@ -103,7 +103,7 @@ export default function UsersManageScreen() {
               </TouchableOpacity>
             </View>
           </Modalize>
-        </View>
+        </SafeAreaView>
       );
     }
     
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     backgroundColor: colors.primary,
-    paddingTop: 50,
+    paddingTop: 10,
   },
   titleText: {
     fontSize: 24,

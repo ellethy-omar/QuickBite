@@ -3,7 +3,7 @@ export interface userData {
     name: string;
     email: string;
     isBanned: boolean;
-    profileImage: string;
+    profilePicture: string;
     phone: string;
     addresses: Array<{
         label: string;

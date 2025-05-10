@@ -31,7 +31,7 @@ export default function AdminScreensLayout() {
             backgroundColor: colors.background,
             borderTopWidth: 1,
             borderColor: colors.secondary,
-            height: 80,
+            height: 60,
           },
           tabBarLabelStyle: {
             fontSize: 10,
