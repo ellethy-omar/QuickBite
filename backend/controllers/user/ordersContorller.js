@@ -9,10 +9,9 @@ const createOrder = async (req, res) => {
         const userID = req.user._id;
 
         req.body.userID = userID;
-
         req.body.deliveryDriverID = null;
 
-        if ( !restaurantID || !items || !Array.isArray(items) || items.length === 0) {
+        if (!restaurantID || !items || !Array.isArray(items) || items.length === 0) {
             console.log("Missing required fields or empty items list.");
             return res.status(403).json({ error: 'Missing required order fields or empty items list.' });
         }
@@ -32,11 +31,29 @@ const createOrder = async (req, res) => {
         const restaurant = await Restaurant.findById(restaurantID);
         if (!restaurant) return res.status(404).json({ error: 'Restaurant not found.' });
     
-        const newOrder = await Order.createOrder(req.body)
+        // Run validation before trying to create order
+        const validation = await Order.validateOrder(req.body);
+        if (!validation.isValid) {
+            // Handle stock availability issues
+            if (validation.outOfStockItems) {
+                return res.status(403).json({
+                    error: 'Some products do not have sufficient stock',
+                    outOfStockItems: validation.outOfStockItems,
+                    totalAmount: validation.totalAmount
+                });
+            }
+            
+            // Handle any other validation errors
+            return res.status(403).json({ 
+                error: validation.error,
+                details: validation.missingProducts ? { missingProducts: validation.missingProducts } : undefined
+            });
+        }
     
+        const newOrder = await Order.createOrder(req.body);
         res.status(201).json(newOrder);
-
         console.log('newOrder:', newOrder);
+        
     } catch (error) {
         console.log("Order creation error:", error);
         res.status(500).json({ error: 'Internal server error', details: error.message });
