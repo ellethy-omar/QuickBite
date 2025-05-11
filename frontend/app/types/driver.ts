@@ -3,9 +3,9 @@ export interface DriverData {
     email: string;
     _id: string;
     phone: string;
-    image: string;
+    profilePicture: string;
     vehicle: {
-        type: string;
+        category: string;
         model: string;
         plateNumber: string;
     };

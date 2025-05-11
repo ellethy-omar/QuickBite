@@ -1,19 +1,9 @@
 import React, { useState } from 'react';
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Keyboard,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { View, TextInput, StyleSheet, Text, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
 import { RestaurantFormData } from '@/app/types/authTypes';
 import colors from '../../styles/colors';
 import cuisineList from '@/constants/cuisineList';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function RestaurantSignup({
   restaurantFormData,
@@ -39,7 +29,7 @@ export default function RestaurantSignup({
           <View>
             <Text style={styles.stepTitle}>Step 1: Enter your restaurant's credentials</Text>
             <View style={styles.inputContainer}>
-              <IconSymbol name="person.fill" size={16} color={colors.primary} />
+              <MaterialIcons name="person" size={16} color={colors.primary} />
               <TextInput
                 style={styles.input}
                 placeholderTextColor="gray"
@@ -51,7 +41,7 @@ export default function RestaurantSignup({
               />
             </View>
             <View style={styles.inputContainer}>
-              <IconSymbol name="lock.fill" size={16} color={colors.primary} />
+              <MaterialIcons name="lock" size={16} color={colors.primary} />
               <TextInput
                 style={{ width: '80%' }}
                 placeholderTextColor="gray"
@@ -63,15 +53,15 @@ export default function RestaurantSignup({
                 }
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <IconSymbol
-                  name={!showPassword ? 'eye.fill' : 'eye.slash.fill'}
+                <MaterialIcons
+                  name={!showPassword ? 'lock-open' : 'lock'}
                   size={18}
                   color={colors.primary}
                 />
               </TouchableOpacity>
             </View>
             <View style={styles.inputContainer}>
-              <IconSymbol name="lock.fill" size={16} color={colors.primary} />
+              <MaterialIcons name="lock" size={16} color={colors.primary} />
               <TextInput
                 style={{ width: '80%' }}
                 placeholderTextColor="gray"
@@ -83,8 +73,8 @@ export default function RestaurantSignup({
                 }
               />
               <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                <IconSymbol
-                  name={!showConfirmPassword ? 'eye.fill' : 'eye.slash.fill'}
+                <MaterialIcons
+                  name={!showConfirmPassword ? 'lock-open' : 'lock'}
                   size={18}
                   color={colors.primary}
                 />
@@ -98,24 +88,24 @@ export default function RestaurantSignup({
           <View>
             <Text style={styles.stepTitle}>Step 2: Enter your restaurant's contacts</Text>
             <View style={styles.inputContainer}>
-              <IconSymbol name="mail.fill" size={16} color={colors.primary} />
+              <MaterialIcons name="mail" size={16} color={colors.primary} />
               <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Business Email" value={restaurantFormData.email} onChangeText={(text) => setRestaurantFormData({ ...restaurantFormData, email: text })} />
             </View>
             <View style={styles.inputContainer}>
-              <IconSymbol name="phone.fill" size={16} color={colors.primary} />
+              <MaterialIcons name="phone" size={16} color={colors.primary} />
               <TextInput style={styles.input} placeholderTextColor="gray" placeholder="Phone Number" value={restaurantFormData.phone} onChangeText={(text) =>setRestaurantFormData({ ...restaurantFormData, phone: text }) } />
             </View>
             <View style={styles.inputContainer}>
-                <IconSymbol name="location.fill" size={16} color={colors.primary} />
+                <MaterialIcons name="location-pin" size={16} color={colors.primary} />
                 <TextInput style={{width: '90%'}} placeholderTextColor="gray" placeholder="Governorate/state" value={restaurantFormData.address.area} onChangeText={(text) => setRestaurantFormData({...restaurantFormData, address: {...restaurantFormData.address, area: text}})} />
             </View>
             <View style={{width: '80%', marginTop: 20, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <View style={styles.inputContainerMinor}>
-                    <IconSymbol name="signpost.right.fill" size={16} color={colors.primary} />
+                    <MaterialIcons name="streetview" size={16} color={colors.primary} />
                     <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Street" value={restaurantFormData.address.street} onChangeText={(text) => setRestaurantFormData({...restaurantFormData, address: {...restaurantFormData.address, street: text}})} />
                 </View>
                 <View style={styles.inputContainerMinor}>
-                    <IconSymbol name="house.fill" size={16} color={colors.primary} />
+                    <MaterialIcons name="house" size={16} color={colors.primary} />
                     <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="City" value={restaurantFormData.address.city} onChangeText={(text) => setRestaurantFormData({...restaurantFormData, address: {...restaurantFormData.address, city: text}})} />
                 </View>
             </View>
@@ -205,7 +195,7 @@ export default function RestaurantSignup({
   <View>
   <Text style={styles.stepTitle}>Step 4: Set your restaurant's specialties</Text>
   <View style={styles.inputContainerSquare}>
-    <IconSymbol name="info.circle.fill" size={16} color={colors.primary} />
+    <MaterialIcons name="info" size={16} color={colors.primary} />
     <TextInput style={[styles.input, { height: '100%', textAlignVertical: 'top' }]} placeholderTextColor="gray" placeholder="Description" value={restaurantFormData.description} onChangeText={(text) =>setRestaurantFormData({ ...restaurantFormData, description: text })} multiline={true}/>
   </View>
   <Text style={styles.cuisineText}>Select your restaurant's cuisines</Text>
@@ -238,7 +228,7 @@ export default function RestaurantSignup({
             }}
           >
             {restaurantFormData.cuisines.includes(cuisine) && (
-              <IconSymbol name="checkmark" size={10} color={colors.primary} />
+              <MaterialIcons name="check" size={10} color={colors.primary} />
             )}
           </View>
           <Text
@@ -270,7 +260,7 @@ export default function RestaurantSignup({
             style={styles.stepButton}
             onPress={() => setCurrentStep(Math.max(0, currentStep - 1))}
           >
-            <IconSymbol name="chevron.left" size={15} color="white" />
+            <MaterialIcons name="chevron-left" size={15} color="white" />
             <Text style={{ color: 'white', fontSize: 14 }}>Back</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -278,7 +268,7 @@ export default function RestaurantSignup({
             onPress={() => setCurrentStep(Math.min(3, currentStep + 1))}
           >
             <Text style={{ color: 'white', fontSize: 14 }}>Next</Text>
-            <IconSymbol name="chevron.right" size={15} color="white" />
+            <MaterialIcons name="chevron-right" size={15} color="white" />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

@@ -5,7 +5,7 @@ import { AdminData } from '../types/admin';
 const initialState: AdminData = {
   name: '',
   email: '',
-  image: '',
+  profilePicture: '',
   phone: '',
   id: '',
   handledRequests: 0
@@ -20,7 +20,7 @@ const adminSlice = createSlice({
         state.email = action.payload.email;
         state.phone = action.payload.phone;
         state.id = action.payload.id;
-        state.image = action.payload.image;
+        state.profilePicture = action.payload.profilePicture;
         state.handledRequests = action.payload.handledRequests;
     },
   },

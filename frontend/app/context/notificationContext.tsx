@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, SafeAreaView } from 'react-native';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface NotificationContextType {
   showNotification: (message: string, type?: 'success' | 'error' | 'info') => void;
@@ -41,7 +41,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       {notification && (
         <Animated.View style={[ styles.notification, { transform: [{ translateY: slideAnim }] },]}>
           <SafeAreaView style={[styles.leftEdge, styles[notification.type]]} />
-            <IconSymbol name={notification.type === 'success' ? 'checkmark.circle.fill' : notification.type === 'error' ? 'xmark.circle.fill' : 'info.circle.fill'} size={21} color={notification.type == "success" ? "#4CAF50" : notification.type === "error" ? "#F44336" : "#2196F3"} style={{marginLeft: 5}}/>
+            <MaterialIcons name={notification.type === 'success' ? 'check' : notification.type === 'error' ? "cancel" : 'info'} size={21} color={notification.type == "success" ? "#4CAF50" : notification.type === "error" ? "#F44336" : "#2196F3"} style={{marginLeft: 5}}/>
           <Text style={styles.notificationText}>{notification.message}</Text>
         </Animated.View>
       )}

@@ -2,78 +2,83 @@ import React, { useEffect, useRef } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, TextInput, ScrollView, SafeAreaView } from 'react-native';
 import { Modalize } from 'react-native-modalize';
 import colors from '@/app/styles/colors';
-import { userData } from '../types/user';
-import UserContainer from '../components/userContainer';
-import { fetchAllUsers } from '../endpoints/adminEndpoints';
+import { fetchAllDrivers } from '../endpoints/adminEndpoints';
+import { DriverData } from '../types/driver';
+import DriverContainer from '../components/driverContainer';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RefreshControl } from 'react-native-gesture-handler';
 
-export default function UsersManageScreen() {
-      const [users, setUsers] = React.useState<userData[]>([]);
-      const [loading, setLoading] = React.useState(true);
-      const [refreshing, setRefreshing] = React.useState(false);
-      const [filteredUsers, setFilteredUsers] = React.useState<userData[]>(users);
-      const modalizeRef = useRef<Modalize>(null);
+export default function DriversManageScreen() {
+    const [drivers, setDrivers] = React.useState<DriverData[]>([]);
+    const [loading, setLoading] = React.useState(true);
+    const [filteredDrivers, setFilteredDrivers] = React.useState<DriverData[]>(drivers);
+    const modalizeRef = useRef<Modalize>(null);
+    const [refreshing, setRefreshing] = React.useState(false);
 
-      useEffect(() => {
-        if (!loading) return;
-
-        const fetchUsers = async () => {
-          try {
-            const response = await fetchAllUsers();
-            setUsers(response);
-            setFilteredUsers(response); // Initialize filtered users with all users
-          } catch (error) {
-            console.error('Error fetching users:', error);
-          } finally {
+    const fetchDrivers = async () => {
+        try {
+            const response = await fetchAllDrivers();
+            setDrivers(response);
+            setFilteredDrivers(response);
+        } catch (error) {
+            console.error('Error fetching drivers:', error);
+        } finally {
             setLoading(false);
             setRefreshing(false);
-          }
-        };
+        }
+    };
 
-        fetchUsers();
-      }, [loading]);
+    useEffect(() => {
+        if (!loading) return;
+        fetchDrivers();
+    }, [loading]);
 
-      const onRefresh = () => {
-        setLoading(true);
-        fetchAllUsers();
-      }
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchDrivers();
+    };
 
-      const openModal = () => {
+    const openModal = () => {
         modalizeRef.current?.open();
-      };
-    
-      const handleFilterRestaurants = (text: string) => {
-        const filtered = users.filter((user) =>
-          user.name.toLowerCase().includes(text.toLowerCase())
+    };
+
+    const handleFilterDrivers = (text: string) => {
+        const filtered = drivers.filter((driver) =>
+            driver.name.toLowerCase().includes(text.toLowerCase())
         );
-        setFilteredUsers(filtered);
-      };
+        setFilteredDrivers(filtered);
+    };
     
-      const handleSort = (type: string) => {
-        let sortedUsers = [...filteredUsers];
+    const handleSort = (type: string) => {
+        let sortedDrivers = [...filteredDrivers];
         switch (type) {
-          case 'alphabetical-asc':
-            sortedUsers.sort((a, b) => a.name.localeCompare(b.name));
+            case 'alphabetical-asc':
+            sortedDrivers.sort((a, b) => a.name.localeCompare(b.name));
             break;
-          case 'alphabetical-desc':
-            sortedUsers.sort((a, b) => b.name.localeCompare(a.name));
+            case 'alphabetical-desc':
+            sortedDrivers.sort((a, b) => b.name.localeCompare(a.name));
             break;
-          default:
+            case 'rating-asc':
+                sortedDrivers.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+                break;
+            case 'rating-desc':
+                sortedDrivers.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                break;
+            default:
             break;
         }
-        setFilteredUsers(sortedUsers);
-        modalizeRef.current?.close(); // Close the modal after sorting
-      };
+        setFilteredDrivers(sortedDrivers);
+        modalizeRef.current?.close();
+    };
 
     return (
         <SafeAreaView style={styles.background}>
-          <Text style={styles.titleText}>Users</Text>
+          <Text style={styles.titleText}>Drivers</Text>
           <TextInput
             placeholder="Search"
             style={styles.searchBox}
             placeholderTextColor={colors.primary}
-            onChangeText={(text) => handleFilterRestaurants(text)}
+            onChangeText={(text) => handleFilterDrivers(text)}
           />
     
           <View style={styles.toolKit}>
@@ -81,19 +86,19 @@ export default function UsersManageScreen() {
               <Text style={{ fontSize: 11, color: colors.primary, fontWeight: '700' }}>Sort by</Text>
               <MaterialIcons name="sort" size={16} color={colors.primary} />
             </TouchableOpacity>
-            <Text style={styles.infoText}>Found Users: {filteredUsers.length}</Text>
+            <Text style={styles.infoText}>Found drivers: {filteredDrivers.length}</Text>
           </View>
     
-          <ScrollView style={styles.resultContainer} contentContainerStyle={{ gap: 15 }} bounces={true} showsVerticalScrollIndicator={true} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />}>
+          <ScrollView style={styles.resultContainer} contentContainerStyle={{ gap: 15, borderTopLeftRadius: 20 }} bounces={true} showsVerticalScrollIndicator={true} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />}>
             {loading ? (
               <Text style={styles.noResultsText}>Loading...</Text>
             ) : (
               <>
-              {filteredUsers.length === 0 ? (
+              {filteredDrivers.length === 0 ? (
               <Text style={styles.noResultsText}>No Restaurants Found</Text>
             ) : (
-              filteredUsers.map((item) => (
-                <UserContainer key={item._id} userData={item}/>
+              filteredDrivers.map((item) => (
+                <DriverContainer key={item._id} driverData={item}/>
               ))
             )}
               </>
@@ -108,6 +113,12 @@ export default function UsersManageScreen() {
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleSort('alphabetical-desc')} style={styles.sortOption}>
                 <Text>Alphabetical (Z-A)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleSort('rating-asc')} style={styles.sortOption}>
+                <Text>Rating (Ascending)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleSort('rating-desc')} style={styles.sortOption}>
+                <Text>Rating (Descending)</Text>
               </TouchableOpacity>
             </View>
           </Modalize>

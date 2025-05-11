@@ -5,11 +5,11 @@ import { DriverData } from '../types/driver';
 const initialState: DriverData = {
   name: '',
   email: '',
-  image: '',
+  profilePicture: '',
   phone: '',
   _id: '',
   vehicle: {
-      type: '',
+      category: '',
       plateNumber: '',
       model: '',
   },
@@ -34,6 +34,7 @@ const driverSlice = createSlice({
         state.rating = action.payload.rating;
         state.deliveryStats = action.payload.deliveryStats;
         state.isBanned = action.payload.isBanned;
+        state.profilePicture = action.payload.profilePicture;
     },
   },
 });

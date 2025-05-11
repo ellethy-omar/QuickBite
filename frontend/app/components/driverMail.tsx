@@ -7,9 +7,9 @@ export default function DriverMail({driverData, setMailData}: {driverData: Drive
 
     return (
         <View style={styles.background}>
-            <Text style={styles.titleText}>{driverData.title}</Text>
-            <Text style={styles.infoText}>{driverData.content}</Text>
-            <Text style={styles.infoText}>{driverData.name}</Text>
+            <Text style={styles.titleText}>{driverData.name}</Text>
+            <Text style={styles.infoText}>{driverData.description}</Text>
+            <Text style={styles.infoText}>Since: {new Date(driverData.createdAt).toLocaleString()}</Text>
             <View style={{display: 'flex', flexDirection: 'row', gap: 10, marginTop: 10}}>
             <TouchableOpacity style={{paddingHorizontal: 15, paddingVertical: 6, backgroundColor: colors.secondary, borderRadius: 50}} onPress={() => console.log('Accept Request')}>
                 <Text style={{fontSize: 14, fontWeight: '600'}}>Ignore</Text>
@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     infoText: {
         fontSize: 13,
         marginBottom: 5,
+        fontWeight: '500',
     },
 })
 
