@@ -2,7 +2,7 @@ import { userData } from "../types/user";
 import { Text, StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import colors from "../styles/colors";
 import { useNavigation } from 'expo-router';
-
+import SmartImage from "./smartImage";
 export default function UserContainer({userData}: {userData : userData}) {
     const navigation = useNavigation();
     
@@ -12,7 +12,7 @@ export default function UserContainer({userData}: {userData : userData}) {
 
     return (
         <TouchableOpacity style={styles.container} onPress={() => handlePress()}>
-            <Image source={{ uri: userData.profileImage }} style={{ width: 100, height: 100, borderRadius: 200, objectFit: 'cover' }} />
+            <SmartImage uri={userData.profilePicture} style={styles.image} svgStyle={{height: 130, width:130}}/>
             <View style={styles.infoSection}>
                 <Text style={styles.titleText}>{userData.name}</Text>
                 <Text style={{fontSize: 12, fontWeight: "500" ,color: colors.primary}}>Email: <Text style={styles.infoText}>{userData.email}</Text></Text>
