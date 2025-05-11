@@ -5,11 +5,13 @@ import DriverMail from '@/app/components/driverMail';
 import colors from '@/app/styles/colors';
 import { Modalize } from 'react-native-modalize';
 import { useSelector } from 'react-redux';
+import { MaterialIcons } from '@expo/vector-icons';
+import useHandleLogout from '@/hooks/useHandleLogout';
+import ConfirmActionModal from '../components/modals/confirmActionModal';
 
 export default function DashboardScreen() {
     const adminData = useSelector((state: { admin: AdminData }) => state.admin);
     const [user, setUser] = useState<AdminData>(adminData);
-
     const [driverMails, setDriverMails] = useState<DriverMailData[]>([
         {
             id: '1',
@@ -72,10 +74,11 @@ export default function DashboardScreen() {
             name: 'Olivia Martinez',
         }
     ]);
-
     const [filteredMails, setFilteredMails] = useState(driverMails);
     const mailReplyModalRef = useRef<Modalize>(null);
     const [modalData, setModalData] = useState<DriverMailData| null>(null);
+    const handleLogout = useHandleLogout();
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     useEffect(() => {
         if (modalData) {
@@ -98,6 +101,8 @@ export default function DashboardScreen() {
 
     return (
         <SafeAreaView style={styles.background}>
+            <ConfirmActionModal visible={showLogoutModal} onClose={() => setShowLogoutModal(false)} onConfirm={handleLogout} title="Logout" message="Are you sure you want to logout?"/>
+            <MaterialIcons onPress={() => setShowLogoutModal(true)} name="logout" size={24} color="white" style={{position: "absolute", top: 15, right: 15, zIndex: 100}}/>
             <Text style={styles.titleText}>Dashboard</Text>
             <View style={styles.infoSection}>
                 <View style={styles.credentialsSection}>
@@ -153,6 +158,7 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         alignItems: 'stretch',
         backgroundColor: colors.primary,
+        position: 'relative'
     },
     titleText: {
         fontSize: 24,

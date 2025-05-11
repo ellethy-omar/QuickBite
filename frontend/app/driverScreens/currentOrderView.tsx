@@ -134,12 +134,7 @@ export default function CurrentOrderView() {
 
     return (
         <View style={styles.container}>
-            <ConfirmActionModal
-                visible={modalData.visible}
-                onClose={modalData.onClose}
-                onConfirm={modalData.onConfirm}
-                title={modalData.title}
-                message={modalData.message}/>
+            <ConfirmActionModal visible={modalData.visible} onClose={modalData.onClose} onConfirm={modalData.onConfirm} title={modalData.title} message={modalData.message}/>
             <Text style={styles.title}>Order Tracker</Text>
             <Text style={styles.subTitle}>
                 This is where you can track your current order.
@@ -147,7 +142,9 @@ export default function CurrentOrderView() {
             <ScrollView style={{flex: 1, width: "95%"}} showsVerticalScrollIndicator={false} refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />}>
             {fetching ? (
-                <Text style={{ fontSize: 16, color: colors.primary }}>Loading...</Text>
+                <Text style={{ fontSize: 20, fontWeight: "500", color: colors.primary, textAlign: 'center', marginTop: 100 }}>
+                    No current orders available
+                </Text>
             ) : orderData != null ? (
                 <>
                 <View style={styles.sectionContainer}>

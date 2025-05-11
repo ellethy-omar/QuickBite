@@ -55,6 +55,7 @@ export default function SignupScreen() {
               return;
             }
             await UserSignupRoute(userFormData);
+            showNotification('user signup successful!', 'success');
           } else if(currentSection === 1) {
             if(restaurantFormData.password !== restaurantFormData.confirmPassword) {
               showNotification('Passwords do not match!', 'error');
@@ -80,7 +81,11 @@ export default function SignupScreen() {
             navigation.navigate('authScreens/login');
           }, 1000);
         } catch (error) {
-          showNotification('Server error! Please try again later.', 'error');
+          if (error.response && error.response.status === 403) {
+            showNotification('invalid password, password must be at least 8 characters long, contain upper and lowercase laterals, at least one number and a special character.', 'error');
+          } else {
+            showNotification('Server error! Please try again later.', 'error');
+          }
         } finally {
           setSubmitting(false);
         }
