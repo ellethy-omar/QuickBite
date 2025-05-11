@@ -21,7 +21,7 @@ export interface OpeningHourRange {
     image: string;
     banner: string;
     phone: string;
-    bio: string;
+    description: string;
     rating: number;
     ratingCount: number;
     address: {
@@ -37,9 +37,11 @@ export interface OpeningHourRange {
       };
     isActive: boolean;
     isBanned: boolean;
+    coverImage: string;
   }  
 
 export interface MenuItem {
+    id: string;
     name: string,
     price: number,
     description: string,

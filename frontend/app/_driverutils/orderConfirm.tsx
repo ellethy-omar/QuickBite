@@ -62,32 +62,35 @@ export default function OrderConfirm() {
                 <Text style={styles.titleText}>Order Confirmation</Text>
                 <MaterialIcons name="arrow-back" size={24} style={{height: "100%", opacity: 0}} color="white"/>
             </View>
-            <ScrollView style={{width: '100%'}} contentContainerStyle={{alignItems: 'center', paddingBottom: 20, position: 'relative'}}>
-            <View style={styles.section}>
-                    <Text style={{fontSize: 24, fontWeight: '700', color: colors.primary}}>Order Info</Text>
-                    {orderData.items.map((item, index: number) => (
+            <ScrollView style={{width: '100%'}} contentContainerStyle={{width: "96%", marginTop: 10, marginHorizontal: "auto", padding: 10, borderWidth: 0.6, borderColor: colors.primary, borderRadius: 10, paddingBottom: 20, position: 'relative', gap: 20}}>
+            <View>
+                <Text style={{fontSize: 24, fontWeight: '700', color: colors.primary}}>Order Info</Text>
+                {orderData.items.map((item, index: number) => (
+                    <>
                         <View key={index} style={{paddingVertical: 5}}>
                             <Text style={{fontSize: 14, fontWeight: '600', marginBottom: 5}}>{item.itemName}</Text>
                             <Text style={{fontSize: 12, color: 'gray', fontWeight: '500', marginBottom: 5}}>{item.itemDescription}</Text>
                             <Text style={{fontSize: 12, fontWeight: '500', color: 'gray'}}>{item.itemPrice} EGP</Text>
                         </View>
-                    ))}
-                </View>
-                <View style={styles.section}>
-                    <Text style={{fontSize: 24, marginBottom: 5, fontWeight: '700', color: colors.primary}}>Customer Info</Text>
-                    <Text style={{fontWeight: '500', color: colors.primary}}>Name: <Text style={styles.infoText}>{orderData.userId.name}</Text></Text>
-                    <Text style={{fontWeight: '500', color: colors.primary}}>Phone: <Text style={styles.infoText}>{orderData.userId.phone}</Text></Text>
-                    <Text style={{fontWeight: '500', color: colors.primary}}>Delivery Address: <Text style={styles.infoText}>{orderData.deliveryAddress.area}, {orderData.deliveryAddress.street}, {orderData.deliveryAddress.building}, Floor: {orderData.deliveryAddress.floor}, Apartment: {orderData.deliveryAddress.apartment}</Text></Text>
-                </View>
-                <View style={styles.section}>
-                    <Text style={{fontSize: 24, marginBottom: 5, fontWeight: '700', color: colors.primary}}>Restaurant Info</Text>
-                    <Text style={{fontWeight: '500', color: colors.primary}}>Name: <Text style={styles.infoText}>{orderData.restaurantId.name}</Text></Text>
-                    <Text style={{fontWeight: '500', color: colors.primary}}>Phone: <Text style={styles.infoText}>{orderData.restaurantId.phone}</Text></Text>
-                    <Text style={{fontWeight: '500', color: colors.primary}}>Address: <Text style={styles.infoText}>{orderData.restaurantId.address.area}, {orderData.restaurantId.address.street}, {orderData.restaurantId.address.city}</Text></Text>
-                </View>
+                        <View style={{width: "80%", height: 1, backgroundColor: "gray", marginVertical: 10, marginHorizontal: "auto"}} />
+                    </>
+                ))}
+            </View>
+            <View style={{gap:5}}>
+                <Text style={{fontSize: 24, marginBottom: 5, fontWeight: '700', color: colors.primary}}>Customer Info</Text>
+                <Text style={{fontWeight: '500', color: colors.primary}}>Name: <Text style={styles.infoText}>{orderData.userId.name}</Text></Text>
+                <Text style={{fontWeight: '500', color: colors.primary}}>Phone: <Text style={styles.infoText}>{orderData.userId.phone}</Text></Text>
+                <Text style={{fontWeight: '500', color: colors.primary}}>Delivery Address: <Text style={styles.infoText}>{orderData.deliveryAddress.area}, {orderData.deliveryAddress.street}, {orderData.deliveryAddress.building}, Floor: {orderData.deliveryAddress.floor}, Apartment: {orderData.deliveryAddress.apartment}</Text></Text>
+            </View>
+            <View style={{gap:5}}>
+                <Text style={{fontSize: 24, marginBottom: 5, fontWeight: '700', color: colors.primary}}>Restaurant Info</Text>
+                <Text style={{fontWeight: '500', color: colors.primary}}>Name: <Text style={styles.infoText}>{orderData.restaurantId.name}</Text></Text>
+                <Text style={{fontWeight: '500', color: colors.primary}}>Phone: <Text style={styles.infoText}>{orderData.restaurantId.phone}</Text></Text>
+                <Text style={{fontWeight: '500', color: colors.primary}}>Address: <Text style={styles.infoText}>{orderData.restaurantId.address.area}, {orderData.restaurantId.address.street}, {orderData.restaurantId.address.city}</Text></Text>
+            </View>
             </ScrollView>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignItems: 'center', paddingBottom: 10, position: 'absolute', bottom: 15}}>
-                <Text style={{fontSize: 20, marginBottom: 5, fontWeight: '700', color: colors.primary}}>Total Amount: {orderData.totalAmount}</Text>
+                <Text style={{fontSize: 18, marginBottom: 5, fontWeight: '700'}}>Total Amount: <Text style={{color: colors.primary, fontSize: 28}}>{orderData.totalAmount}</Text> EGP</Text>
                 <View style={{ overflow: 'hidden', borderRadius: 10 }}>
                     <TouchableOpacity style={{ backgroundColor: submitting ? "gray" : colors.primary, padding: 10, borderRadius: 50, alignItems: 'center', justifyContent: 'center', overflow: 'hidden',}} onPress={() => setSubmitting(true)}>
                         <Text style={styles.text}>{submitting ? "loading..." : "Accept Order"}</Text>

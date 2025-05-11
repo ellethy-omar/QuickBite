@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Image, ImageStyle, StyleProp, ViewStyle } from 'react-native';
+import { Image, ImageStyle, StyleProp, ViewStyle, TouchableOpacity } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 
 interface SmartImageProps {
   uri: string;
   style?: StyleProp<ImageStyle>;
   svgStyle?: StyleProp<ViewStyle>;
+  onPress?: () => void;
 }
 
-const SmartImage: React.FC<SmartImageProps> = ({ uri, style, svgStyle }) => {
+const SmartImage: React.FC<SmartImageProps> = ({ uri, style, svgStyle, onPress }) => {
   const [isSvg] = useState<boolean>(uri?.toLowerCase().endsWith('.svg'));
   const [svgXmlData, setSvgXmlData] = useState<string | null>(null);
 
@@ -25,11 +26,15 @@ const SmartImage: React.FC<SmartImageProps> = ({ uri, style, svgStyle }) => {
 
   if (isSvg) {
     return svgXmlData ? (
-      <SvgXml xml={svgXmlData} width={width ? String(width) : '100%'} height={height ? String(height) : '30%'}/>
+      <SvgXml onPress={onPress} xml={svgXmlData} width={width ? String(width) : '100%'} height={height ? String(height) : '30%'}/>
     ) : null;
   }
 
-  return <Image source={{ uri }} style={style} resizeMode="cover" />;
+  return (
+    <TouchableOpacity onPress={onPress} disabled={!onPress}>
+      <Image source={{ uri }} style={style} resizeMode="cover" />
+    </TouchableOpacity>
+  );
 };
 
 export default SmartImage;

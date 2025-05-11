@@ -10,7 +10,7 @@ export const fetchUserOrders = async () => {
         deliveryAddress: order.userID.addresses.find((address: any) => address.isDefault == true),
         userId: order.userID == null ? {name: "Guest", phone: "333", email: "none", _id: "fmfnjnwdoi"} : order.userID,
         totalAmount: order.totalAmount,
-        restaurantId: {...order.restaurantID, logo: order.restaurantLogo, phone: order.restaurantID.contact.phone},
+        restaurantId: {...order.restaurantID, logo: order.restaurantID.logo, phone: order.restaurantID.contact.phone},
         items: order.items.map((item: any) => ({
           itemId: item.productId._id,
           itemPrice: item.productId.price,
@@ -52,14 +52,13 @@ export const fetchDriverProfile = async ()  => {
 }
 
 export const editDriverProfile = async (driverData: DriverData) => {
-  console.log(driverData)
   const body = {
     name: "kanye west",
     email: driverData.email,
     phone: driverData.phone,
     vehicle: {
       plateNumber: driverData.vehicle.plateNumber,
-      category: driverData.vehicle.type,
+      category: driverData.vehicle.category,
       model: driverData.vehicle.model
     }
   }
@@ -154,3 +153,17 @@ export const markOrderAsDelivered = async () => {
     throw error;
   }
 }
+
+export const sendAdminRequest = async (request: string) => {
+  try {
+    const response = await apiClient.post('/api/driver/sendRequest', {
+      description: request,
+      data: {}
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("error", error.response?.data || error.message);
+    throw error;
+  }
+}
+

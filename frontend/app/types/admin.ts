@@ -3,13 +3,16 @@ export interface AdminData {
     name: string,
     email: string,
     handledRequests: number,
-    image: string,
+    profilePicture: string,
     phone: string,
 }
 
 export interface DriverMailData {
     id: string,
-    title: string,
-    content: string,
+    senderId: string,
     name: string,
+    status: string,
+    senderModel: string,
+    description: string,
+    createdAt: string,
 }
