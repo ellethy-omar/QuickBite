@@ -167,3 +167,20 @@ export const sendAdminRequest = async (request: string) => {
   }
 }
 
+export const fetchAllNotifications = async () => {
+  try {
+    const response = await apiClient.get('/api/driver/getNotifications');
+    console.log("response", JSON.stringify(response.data.notifications));
+    const notifications = response.data.notifications.map((notification: any) => ({
+      id: notification._id,
+      description: notification.description,
+      adminName: "QuickBite Admin",
+    }));
+
+    return notifications;
+  } catch (error: any) {
+    console.error("error", error.response?.data || error.message);
+    throw error;
+  }
+}
+

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TextInput } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { ChatDriver, ChatMessage } from '../types/chat';
+import { ChatMessage } from '../types/chat';
 import ChatBox from '../components/chatBox';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScrollView } from 'react-native-gesture-handler';

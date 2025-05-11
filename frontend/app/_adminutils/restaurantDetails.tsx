@@ -8,6 +8,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MenuItem, RestaurantData } from '../types/restaurant';
 import { useNavigation } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import { banRestaurantAccess, sendMessageAdmin } from '../endpoints/adminEndpoints';
+import { useNotification } from '../context/notificationContext';
 
 export default function RestaurantDetails() {
   const { restaurant } = useLocalSearchParams();
@@ -23,11 +25,34 @@ export default function RestaurantDetails() {
   const navigator = useNavigation();
   const [editingMenu, setEditingMenu] = useState<MenuItem|null>(null);
   const [shackItems, setShackItems] = useState<boolean>(false);
-
+  const { showNotification } = useNotification();
   const [restaurantData, setRestaurantData] = useState(JSON.parse(restaurant));
   const menuSortModalRef = useRef<Modalize>(null);
   const menuManageModalRef = useRef<Modalize>(null);
   const restaurantActionsModalRef = useRef<Modalize>(null);
+  const [restaurantRequestStep, setRestaurantRequestStep] = useState(0);
+  const [requestText, setRequestText] = useState("");
+
+  const handleBanRestaurant = async () => {
+    try {
+        await banRestaurantAccess(restaurantData._id, restaurantData.banned);
+        setRestaurantData({...restaurantData, banned: !restaurantData.banned});
+        showNotification(`Driver ${restaurantData.banned ? "unbanned" : "banned"} successfully!`, "success");
+    } catch {
+        showNotification(`An error occurred while ${restaurantData.banned ? "unbanning" : "banning"} Driver, please try again`, "error");
+    } finally {
+        restaurantActionsModalRef.current?.close();
+    }
+  }
+
+  const handleSendNotification = async () => {
+    try {
+      await sendMessageAdmin(restaurantData._id, requestText, 'Restaurant');
+      showNotification('Notification sent successfully!', 'success');
+    } catch (error) {
+      showNotification('Failed to send notification.', 'error');
+    }
+  };
 
   const openSortModal = () => {
     menuSortModalRef.current?.open();
@@ -114,8 +139,8 @@ export default function RestaurantDetails() {
           <Text style={{ fontSize: 14, fontWeight: '600' }}>manage Menu</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.toolButton} onPress={openSortModal}>
-          <Text style={{ fontSize: 14, color: colors.primary, fontWeight: '700' }}>Sort by</Text>
-          <MaterialIcons name="sort" size={16} color={colors.primary} />
+          <Text style={{ fontSize: 14, fontWeight: '700' }}>Sort by</Text>
+          <MaterialIcons name="sort" size={18} color={colors.primary} />
         </TouchableOpacity>
         </View>
       </View>
@@ -165,21 +190,36 @@ export default function RestaurantDetails() {
       </Modalize>
 
       <Modalize ref={restaurantActionsModalRef} adjustToContentHeight modalStyle={styles.modalStyle}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Restaurant Actions</Text>
-          <TouchableOpacity onPress={() => {}} style={styles.sortOption}>
-            <Text>Issue Ticket To Restaurant</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}} style={styles.sortOption}>
-            <Text>Set Restaurant To Public</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}} style={styles.sortOption}>
-            <Text>Set Restaurant To Private</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}} style={styles.sortOption}>
-            <Text>Delete Restaurant</Text>
-          </TouchableOpacity>
-        </View>
+          {restaurantRequestStep == 0 ? (
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Restaurant Actions</Text>
+            <TouchableOpacity onPress={() => setRestaurantRequestStep(1)} style={styles.sortOption}>
+              <Text>Send Notification To Restaurant</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {}} style={styles.sortOption}>
+              <Text>Set Restaurant To Public</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {}} style={styles.sortOption}>
+              <Text>Set Restaurant To Private</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleBanRestaurant()} style={styles.sortOption}>
+              <Text>Ban Restaurant</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Send Notification</Text>
+            <TextInput value={requestText} onChangeText={setRequestText} style={{ borderWidth: 1, borderColor: colors.secondary, marginBottom: 20, padding: 10, height: 100, borderRadius: 8, backgroundColor: colors.background }} placeholder="Notification Message" multiline numberOfLines={4} textAlignVertical="top" placeholderTextColor="gray" />
+            <View style={{ display: 'flex', flexDirection: 'row', gap: 10, marginTop: 10, justifyContent: 'center' }}>
+              <TouchableOpacity style={[{backgroundColor: colors.secondary}, styles.actionButton]} onPress={() => setRestaurantRequestStep(0)}>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.primary }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[{backgroundColor: colors.primary}, styles.actionButton]} onPress={() => handleSendNotification()}>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.primaryText }}>Send</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </Modalize>
     </GestureHandlerRootView>
   );
@@ -205,9 +245,15 @@ const styles = StyleSheet.create({
     width: '85%',
     marginHorizontal: 'auto',
     marginTop: -60,
-    borderWidth: 1,
     marginBottom: 5,
-    borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOffset: {
+      width: 2,
+      height: 4,
+    },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+    elevation: 8,
   },
   bodyContainer: {
     padding: 10,
@@ -222,7 +268,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.secondary,
     marginTop: 5,
     paddingVertical: 10,
     alignItems: 'flex-end',
