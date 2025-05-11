@@ -96,9 +96,13 @@ restaurantSchema.statics.createRestaurant = async function (data) {
 
 
 restaurantSchema.statics.findByEmailOrPhone = async function (identifier) {
-  return await this.findOne({
-    $or: [{ "contact.email": identifier }, { "contact.phone": identifier }]
-  });
+  return await this.findOne({ 
+      $or: [
+        { 'contact.email': identifier }, 
+        { 'contact.phone': identifier }
+      ]
+    })
+    .select('+contact.password');;
 };
 
 restaurantSchema.methods.isPasswordMatch = async function (password) {

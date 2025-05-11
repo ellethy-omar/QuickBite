@@ -16,8 +16,11 @@ const {
 } = require('../controllers/restaurant/menuController')
 
 const {
+    getRestaurantAllCalledOrders,
     getRestaurantAllRequiredOrders,
-    getRestaurantAllOrders
+    acceptOrder,
+    rejectOrder,
+    getOrdersHistory
 } = require('../controllers/restaurant/ordersContorller')
 
 // profile routes
@@ -40,6 +43,9 @@ router.put("/editRestaurantProductImage", editRestaurantProductImage)
 
 // order routes
 router.get("/getRestaurantAllRequiredOrders", getRestaurantAllRequiredOrders);
-router.get("/getRestaurantAllOrders", getRestaurantAllOrders);
+router.get("/getRestaurantAllCalledOrders", getRestaurantAllCalledOrders);
+router.put('/acceptOrder', acceptOrder)
+router.put('/rejectOrder', rejectOrder)
+router.get('/getOrdersHistory', getOrdersHistory)
 
 module.exports = router;
