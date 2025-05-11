@@ -103,7 +103,7 @@ export default function UserDetailsScreen() {
             </View>
             <ScrollView style={{flex: 1}}>
               <View style={styles.section}>
-                <View>
+                <View style={{gap:5}}>
                     <Text style={styles.subtitle}>Personal Information</Text>
                     <Text style={styles.infoText}>Username:  <Text style={{color:"gray"}}>{userData.name}</Text></Text>
                     <Text style={styles.infoText}>Phone number:  <Text style={{color:"gray"}}>{userData.phone}</Text></Text>
@@ -112,18 +112,16 @@ export default function UserDetailsScreen() {
                 </View>
                 <View>
                     <Text style={styles.subtitle}>User Addresses</Text>
-                    {userData.addresses.map((address, index) => (
+                    {userData.addresses.map((address, index : number) => (
                         <View key={index} style={styles.addressContainer}>
                             <View style={{display: 'flex', flexDirection: 'row', gap: 5, alignItems: 'center'}}>
                                 <MaterialIcons name='label-important' size={20} color={colors.primary}/>
                                 <Text style={{fontSize: 18, color: colors.primary, fontWeight: '600'}}>{address.label}</Text>
                             </View>
-                            <Text style={styles.infoText}>Area: <Text style={{color:"gray"}}>{address.area}</Text></Text>
-                            <View style={{display: 'flex', flexDirection: 'row', gap: 40, alignItems: 'center'}}>
+                            <View style={{display: 'flex', flexWrap: "wrap", flexDirection: "row", rowGap: 5, columnGap: 20, alignItems: 'center'}}>
+                                <Text style={styles.infoText}>Area: <Text style={{color:"gray"}}>{address.area}</Text></Text>
                                 <Text style={styles.infoText}>Street: <Text style={{color:"gray"}}>{address.street}</Text></Text>
                                 <Text style={styles.infoText}>Apartment: <Text style={{color:"gray"}}>{address.apartment}</Text></Text>
-                            </View>
-                            <View style={{display: 'flex', flexDirection: 'row', gap: 37, alignItems: 'center'}}>
                                 <Text style={styles.infoText}>Building: <Text style={{color:"gray"}}>{address.building}</Text></Text>
                                 <Text style={styles.infoText}>Floor: <Text style={{color:"gray"}}>{address.floor}</Text></Text>
                             </View>

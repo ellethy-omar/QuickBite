@@ -11,6 +11,17 @@ export const fetchAllUsers = async () => {
     }
 }
 
+export const fetchAllDrivers = async () => {
+    try {
+        const response = await apiClient.get('/api/admin/getAllDrivers');
+
+        return response.data;
+    } catch (error: any) {
+        console.error("error", error.response?.data || error.message);
+        throw error;
+    }
+}
+
 export const fetchAllRestaurants = async () => {
     try {
         const response = await apiClient.get('/api/admin/getAllRestaurants');
@@ -25,9 +36,9 @@ export const fetchAllRestaurants = async () => {
             phone: restaurant.contact.phone,
             email: restaurant.contact.email,
             image: restaurant.logo,
-            banner: restaurant.coverImage,
             isActive: restaurant.isActive,
             isBanned: restaurant.isBanned,
+            coverImage: restaurant.coverImage,
         }));
 
         return mappedRestaurants;
@@ -37,11 +48,10 @@ export const fetchAllRestaurants = async () => {
     }
 }
 
-export const fetchRestaurantProducts = async () => {
+export const fetchRestaurantProducts = async (id: string) => {
     try {
-        const response = await apiClient.get('/api/restaurant/getRestaurantProducts');
-
-        const mappedRestaurants = response.data.map((item: any) => ({
+        const response = await apiClient.get(`/api/admin/getAllProductsOfCertainRestaurant?restraurantID=${id}`);
+        const mappedRestaurants = response.data.data.map((item: any) => ({
             name: item.name,
             description: item.description,
             price: item.price,
@@ -55,23 +65,42 @@ export const fetchRestaurantProducts = async () => {
     }
 }
 
-export const fetchDriverMail = async () => {
+export const fetchAdminMail = async (type: string, status: string) => {
     try {
-        const response = await apiClient.get('/api/restaurant/getRestaurantProducts');
+        const response = await apiClient.get(`api/admin/getAllRequests?status=${status}&senderModel=${type}`);
+        console.log("response", response.data.requests);
 
-        const mappedRestaurants = response.data.map((item: any) => ({
-            name: item.name,
+        const mappedMail = response.data.requests.map((item: any) => ({
+            name: item.senderId.name,
+            id: item._id,
+            senderId: item.senderId._id,
+            status: item.status,
+            senderModel: item.senderModel,
             description: item.description,
-            price: item.price,
-            image: item.image
+            createdAt: item.createdAt,
         }));
 
-        return mappedRestaurants;
+        return mappedMail;
     } catch (error: any) {
         console.error("error", error.response?.data || error.message);
         throw error;
     }
 }
+
+export const replyToMail = async (id: string, message: string, type: string) => {
+    try {
+        const response = await apiClient.post('/api/admin/sendNotification', {
+            receiverId: id,
+            description: message,
+            receiverModel: type
+        });
+        return response;
+
+    } catch (error: any) {
+        console.error("error", error.response?.data || error.message);
+        throw error;
+    }
+};
 
 export const sendMessageUser = async (userId: string, message: string) => {
     try {

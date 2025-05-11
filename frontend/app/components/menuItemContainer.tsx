@@ -2,7 +2,7 @@ import { MenuItem } from "@/app/types/restaurant";
 import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from "react-native";
 import colors from "@/app/styles/colors";
 import React, { useRef, useEffect } from "react";
-import { IconSymbol } from "@/components/ui/IconSymbol";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function MenuItemContainer({ itemData, setEditing, shouldShake }: { 
     itemData: MenuItem, 
@@ -58,7 +58,7 @@ export default function MenuItemContainer({ itemData, setEditing, shouldShake }:
                 ]}
             >
                 <TouchableOpacity style={{height: '100%', display: 'flex',justifyContent: "center", alignContent: 'center'}} onPress={() => setEditing(itemData)}>
-                    <IconSymbol name="trash.fill" color='white' style={{marginBottom: 4, marginHorizontal: "auto"}}/>
+                    <MaterialIcons name="delete" size={20} color='white' style={{marginBottom: 4, marginHorizontal: "auto"}}/>
                     <Text style={styles.buttonText}>Delete</Text>
                 </TouchableOpacity>
             </Animated.View>

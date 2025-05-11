@@ -7,11 +7,11 @@ import { UserFormData, RestaurantFormData, DriverFormData } from '../types/authT
 import UserSignup from './sections/userSignup';
 import RestaurantSignup from './sections/restaurantSignup';
 import DriverSignup from './sections/driverSignup';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { UserSignupRoute, RestaurantSignupRoute, DriverSignupRoute } from '../endpoints/authEndpoints';
 import colors from '../styles/colors';
 import { useNotification } from '../context/notificationContext';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function SignupScreen() {
     const [userFormData, setUserFormData] = useState<UserFormData>({ name: '', email: '', phone: '', password: '', confirmPassword: '', address: {label: "", apartment: "", street: '', area: '', building: '', floor: '', isDefault: false} });
@@ -122,7 +122,7 @@ export default function SignupScreen() {
                 {/* Section 2 */}
                 <View style={styles.section}>
                     <TouchableOpacity style={{ position: 'absolute', top: 50, right: 0, left: 0, justifyContent: 'center', alignItems: 'center' }} onPress={handleScrollUp}>
-                      <IconSymbol name="chevron.compact.up" size={28} color={colors.primary} />
+                      <MaterialIcons name="arrow-drop-up" size={28} color={colors.primary} />
                       <Text style={{ color: colors.primary, fontSize: 12, fontWeight: 600 }}>Back To Top</Text>
                     </TouchableOpacity>
                     <Text style={styles.welcomeText}>Register</Text>

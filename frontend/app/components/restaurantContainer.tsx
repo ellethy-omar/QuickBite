@@ -2,17 +2,20 @@ import React from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from 'expo-router';
 import colors from '../styles/colors';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { RestaurantData } from '../types/restaurant';
 import { fetchRestaurantProducts } from '../endpoints/adminEndpoints';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function RestaurantContainer({ restaurantData }: {restaurantData: RestaurantData }) {
   const navigation = useNavigation();
 
   const handlePress = async () => {
-    const menuData = await fetchRestaurantProducts();
-    console.log(restaurantData)
-    navigation.navigate('_adminutils/restaurantDetails', { restaurant: JSON.stringify(restaurantData) });
+    const menuData = await fetchRestaurantProducts(restaurantData.id);
+    const addedMenu = {
+      ...restaurantData,
+      menu: menuData,
+    }
+    navigation.navigate('_adminutils/restaurantDetails', { restaurant: JSON.stringify(addedMenu) });
     };
 
   return (
@@ -21,14 +24,12 @@ export default function RestaurantContainer({ restaurantData }: {restaurantData:
       <View style={{ display: 'flex', flexDirection: 'column', paddingLeft: 10, flex: 1, gap: 5, paddingTop: 4 }}>
       <Text style={styles.titleText} numberOfLines={1} ellipsizeMode="tail">{restaurantData.name}</Text>
       <View style={{ display: 'flex', flexDirection: 'row', gap: 4, alignContent: 'center', alignItems: 'center' }}>
-        <IconSymbol name="star.fill" size={16} color={colors.primary} />
-        <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">
-        {`Rating: ${restaurantData.rating}`}
-        </Text>
+        <MaterialIcons name="star" size={16} color={colors.primary} />
+        <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">Rating: <Text style={{color: colors.primary, fontSize: 14}}>{restaurantData.rating}</Text></Text>
       </View>
-      <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">Orders Done: {restaurantData.ordersDone}</Text>
+      <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">Status: <Text style={{color: colors.primary}}>{restaurantData.isActive ? "Active" : "Closed"}</Text></Text>
       <Text style={styles.infoText} numberOfLines={1} ellipsizeMode="tail">
-        Address: {restaurantData.address.area}, {restaurantData.address.city}, {restaurantData.address.street}
+        Address: <Text style={{color: colors.primary}}>{restaurantData.address.area}, {restaurantData.address.city}, {restaurantData.address.street}</Text>
       </Text>
       </View>
     </TouchableOpacity>
@@ -58,6 +59,6 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 13,
-    color: colors.primary,
+    fontWeight: '500',
   },
 });

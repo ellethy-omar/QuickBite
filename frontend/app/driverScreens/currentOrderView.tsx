@@ -161,11 +161,14 @@ export default function CurrentOrderView() {
                     <View>
                         <Text style={{ fontSize: 18, fontWeight: '700', color: colors.primary }}>Order Details</Text>
                         {orderData.items.map((item, index: number) => (
-                            <View key={index} style={{paddingVertical: 5}}>
-                                <Text style={{fontSize: 16, fontWeight: '600', marginBottom: 5}}>{item.itemName}</Text>
-                                <Text style={{fontSize: 12, fontWeight: '500', color: 'gray'}}>{item.itemDescription}</Text>  
+                          <>
+                            <View key={index}>
+                                <Text style={{fontSize: 14, fontWeight: '600', marginBottom: 5}}>{item.itemName}</Text>
+                                <Text style={{fontSize: 12, color: 'gray', fontWeight: '500', marginBottom: 5}}>{item.itemDescription}</Text>
                                 <Text style={{fontSize: 12, fontWeight: '500', color: 'gray'}}>{item.itemPrice} EGP</Text>
                             </View>
+                            <View style={{width: "80%", height: 1, backgroundColor: "gray", marginVertical: 10, marginHorizontal: "auto"}} />
+                          </>
                         ))}
                     </View>
                     <View>

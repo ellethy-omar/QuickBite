@@ -86,7 +86,6 @@ export default function LoginScreen() {
 
        } else {
           const response = await LoginAdminRoute(email,password);
-          console.log(response.data.admin)
           dispatch(setAdminDetails(response.data.admin));
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
