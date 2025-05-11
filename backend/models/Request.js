@@ -42,4 +42,6 @@ RequestSchema.pre('save', function(next) {
   next();
 });
 
-module.exports = mongoose.model('Request', RequestSchema);
+const Request = mongoose.model('Request', RequestSchema);
+
+module.exports = Request;
