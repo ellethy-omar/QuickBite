@@ -52,16 +52,39 @@ export interface OrderDetailsMap {
 }
 
 export interface RawOrder {
+  _id: string;
   status: string;
   userID: string;
   restaurantID: {
     _id: string;
     name: string;
     logo?: string;
+    contact: {
+      phone: string;
+    };
   };
-  deliveryDriverID: string | null;
-  items: Array<{ productId: string; quantity: number }>;
+  deliveryDriverID: {
+    _id: string;
+    name: string;
+    phone: string;
+    profilePicture: string;
+    rating: number;
+    vehicle: {
+      model: string;
+      plateNumber: string;
+    };
+  } | null;
+  items: Array<{
+    _id: string;
+    productId: {
+      _id: string;
+      name: string;
+    };
+    quantity: number;
+  }>;
   totalAmount: number;
   createdAt: string;
   updatedAt: string;
+  processingStartedAt?: string;
+  deliveredAt?: string;
 }
