@@ -6,6 +6,9 @@ import colors from '../styles/colors';
 import { fetchDriverProfile, fetchDriverHistory } from '../endpoints/driverEndpoints';
 import { OrderDriver } from "../types/orderDriver"
 import { Modalize } from 'react-native-modalize';
+import { MaterialIcons } from '@expo/vector-icons';
+import ConfirmActionModal from '../components/modals/confirmActionModal';
+import useHandleLogout from '@/hooks/useHandleLogout';
 
 export default function ProfileView() {
     const [driverData, setDriverData] = useState<DriverData>(useSelector((state: any) => state.driver));
@@ -13,6 +16,8 @@ export default function ProfileView() {
     const [fetching, setFetching] = useState(true);
     const [orderLog, setOrderLog] = useState<OrderDriver[]>([])
     const requestModalRef = useRef<Modalize>(null);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const handleLogout = useHandleLogout();
 
     const openRequestModal = () => {
         requestModalRef.current?.open();
@@ -57,7 +62,8 @@ export default function ProfileView() {
 
     return (
             <SafeAreaView style={styles.background}>
-                <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", padding: 10, width: "100%"}}>
+                <ConfirmActionModal visible={showLogoutModal} onClose={() => setShowLogoutModal(false)} onConfirm={handleLogout} title="Logout" message="Are you sure you want to logout?"/>
+                <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", padding: 10, width: "100%", position: "relative"}}>
                     <Image source={{uri: driverData.image || "https://fastly.picsum.photos/id/137/200/300.jpg?hmac=5vAnK2h9wYgvt2769Z9D1XYb8ory9_zB0bqDgVjgAnk"}} style={{width: 110, height: 110, borderRadius: 100}} resizeMode="cover" />
                     <View style={{paddingRight: 20, gap: 5}}>
                         <Text style={{fontSize: 28, fontWeight: '700', color: "white", marginBottom: 3}}>{driverData.name}</Text>
@@ -65,8 +71,8 @@ export default function ProfileView() {
                         <Text style={{fontSize: 12, fontWeight: '500', color: "white"}}>Email Address: <Text style={{fontWeight: '400'}}>{driverData.email}</Text></Text>
                         <Text style={{fontSize: 12, fontWeight: '500', color: "white"}}>Vehicle: <Text style={{fontWeight: '400'}}>{driverData.vehicle.type == "bike" ? "bike" : `${driverData.vehicle.model}, ${driverData.vehicle.plateNumber}`}</Text></Text>
                     </View>
+                    <MaterialIcons onPress={() => setShowLogoutModal(true)} name="logout" size={24} color="white" style={{position: "absolute", top: 20, right: 15}}/>
                 </View>
-
             <View style={styles.ordersListContainer}>
                 <ScrollView contentContainerStyle={styles.scrollViewContent} style={styles.scrollView} bounces={true} overScrollMode="never" showsVerticalScrollIndicator={false}
                     refreshControl={

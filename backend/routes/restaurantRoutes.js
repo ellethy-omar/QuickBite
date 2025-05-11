@@ -6,6 +6,8 @@ const {
     updateRestaurantCoverImage
 } = require('../controllers/restaurant/profileContorller');
 
+const { getMyrequests, getNotifications, sendRequest } = require('../controllers/notificationsRequestsContorller')
+
 const {
     getRestaurantProducts,
     addRestaurantProduct,
@@ -23,6 +25,12 @@ router.get("/getRestaurantProfie", getRestaurantProfie);
 router.put("/updateRestaurantProfile", updateRestaurantProfile);
 router.put("/updateRestaurantLogo", updateRestaurantLogo)
 router.put("/updateRestaurantCoverImage", updateRestaurantCoverImage)
+
+// requests/notifications routes
+router.get('/getMyrequests', getMyrequests)
+router.get('/getNotifications', getNotifications)
+router.post('/sendRequest', sendRequest)
+
 
 // menu routes
 router.get("/getRestaurantProducts", getRestaurantProducts)

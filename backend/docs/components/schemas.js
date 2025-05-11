@@ -508,3 +508,89 @@
  *             $ref: '#/components/schemas/UploadImagePayload'
  *     
  */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Notification:
+ *       type: object
+ *       required:
+ *         - senderId
+ *         - receiverId
+ *         - receiverModel
+ *         - description
+ *       properties:
+ *         senderId:
+ *           type: string
+ *           format: objectId
+ *           description: ObjectId of the admin who sent the notification
+ *           example: "60d21b4667d0d8992e610c85"
+ *         receiverId:
+ *           type: string
+ *           format: objectId
+ *           description: ObjectId of the target (User, Driver, or Restaurant)
+ *           example: "60d21c4f67d0d8992e610c91"
+ *         receiverModel:
+ *           type: string
+ *           enum: [User, Driver, Restaurant]
+ *           description: Indicates the collection where the receiver belongs
+ *           example: "User"
+ *         description:
+ *           type: string
+ *           description: Brief message or purpose of the notification
+ *           example: "Your request has been accepted"
+ *         data:
+ *           type: object
+ *           nullable: true
+ *           description: Optional additional context for the notification
+ *           example: { "requestId": "60d876ab6f2b4a2d4c8e1234" }
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the notification was created
+ *           example: "2025-05-11T10:00:00.000Z"
+ *
+ *     Request:
+ *       type: object
+ *       required:
+ *         - senderId
+ *         - senderModel
+ *         - description
+ *       properties:
+ *         senderId:
+ *           type: string
+ *           format: objectId
+ *           description: ObjectId of the sender (User, Restaurant, or Driver)
+ *           example: "60d21c4f67d0d8992e610c91"
+ *         senderModel:
+ *           type: string
+ *           enum: [User, Restaurant, Driver]
+ *           description: Indicates the model collection of the sender
+ *           example: "User"
+ *         description:
+ *           type: string
+ *           description: Main content of the request
+ *           example: "Please change my delivery address"
+ *         data:
+ *           type: object
+ *           nullable: true
+ *           description: Optional detailed data related to the request
+ *           example: { "newAddress": "123 New Street, Cityville" }
+ *         status:
+ *           type: string
+ *           enum: [pending, accepted, declined]
+ *           description: Status of the request
+ *           default: pending
+ *           example: "pending"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the request was created
+ *           example: "2025-05-10T09:30:00.000Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the request was last updated
+ *           example: "2025-05-10T10:00:00.000Z"
+ */
