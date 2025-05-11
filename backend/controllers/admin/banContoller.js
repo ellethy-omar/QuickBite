@@ -1,4 +1,7 @@
-// Ban a user by setting isBanned = true
+const Driver = require('../../models/Driver')
+const Restaurant = require('../../models/Restaurant')
+const User = require('../../models/User')
+
 const banUser = async (req, res) => { 
     try {
         const { userId } = req.query;

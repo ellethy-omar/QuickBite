@@ -1,5 +1,7 @@
 const Driver = require('../../models/Driver')
+const Request = require('../../models/Request')
 const { uploadBase64Image } = require('../../controllers/cloudinaryController');
+
 const getDriverProfile = async (req, res) => {
     const driver = await Driver.findById(req.user._id);
 
@@ -9,12 +11,10 @@ const getDriverProfile = async (req, res) => {
 
 const updateDriverProfile = async (req, res) => {
     try {
-        const driverId = req.user._id; // Must be set by your authentication middleware
+        const driverId = req.user._id;
 
-        // Fields allowed to be updated
         const allowedFields = ['name', 'email', 'phone', 'vehicle'];
 
-        // Filter request body to only allow allowedFields
         const updates = {};
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
@@ -22,59 +22,83 @@ const updateDriverProfile = async (req, res) => {
             }
         }
 
-        // Perform the update
-        const updatedDriver = await Driver.findByIdAndUpdate(
-            driverId,
-            { $set: updates },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedDriver) {
-            return res.status(404).json({ error: 'Driver not found' });
-        }
-
-        delete updatedDriver.password;
-
-        res.status(200).json({
-            message: 'Driver profile updated successfully',
-            driver: updatedDriver
+        const request = new Request({
+            senderId: driverId,
+            senderModel: 'Driver',
+            description: 'Driver profile update request',
+            data: {
+                updates: updates,
+                originalRequest: 'updateDriverProfile'
+            },
+            status: 'pending'
         });
 
-        console.log('updatedDriver:', updatedDriver);
+        await request.save();
+
+        res.status(200).json({
+            message: 'Profile update request submitted successfully. Waiting for admin approval.',
+            requestId: request._id
+        });
+
+        console.log('request', request);
+
     } catch (error) {
-        console.log('Update error:', error);
+        console.log('Submit request error:', error);
         res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 };
 
 const updateDriverProfilePhoto = async (req, res) => {
     try {
+        const driverId = req.user._id;
         const { imageBase64, tags } = req.body;
 
         if (!imageBase64 || !tags || !Array.isArray(tags) || tags.length === 0) {
             console.log("Missing required fields");
-            return res.status(403).json({ error: 'Product ID, imageBase64, and tags are required.' });
+            return res.status(403).json({ error: 'imageBase64 and tags are required.' });
         }
 
-        const driver = await Driver.findById(req.user._id);
+        const temporaryTags = [...tags, 'temporary', 'pending_approval'];
+        
+        try {
+            const uploadResponse = await uploadBase64Image(imageBase64, temporaryTags);
+            
+            if (!uploadResponse || !uploadResponse.secure_url) {
+                console.log("Image upload failed");
+                return res.status(500).json({ error: 'Temporary image upload failed.' });
+            }
+            
+            const request = new Request({
+                senderId: driverId,
+                senderModel: 'Driver',
+                description: 'Driver profile photo update request',
+                data: {
+                    imageUrl: uploadResponse.secure_url,
+                    publicId: uploadResponse.public_id,
+                    tags: tags,
+                    originalRequest: 'updateDriverProfilePhoto'
+                },
+                status: 'pending'
+            });
 
-        const uploadResponse = await uploadBase64Image(imageBase64, tags);
-        if (!uploadResponse || !uploadResponse.secure_url) {
-            console.log("Image upload failed");
-            return res.status(500).json({ error: 'Image upload failed.' });
+            await request.save();
+
+            res.status(200).json({
+                message: 'Profile photo update request submitted successfully. Waiting for admin approval.',
+                requestId: request._id,
+                temporaryImageUrl: uploadResponse.secure_url
+            });
+
+            console.log('request:', request);
+            
+        } catch (uploadError) {
+            console.log('Image upload error:', uploadError);
+            return res.status(500).json({ error: 'Failed to upload image', details: uploadError.message });
         }
 
-        driver.profilePicture = uploadResponse.secure_url;
-        await driver.save();
-
-        res.status(200).json({
-            message: 'Profile image updated successfully',
-            imageURL: uploadResponse.secure_url,
-        });
-        console.log('imageURL:', uploadResponse.secure_url);
-    } catch (err) {
-        console.log('Error updating Driver image:', err);
-        res.status(500).json({ error: 'Failed to update Driver image', details: err.message });
+    } catch (error) {
+        console.log('Submit request error:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 }
 

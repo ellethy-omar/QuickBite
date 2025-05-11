@@ -24,6 +24,15 @@ const {
     sendWarningToRestaurant
 } = require('../controllers/admin/dashboardController')
 
+const {
+    getAllRequests,
+    getRequestById,
+    processDriverProfileUpdateRequest,
+    processDriverProfilePhotoUpdateRequest,
+    sendNotification,
+    processRequest
+} = require('../controllers/admin/notificationsController')
+
 // profile routes
 router.get("/getAdminProfile", getAdminProfile);
 router.put("/updateAdminProfile", updateAdminProfile);
@@ -48,5 +57,13 @@ router.put('/banRestaurant', banRestaurant)
 router.put('/unBanUser', unBanUser)
 router.put('/unBanDriver', unBanDriver)
 router.put('/unBanRestaurant', unBanRestaurant)
+
+// Notifcations_Requests routes
+router.get('/getAllRequests', getAllRequests)
+router.get('/getRequestById', getRequestById)
+router.put('/processDriverProfileUpdateRequest', processDriverProfileUpdateRequest)
+router.put('/processDriverProfilePhotoUpdateRequest', processDriverProfilePhotoUpdateRequest)
+router.post('/sendNotification', sendNotification);
+router.put('/processRequest', processRequest)
 
 module.exports = router;

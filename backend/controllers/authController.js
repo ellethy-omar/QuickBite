@@ -347,7 +347,7 @@ const loginRestaurant = async (req, res) => {
 
     const token = generateToken(restaurant._id, 'restaurant');
 
-    delete newRestaurant.contact.password;
+    delete restaurant.contact.password;
 
     res.status(200).json({
       message: 'Login successful',
