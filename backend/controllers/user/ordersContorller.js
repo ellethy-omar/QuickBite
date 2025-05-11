@@ -80,7 +80,15 @@ const updateOrder = async (req, res) => {
             return res.status(403).json({ error: "You are not authorized to update this order." });
         }
 
-        if (['delivered', 'cancelled'].includes(order.status)) {
+        // Check if a delivery driver has been assigned
+        if (order.deliveryDriverID) {
+            return res.status(409).json({ 
+                error: "Cannot modify order after a delivery driver has been assigned.",
+                driverAssigned: true
+            });
+        }
+
+        if (['processing','delivered', 'cancelled'].includes(order.status)) {
             return res.status(403).json({ error: `Cannot update an order that is ${order.status}.` });
         }
 
@@ -94,7 +102,18 @@ const updateOrder = async (req, res) => {
         // Validate and compute total using the static method
         const validation = await Order.validateOrder(updatedData);
         if (!validation.isValid) {
-            return res.status(403).json({ error: validation.error, missingProducts: validation.missingProducts });
+            if (validation.outOfStockItems) {
+                return res.status(403).json({
+                    error: 'Some products do not have sufficient stock',
+                    outOfStockItems: validation.outOfStockItems,
+                    totalAmount: validation.totalAmount
+                });
+            }
+            
+            return res.status(403).json({ 
+                error: validation.error, 
+                details: validation.missingProducts ? { missingProducts: validation.missingProducts } : undefined
+            });
         }
 
         // Apply updates
@@ -103,7 +122,7 @@ const updateOrder = async (req, res) => {
 
         await order.save();
 
-        console.log('Updared order:', order);
+        console.log('Updated order:', order);
 
         return res.status(200).json({ message: "Order updated successfully", order });
     } catch (error) {
@@ -114,6 +133,7 @@ const updateOrder = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
     const { orderID } = req.query;
+    const userID = req.user._id;
 
     if (!orderID) {
         console.log("Order ID is required");
@@ -121,14 +141,46 @@ const cancelOrder = async (req, res) => {
     }
 
     try {
-        await Order.findByIdAndUpdate(orderID, { status: 'cancelled' }, { new: true });
+        // First find the order to check delivery driver status
+        const order = await Order.findById(orderID);
+        
+        if (!order) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        // Verify the user owns this order
+        if (order.userID.toString() !== userID.toString()) {
+            return res.status(403).json({ error: "You are not authorized to cancel this order" });
+        }
+
+        // Check if a delivery driver has been assigned
+        if (order.deliveryDriverID) {
+            return res.status(403).json({ 
+                error: "Cannot cancel order after a delivery driver has been assigned",
+                driverAssigned: true
+            });
+        }
+
+        // Check if order is already delivered or cancelled
+        if (order.status === 'delivered') {
+            return res.status(403).json({ error: "Cannot cancel an order that has been delivered" });
+        }
+        
+        if (order.status === 'cancelled') {
+            return res.status(403).json({ error: "This order is already cancelled" });
+        }
+
+        // Update order status to cancelled
+        order.status = 'cancelled';
+        await order.save();
+        
         res.status(200).json({ message: 'Order cancelled successfully' });
         console.log('Order cancelled successfully:', orderID);
     } catch (error) {
         console.log("Order cancellation error:", error);
         res.status(500).json({ error: 'Internal server error', details: error.message });
     }
-}
+};
 
 const getMyOrders = async (req, res) => {
     try {
