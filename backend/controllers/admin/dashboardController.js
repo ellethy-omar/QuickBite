@@ -69,72 +69,84 @@ const getAllProductsOfCertainRestaurant = async (req, res) => {
       });
       console.log('products:', products);
 }
-  
-// Send a warning to a user
-// Insight: consider adding a `warnings` array or `warningCount` to your schema
-// and implementing notifications (email, SMS, in-app) as needed.
-const sendWarningToUser = async (req, res) => {
-    try {
-    const { message, userId } = req.body
+
+const getAllOrdersForCetainUser = async (req, res) => {
+    const { userId } = req.query;
+
+    if(!userId) {
+        console.log("userId is required")
+        return res.status(403).json({ error: "userId is required"})
+    }
+
+    const user = User.findById(userId);
+
+    if(!user) {
+        console.log("User not found")
+        return res.status(403).json({ error: "User not found"})        
+    }
         
-        if (!message || !userId) {
-            console.log('Message and user ID are required.');
-            return res.status(403).json({ error: 'Message and user ID are required' });
-        }
-    const user = await User.findById(req.params.id)
-    if (!user) return res.status(404).json({ error: 'User not found.' })
-
-    // Example: push to a warnings array
-    // user.warnings.push({ message, date: new Date() })
-    // await user.save()
-
-    res.json({ message: 'Warning sent to user.', warning: message })
-    } catch (err) {
-    console.log(err)
-    res.status(500).json({ error: 'Server error while sending warning.' })
+    try {
+        const orders = await Order.findOrdersByUserId(userId)
+        res.status(200).json({
+            message: "All orders fetched successfully",
+            data: orders
+        });
+        console.log('orders:', orders);
+    } catch (error) {
+        console.log("Order fetching error:", error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });        
     }
 }
 
-// Send a warning to a driver
-const sendWarningToDriver = async (req, res) => {
-    try {
-    const { message, driverId } = req.body
-        if (!message || !driverId) {
-            console.log('Message and driver ID are required.');
-            return res.status(403).json({ error: 'Message and driver ID are required' });
+
+const getDriverOrdersHistory = async (req, res) => {
+        const { driverId } = req.query;
+
+        if(!driverId) {
+            console.log("driverId is required")
+            return res.status(403).json({ error: "driverId is required"})
         }
-    const driver = await Driver.findById(req.params.id)
-    if (!driver) return res.status(404).json({ error: 'Driver not found.' })
 
-    // driver.warnings.push({ message, date: new Date() })
-    // await driver.save()
+        try {
+            const orders = await Order.find({
+                deliveryDriverID: driverId
+            }).populate('restaurantID', 'name address logo contact.phone')
+            .populate('userID', 'name phone addresses')
+            .populate('items.productId', 'name price category description image');
 
-    res.json({ message: 'Warning sent to driver.', warning: message })
-    } catch (err) {
-    console.log(err)
-    res.status(500).json({ error: 'Server error while sending warning.' })
-    }
+            if(!orders) {
+                console.log('You do not have any order.');
+                return res.status(200).json({
+                    message: 'You do not have any orders.',
+                    data: orders
+                });
+            } else {
+                console.log('Found order:', orders);
+                res.status(200).json({
+                    message: 'Order found.',
+                    data: orders
+                });
+            }
+        }
+        catch (error) {
+            console.log('Error finding order:', err);
+            res.status(500).json({ error: 'Error getting the order????????? How did you reach this point?', details: err.message });        
+        }
 }
 
-// Send a warning to a restaurant
-const sendWarningToRestaurant = async (req, res) => {
+const getProcessingOrders = async (req, res) => {
     try {
-    const { message, restaurantId } = req.body
-        if (!message || !restaurantId) {
-            console.log('Message and restaurant ID are required.');
-            return res.status(403).json({ error: 'Message and restaurant ID are required' });
-        }
+        const orders = await Order.find()
+        .populate('restaurantID', 'name address logo contact.phone')
+        .populate('userID', 'name phone addresses')
+        .populate('items.productId', 'name price category description image')
 
-    const restaurant = await Restaurant.findById(req.params.id)
-    if (!restaurant) return res.status(404).json({ error: 'Restaurant not found.' })
-
-    // restaurant.warnings.push({ message, date: new Date() })
-    // await restaurant.save()
-
-    res.json({ message: 'Warning sent to restaurant.', warning: message })
-    } catch (err) {
-    console.log(err)
-    res.status(500).json({ error: 'Server error while sending warning.' })
+        return res.status(200).json({
+            data: orders
+        });
+    } catch (error) {
+        console.log('Error finding order:', err);
+        res.status(500).json({ error: 'Error getting the order????????? How did you reach this point?', details: err.message });     
     }
 }
 
@@ -143,7 +155,7 @@ module.exports = {
     getAllDrivers,
     getAllRestaurants,
     getAllProductsOfCertainRestaurant,
-    sendWarningToUser,
-    sendWarningToDriver,
-    sendWarningToRestaurant
+    getAllOrdersForCetainUser,
+    getDriverOrdersHistory,
+    getProcessingOrders
 }
