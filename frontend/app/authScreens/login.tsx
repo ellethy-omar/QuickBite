@@ -1,5 +1,4 @@
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import Svg, { Defs, Rect } from 'react-native-svg';
 import { LinearGradient, Stop } from 'react-native-svg';
@@ -14,8 +13,8 @@ import { setDriverDetails } from '../slices/driverSlice';
 import { setAdminDetails } from '../slices/adminSlice';
 import colors from '../styles/colors';
 import { LoginUserRoute, LoginRestaurantRoute, LoginDriverRoute, LoginAdminRoute } from '../endpoints/authEndpoints';
-import { useNotification } from '../context/notificationContext';
-
+import { useNotification } from '@/app/context/notificationContext';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -42,6 +41,11 @@ export default function LoginScreen() {
           const response = await LoginUserRoute(email, password);
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
+            if(rememberMe) {
+              await SecureStore.setItemAsync('savedEmail', email);
+              await SecureStore.setItemAsync('savedPassword', password);
+              await SecureStore.setItemAsync('savedAccType', accType.toString());
+            }
           }
           showNotification('Login successful!', 'success');
           dispatch(setUserDetails(response?.data.user));
@@ -53,6 +57,11 @@ export default function LoginScreen() {
           const response = await LoginRestaurantRoute(email, password);
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
+            if(rememberMe) {
+              await SecureStore.setItemAsync('savedEmail', email);
+              await SecureStore.setItemAsync('savedPassword', password);
+              await SecureStore.setItemAsync('savedAccType', accType.toString());
+            }
           }
           showNotification('Login successful!', 'success');
           setTimeout(() => {
@@ -64,6 +73,11 @@ export default function LoginScreen() {
           dispatch(setDriverDetails(response.data.driver));
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
+            if(rememberMe) {
+              await SecureStore.setItemAsync('savedEmail', email);
+              await SecureStore.setItemAsync('savedPassword', password);
+              await SecureStore.setItemAsync('savedAccType', accType.toString());
+            }
           }
           showNotification('Login successful!', 'success');
           setTimeout(() => {
@@ -76,6 +90,11 @@ export default function LoginScreen() {
           dispatch(setAdminDetails(response.data.admin));
           if (response?.data?.token) {
             await SecureStore.setItemAsync('jwtToken', response.data.token);
+            if(rememberMe) {
+              await SecureStore.setItemAsync('savedEmail', email);
+              await SecureStore.setItemAsync('savedPassword', password);
+              await SecureStore.setItemAsync('savedAccType', accType.toString());
+            }
           }
           showNotification('Login successful!', 'success');
           setTimeout(() => {
@@ -103,21 +122,21 @@ export default function LoginScreen() {
       <Text style={styles.welcomeText}>Welcome Back</Text>
         <Text style={styles.subText}>Login to continue</Text>
           <View style={styles.inputContainer}>
-            <IconSymbol name="person.fill" size={16} color={colors.primary}  />
+            <MaterialIcons name="person" size={16} color={colors.primary}  />
             <TextInput style={styles.input} placeholderTextColor="gray" placeholder={accType == 0 || accType == 3 ? "Email or Username" : "Email or Phone Number"} value={email} onChangeText={(text) => setEmail(text)} />
           </View>
           <View style={styles.inputContainer}>
-            <IconSymbol name="lock.fill" size={16} color={colors.primary}  />
+            <MaterialIcons name="lock" size={16} color={colors.primary}  />
             <TextInput style={{width: '80%'}} placeholderTextColor="gray" placeholder="Password" secureTextEntry={!showPassword} value={password} onChangeText={(text) => setPassword(text)}/>
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <IconSymbol name={!showPassword ? "eye.fill" : "eye.slash.fill"} size={18} color={colors.primary}/>
+            <MaterialIcons name={!showPassword ? "lock-open" : "lock"} size={18} color={colors.primary}/>
             </TouchableOpacity>
           </View>
           <View style={{ width: '78%', flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, alignItems: 'center' }}>
             <View style={{ flexDirection: 'row'}}>
             <TouchableOpacity onPress={() => setRememberMe(!rememberMe)}>
                 <View style={{ width: 15, height: 15, borderRadius: 4, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' }} />
-              {rememberMe && <IconSymbol name="checkmark" size={14} color={colors.primary} style={{ position: 'absolute' }} />}
+              {rememberMe && <MaterialIcons name="check" size={14} color={colors.primary} style={{ position: 'absolute' }} />}
             </TouchableOpacity>
             <Text style={{ color: colors.primary, marginLeft: 10 }}>Remember me</Text>
             </View>
