@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { MaterialIcons } from '@expo/vector-icons';
 import useHandleLogout from '@/hooks/useHandleLogout';
 import ConfirmActionModal from '../components/modals/confirmActionModal';
+import { fetchAdminMail, replyToMail } from '../endpoints/adminEndpoints';
 
 export default function DashboardScreen() {
     const adminData = useSelector((state: { admin: AdminData }) => state.admin);
@@ -79,6 +80,20 @@ export default function DashboardScreen() {
     const [modalData, setModalData] = useState<DriverMailData| null>(null);
     const handleLogout = useHandleLogout();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [replyMessage, setReplyMessage] = useState("");
+
+    useEffect(() => {
+        const fetchMails = async () => {
+            try {
+                const mails = await fetchAdminMail("Driver", "pending");
+                setDriverMails(mails);
+                setFilteredMails(mails);
+            } catch (error) {
+                console.error("Error fetching mails:", error);
+            }
+        };
+        fetchMails();
+    }, []);
 
     useEffect(() => {
         if (modalData) {
@@ -90,12 +105,26 @@ export default function DashboardScreen() {
         }
     }, [modalData]);
 
+    const handleMailReply = async () => {
+        if (replyMessage === "") {
+            console.log("Reply message cannot be empty");
+            return;
+        }
+        try {
+            await replyToMail(modalData?.senderId, replyMessage, "Driver");
+            setModalData(null);
+            setReplyMessage("");
+        } catch (error) {
+            console.error("Error sending reply:", error);
+        }
+    };
+
     const handleFilterMails = (text: string) => {
         if(text === "") {
             setFilteredMails(driverMails);
             return;
         }
-        const filtered = driverMails.filter(mail => mail.title.toLowerCase().includes(text.toLowerCase()));
+        const filtered = driverMails.filter(mail => mail.name.toLowerCase().includes(text.toLowerCase()));
         setFilteredMails(filtered);
     }
 
@@ -111,7 +140,7 @@ export default function DashboardScreen() {
                     <Text style={styles.infoText}>{user?.phone}</Text>
                     <Text style={styles.infoText}><Text style={{fontSize: 14, color: colors.secondaryText, fontWeight: '700',}}>handled requests</Text>: {user?.handledRequests}</Text>
                 </View>
-                <Image source={{ uri: user?.image }} style={{ width: 110, height: 110, borderRadius: 120, objectFit: 'cover' }} />
+                <Image source={{ uri: user?.profilePicture }} style={{ width: 110, height: 110, borderRadius: 120, objectFit: 'cover' }} />
             </View>
             <TouchableOpacity onPress={() => console.log('Edit Profile')} style={{ marginHorizontal: 'auto', width: '94%', borderRadius: 50, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.offset, marginBottom: 20 }}>
                 <View style={{ width: '100%', height: 40, borderRadius: 50, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent', overflow: 'hidden' }}>
@@ -124,24 +153,19 @@ export default function DashboardScreen() {
             {filteredMails.length == 0 ? (
                 <Text style={{color: colors.primary, fontSize: 16, fontWeight: '700', textAlign: 'center', marginTop: 50}}>No Mails Found</Text>
             ):(
-            <FlatList
-                data={filteredMails}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <DriverMail driverData={item} setMailData={setModalData} />}
-                contentContainerStyle={{ gap: 10 }} // Add spacing between items
-            />)}
+                <FlatList data={filteredMails} keyExtractor={(item) => item.id} renderItem={({ item }) => <DriverMail driverData={item} setMailData={setModalData} />} contentContainerStyle={{ gap: 10 }} />)}
             </View>
             
             <Modalize ref={mailReplyModalRef} adjustToContentHeight modalStyle={styles.modalStyle}>
             <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>Reply to {modalData?.name}'s Mail</Text>
-                <Text style={styles.modalText}>{modalData?.content}</Text>
-                <TextInput placeholder='Type your reply here...' style={{borderWidth: 1, height: 100, borderColor: colors.secondary, borderRadius: 10, padding: 10, backgroundColor: colors.secondaryText}} multiline={true} numberOfLines={4} />
+                <Text style={styles.modalText}>{modalData?.description}</Text>
+                <TextInput placeholder='Type your reply here...' value={replyMessage} onChangeText={setReplyMessage} style={{borderWidth: 1, fontSize: 13, height: 100, borderColor: colors.secondary, borderRadius: 10, padding: 10, backgroundColor: colors.secondaryText, textAlignVertical: "top"}} multiline={true} numberOfLines={10} />
                 <View style={{display: 'flex', flexDirection: 'row', gap: 10, justifyContent: 'center', marginTop: 10}}>
                     <TouchableOpacity onPress={() => setModalData(null)} style={{paddingHorizontal: 15, paddingVertical: 6, backgroundColor: colors.secondary, borderRadius: 50 }}>
                         <Text style={{fontSize: 14, fontWeight: '600', color: colors.primary }}>Cancel</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => console.log('Send Reply')} style={{paddingHorizontal: 15, paddingVertical: 6, backgroundColor: colors.primary, borderRadius: 50 }}>
+                    <TouchableOpacity onPress={() => handleMailReply()} style={{paddingHorizontal: 15, paddingVertical: 6, backgroundColor: colors.primary, borderRadius: 50 }}>
                         <Text style={{ color: colors.secondaryText, fontSize: 14, fontWeight: '600' }}>Send</Text>
                     </TouchableOpacity>
                 </View>
@@ -193,8 +217,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#f2f2f2',
         borderWidth: 1,
         borderColor: colors.secondary,
-        borderRadius: 10,
+        borderRadius: 30,
         padding: 10,
+        fontWeight: '500',
     },
     mailContainer: {
         flex: 1,

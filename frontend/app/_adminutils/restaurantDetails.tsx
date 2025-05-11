@@ -2,12 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import colors from '../styles/colors';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import MenuItemContainer from '../components/menuItemContainer';
 import { Modalize } from 'react-native-modalize';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MenuItem, RestaurantData } from '../types/restaurant';
 import { useNavigation } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function RestaurantDetails() {
   const { restaurant } = useLocalSearchParams();
@@ -71,60 +71,51 @@ export default function RestaurantDetails() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
-      <Image source={{ uri: restaurantData.banner }} style={styles.image} />
+      <Image source={{ uri: restaurantData.coverImage }} style={styles.image} />
 
-      <TouchableOpacity style={{ position: 'absolute', top: 50, left: 20, zIndex: 4 }} onPress={() => navigator.goBack()}>
-        <IconSymbol name="chevron.left.to.line" size={20} color={colors.primary} />
+      <TouchableOpacity style={{ position: 'absolute', display: "flex", flexDirection: "row", alignItems: "center", top: 20, left: 10, zIndex: 4 }} onPress={() => navigator.goBack()}>
+        <MaterialIcons name="arrow-back" size={20} color="white"/>
+        <Text style={{ fontSize: 20, color:"white", fontWeight: '700', marginLeft: 5 }}>Back</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={{ position: 'absolute', top: 50, right: 10, zIndex: 4, backgroundColor: colors.primary, padding: 5, borderRadius: 100 }} onPress={openRestaurantActionsModal}>
-        <IconSymbol name="pencil" size={20} color={colors.primaryText} />
+      <TouchableOpacity style={{ position: 'absolute', top: 20, right: 10, zIndex: 4, backgroundColor: colors.primary, padding: 5, borderRadius: 100 }} onPress={openRestaurantActionsModal}>
+        <MaterialIcons name="edit" size={20} color={colors.primaryText} />
       </TouchableOpacity>
 
       <View style={styles.pageHeader}>
         <View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
-        <Image source={{ uri: restaurantData.image }} style={{ width: 65, height: 65, borderRadius: 8 }} />
-        <View style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <Text style={{ fontSize: 17, fontWeight: '700', color: colors.primary, marginBottom: 4 }}>
-          {restaurantData.name}
-          </Text>
-          <Text style={styles.infoText}>{restaurantData.cuisines.join(', ')}</Text>
-          <View style={{ display: 'flex', flexDirection: 'row', gap: 4, alignItems: 'flex-end' }}>
-          <IconSymbol name="star.fill" size={18} color={colors.primary} />
-          <Text style={styles.infoText}>Rating: {restaurantData.rating}</Text>
+          <Image source={{ uri: restaurantData.image }} style={{ width: 75, height: 75, borderRadius: 8 }} />
+            <View style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <Text style={{ fontSize: 17, fontWeight: '700', color: colors.primary, marginBottom: 4 }}>
+              {restaurantData.name}
+              </Text>
+              <Text style={styles.infoText}>{restaurantData.cuisines.join(', ')}</Text>
+              <View style={{ display: 'flex', flexDirection: 'row', gap: 4, alignItems: 'flex-end' }}>
+                <MaterialIcons name="star" size={18} color={colors.primary} />
+                <Text style={styles.infoText}>Rating: {restaurantData.rating}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={{ display: 'flex', flexDirection: 'row', gap: 4, alignItems: 'center' }}>
+            <MaterialIcons name="phone" size={18} color={colors.primary} />
+            <Text style={styles.infoText}>{restaurantData.phone}</Text>
+          </View>
+          <View style={{ display: 'flex', flexDirection: 'row', gap: 4, alignItems: 'center' }}>
+            <MaterialIcons name="location-pin" size={18} color={colors.primary} />
+            <Text style={styles.infoText}>{restaurantData.address.area}, {restaurantData.address.city}, {restaurantData.address.street}</Text>
           </View>
         </View>
-        </View>
-        <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          width: '100%',
-        }}
-        >
-        <View style={{ display: 'flex', flexDirection: 'row', gap: 4, alignItems: 'center' }}>
-          <IconSymbol name="location.fill" size={18} color={colors.primary} />
-          <Text style={styles.infoText}>{restaurantData.address}</Text>
-        </View>
-        <View style={{ display: 'flex', flexDirection: 'row', gap: 4, alignItems: 'center' }}>
-          <IconSymbol name="phone.fill" size={18} color={colors.primary} />
-          <Text style={styles.infoText}>{restaurantData.phone}</Text>
-        </View>
-        </View>
-      </View>
 
       <View style={styles.bodyContainer}>
-        <Text style={styles.subtitle}>{restaurantData.bio}</Text>
+        <Text style={styles.subtitle}>{restaurantData.description}</Text>
         <View style={styles.toolKit}>
         <TouchableOpacity style={styles.toolButton} onPress={() => setShackItems(!shackItems)}>
-          <IconSymbol name="pencil.line" size={17} color={colors.primary} />
+          <MaterialIcons name="edit" size={17} color={colors.primary} />
           <Text style={{ fontSize: 14, fontWeight: '600' }}>manage Menu</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.toolButton} onPress={openSortModal}>
           <Text style={{ fontSize: 14, color: colors.primary, fontWeight: '700' }}>Sort by</Text>
-          <IconSymbol name="chevron.down" size={16} color={colors.primary} />
+          <MaterialIcons name="sort" size={16} color={colors.primary} />
         </TouchableOpacity>
         </View>
       </View>

@@ -110,6 +110,7 @@ export const LoginAdminRoute = async (name:string, password: string) => {
     }
     try {
         const response = await apiClient.post('/api/auth/loginAdmin', reqBody, {skipAuth: true});
+        console.log(response.data.admin);
         return response;
     } catch (error) {
         console.error('Error:', error);
