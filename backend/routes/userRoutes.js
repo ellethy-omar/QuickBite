@@ -5,6 +5,8 @@ const {
     updateUserProfilePhoto
 } = require('../controllers/user/profileController');
 
+const { getMyrequests, getNotifications, sendRequest } = require('../controllers/notificationsRequestsContorller')
+
 const {
     createOrder,
     updateOrder,
@@ -32,6 +34,11 @@ const {
 router.get("/getUserProfile", getUserProfile);
 router.put("/updateUserProfile", updateUserProfile);
 router.put("/updateUserProfilePhoto", updateUserProfilePhoto)
+
+// requests/notifications routes
+router.get('/getMyrequests', getMyrequests)
+router.get('/getNotifications', getNotifications)
+router.post('/sendRequest', sendRequest)
 
 // order routes
 router.post("/createOrder", createOrder);

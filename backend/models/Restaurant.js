@@ -12,7 +12,7 @@ const dailyHoursSchema = new Schema({
 const contactSchema = new Schema({
     phone: { type: String, required: true },
     email: { type: String, lowercase: true, match: [/.+\@.+\..+/, 'Please enter a valid email'] },
-    password: { type: String, required: true }
+    password: { type: String, required: true, select: false }
 });
   
   // Schema for address
