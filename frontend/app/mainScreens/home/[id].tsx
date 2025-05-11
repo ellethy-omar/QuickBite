@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, SafeAreaView, ActivityIndicator, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import { useNotification } from '@/app/context/notificationContext';
@@ -10,6 +10,7 @@ import { MenuItem } from '@/app/types/restaurant';
 
 export default function RestaurantDetailsScreen() {
   const params = useLocalSearchParams();
+  const router = useRouter();
   const user = useSelector((state: RootState) => state.user);
   const { showNotification } = useNotification();
 
@@ -45,17 +46,27 @@ export default function RestaurantDetailsScreen() {
   const fetchProducts = async () => {
     try {
       const response = await GetProductsForRestaurant(restaurantID);
-      console.log('🛒 Products fetched:', response.data);
-  
+      console.log('🛒 Raw products response:', JSON.stringify(response.data, null, 2));
+
       const mapped = response.data.map((prod) => ({
         id: prod._id,
         name: prod.name,
         price: prod.price,
         description: prod.description,
         image: prod.image || 'https://i.imgur.com/6VBx3io.png',
+        stockAvailable: prod.stockAvailable,
+        restraurantId: prod.restraurantId,
+        category: prod.category,
+        isAvailable: prod.isAvailable ?? true, // Default to true if undefined
       }));
-  
+
+      console.log('🛒 Mapped products:', mapped);
       setProducts(mapped);
+
+      // Warn if no products are available
+      if (mapped.length > 0 && mapped.every((p) => !p.isAvailable)) {
+        showNotification('No products are currently available.', 'error');
+      }
     } catch (err) {
       console.error('❌ Error fetching products:', err);
       showNotification('Failed to load products.', 'error');
@@ -63,23 +74,21 @@ export default function RestaurantDetailsScreen() {
       setLoading(false);
     }
   };
-  
-  
-  const fetchOrders = async (restaurantID) => {
+
+  const fetchOrders = async () => {
     try {
       const response = await GetMyOrders();
       console.log('📦 Orders fetched:', response.data);
-  
+
       const normalizeId = (rid: any): string =>
         typeof rid === 'string' ? rid : String(rid?._id || '');
-      
+
       const activeOrder = response.data.find(
         (order) =>
-          normalizeId(order.restaurantID) === String(restaurantID) &&
+          normalizeId(order.restaurantID) === restaurantID &&
           (order.status === 'pending' || order.status === 'processing')
       );
-            
-  
+
       if (activeOrder) {
         console.log('⚠️ Found active order:', activeOrder);
         setHasActiveOrder(true);
@@ -89,19 +98,28 @@ export default function RestaurantDetailsScreen() {
       }
     } catch (err) {
       console.error('❌ Error checking active orders:', err);
+      showNotification('Failed to check active orders.', 'error');
     }
   };
 
   useEffect(() => {
     console.log('🍔 Route Params:', params);
-  
-    fetchProducts(restaurantID, setProducts, setLoading, showNotification);
-    fetchOrders(restaurantID);
-  }, [restaurantID]);
-  
+    console.log('👤 Current user:', user);
+    fetchProducts();
+    fetchOrders();
+  }, [restaurantID, user]);
 
   const addToCart = (productId: string) => {
-    setCart(prev => ({
+    const product = products.find((p) => p.id === productId);
+    if (!product) {
+      showNotification('Product not found.', 'error');
+      return;
+    }
+    if (!product.isAvailable) {
+      showNotification('This item is not available.', 'error');
+      return;
+    }
+    setCart((prev) => ({
       ...prev,
       [productId]: (prev[productId] || 0) + 1,
     }));
@@ -109,7 +127,7 @@ export default function RestaurantDetailsScreen() {
   };
 
   const removeFromCart = (productId: string) => {
-    setCart(prev => {
+    setCart((prev) => {
       const updatedCart = { ...prev };
       if (updatedCart[productId] > 1) {
         updatedCart[productId] -= 1;
@@ -122,18 +140,30 @@ export default function RestaurantDetailsScreen() {
 
   const calculateTotal = () => {
     return Object.entries(cart).reduce((total, [productId, quantity]) => {
-      const product = products.find(p => p.id === productId);
+      const product = products.find((p) => p.id === productId);
       return product ? total + product.price * quantity : total;
     }, 0);
   };
 
   const confirmCheckout = () => {
+    if (!user.addresses || user.addresses.length === 0) {
+      Alert.alert(
+        'No Address Found',
+        'You need to add a delivery address to place an order.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Add Address', onPress: () => router.push('/mainScreens/settings/profile') },
+        ]
+      );
+      return;
+    }
+
     Alert.alert(
-      "Confirm Order",
+      'Confirm Order',
       `You are about to place an order for ${Object.values(cart).reduce((a, b) => a + b, 0)} items totaling $${calculateTotal().toFixed(2)}.`,
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "Confirm", onPress: handleCheckout },
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Confirm', onPress: handleCheckout },
       ]
     );
   };
@@ -145,30 +175,68 @@ export default function RestaurantDetailsScreen() {
     }
 
     if (!user.addresses || user.addresses.length === 0) {
-      showNotification('No address found. Please update your profile.', 'error');
+      showNotification('No address found. Please add an address.', 'error');
       return;
     }
 
-    const defaultAddress = user.addresses.find(addr => addr.isDefault) || user.addresses[0];
+    const defaultAddress = user.addresses.find((addr) => addr.isDefault) || user.addresses[0];
+    // Clean address object to remove _id and validate fields
+    const cleanedAddress = {
+      label: defaultAddress.label || 'Home',
+      area: defaultAddress.area || '',
+      street: defaultAddress.street || '',
+      building: defaultAddress.building || '',
+      floor: defaultAddress.floor || '',
+      apartment: defaultAddress.apartment || '',
+      isDefault: defaultAddress.isDefault || true,
+    };
 
     const orderItems = Object.entries(cart).map(([productId, quantity]) => ({
       productId,
       quantity,
     }));
 
+    // Validate product IDs and stock
+    const invalidItems = orderItems.filter((item) => {
+      const product = products.find((p) => p.id === item.productId);
+      return !product || !product.isAvailable || (product.stockAvailable && item.quantity > product.stockAvailable);
+    });
+    if (invalidItems.length > 0) {
+      showNotification('Some items in your cart are invalid or out of stock.', 'error');
+      return;
+    }
+
+    const orderPayload = {
+      restaurantID,
+      items: orderItems,
+      address: cleanedAddress,
+    };
+    console.log('📦 Order payload:', JSON.stringify(orderPayload, null, 2));
+
     try {
-      const response = await CreateOrder({
-        restaurantID,
-        items: orderItems,
-        address: defaultAddress,
-      });
+      const response = await CreateOrder(orderPayload);
       console.log('✅ Order created:', response);
       showNotification('Order placed successfully!', 'success');
       setCart({});
-      fetchOrders(restaurantID);
-    } catch (error) {
+      await fetchOrders(); // Refresh active order status
+    } catch (error: any) {
       console.error('❌ Error placing order:', error);
-      showNotification('Failed to place order. Try again.', 'error');
+      const status = error.response?.status;
+      const errorMessage = error.response?.data?.error || 'Unknown error';
+      const fullResponse = error.response?.data || {};
+      console.error('❌ Server error message:', errorMessage);
+      console.error('❌ Full server response:', JSON.stringify(fullResponse, null, 2));
+      if (status === 403) {
+        showNotification(`Missing required order details: ${errorMessage}`, 'error');
+      } else if (status === 420) {
+        showNotification('Please log in again.', 'error');
+      } else if (status === 469) {
+        showNotification('You don’t have permission to place this order.', 'error');
+      } else if (status === 500) {
+        showNotification('Server error. Please contact support (Ref: Omar).', 'error');
+      } else {
+        showNotification(`Failed to place order: ${errorMessage}`, 'error');
+      }
     }
   };
 
@@ -198,7 +266,7 @@ export default function RestaurantDetailsScreen() {
         </View>
         {bio && <Text style={styles.bio}>{bio}</Text>}
 
-        {products.map(product => (
+        {products.map((product) => (
           <View key={product.id} style={styles.productCard}>
             <Image source={{ uri: product.image }} style={styles.productImage} />
             <View style={styles.productInfo}>
@@ -211,7 +279,11 @@ export default function RestaurantDetailsScreen() {
                   <Text style={styles.quantityButtonText}>−</Text>
                 </TouchableOpacity>
                 <Text style={styles.quantityText}>{cart[product.id] || 0}</Text>
-                <TouchableOpacity style={styles.quantityButton} onPress={() => addToCart(product.id)}>
+                <TouchableOpacity
+                  style={[styles.quantityButton, !product.isAvailable && { backgroundColor: '#ccc' }]}
+                  onPress={() => addToCart(product.id)}
+                  disabled={!product.isAvailable}
+                >
                   <Text style={styles.quantityButtonText}>+</Text>
                 </TouchableOpacity>
               </View>
@@ -222,8 +294,8 @@ export default function RestaurantDetailsScreen() {
 
       {Object.keys(cart).length > 0 && (
         <TouchableOpacity
-          style={[styles.cartBar, orderingBlocked && { backgroundColor: '#ccc' }]}
-          disabled={orderingBlocked}
+          style={[styles.cartBar, orderingBlocked && false && { backgroundColor: '#ccc' }]}
+          disabled={orderingBlocked && false}
           onPress={confirmCheckout}
         >
           <Text style={styles.cartBarText}>
