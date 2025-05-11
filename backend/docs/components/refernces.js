@@ -26,4 +26,6 @@
     ! $ref: '#/components/schemas/Item'
     ! $ref: '#/components/schemas/UploadImagePayload'
     ! $ref: '#/components/schemas/ImageUploadResponse'
+    ! $ref: '#/components/schemas/Notification'
+    ! $ref: '#/components/schemas/Request'
 */

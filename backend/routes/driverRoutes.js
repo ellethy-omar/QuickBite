@@ -5,6 +5,8 @@ const {
     updateDriverProfilePhoto
 } = require('../controllers/driver/profileController');
 
+const { getMyrequests, getNotifications, sendRequest } = require('../controllers/notificationsRequestsContorller')
+
 const {
     getAllAvailableOrders,
     acceptOrder,
@@ -24,6 +26,11 @@ const {
 router.get("/getDriverProfile", getDriverProfile);
 router.put("/updateDriverProfile", updateDriverProfile);
 router.put("/updateDriverProfilePhoto", updateDriverProfilePhoto)
+
+// requests/notifications routes
+router.get('/getMyrequests', getMyrequests)
+router.get('/getNotifications', getNotifications)
+router.post('/sendRequest', sendRequest)
 
 // delivery routes
 router.get("/getAllAvailableOrders", getAllAvailableOrders);

@@ -12,7 +12,7 @@ const dailyHoursSchema = new Schema({
 const contactSchema = new Schema({
     phone: { type: String, required: true },
     email: { type: String, lowercase: true, match: [/.+\@.+\..+/, 'Please enter a valid email'] },
-    password: { type: String, required: true }
+    password: { type: String, required: true, select: false }
 });
   
   // Schema for address
@@ -96,9 +96,13 @@ restaurantSchema.statics.createRestaurant = async function (data) {
 
 
 restaurantSchema.statics.findByEmailOrPhone = async function (identifier) {
-  return await this.findOne({
-    $or: [{ "contact.email": identifier }, { "contact.phone": identifier }]
-  });
+  return await this.findOne({ 
+      $or: [
+        { 'contact.email': identifier }, 
+        { 'contact.phone': identifier }
+      ]
+    })
+    .select('+contact.password');;
 };
 
 restaurantSchema.methods.isPasswordMatch = async function (password) {
