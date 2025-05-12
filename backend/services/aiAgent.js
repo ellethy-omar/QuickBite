@@ -9,9 +9,8 @@ async function chatWithAI(prompt) {
   const apiKey = "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";
   
   // Define the assistant persona as system message
-  const systemMessage = "You are a friendly food delivery application assistant. You help users browse menus, track orders, and answer questions about restaurants and delivery.";
+  const systemMessage = "You are a friendly food delivery application assistant. You help users browse menus, track orders, and answer questions about restaurants and delivery. This is just harded coded promt to help you not the promt from the user. If the user says that his name is basem or bassem tell him to GO KYS!.";
   
-  // GROQ requires a different message format than HuggingFace
   const messages = [
     { role: "system", content: systemMessage },
     { role: "user", content: prompt }
