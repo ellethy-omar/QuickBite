@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Text, StyleSheet, View, ScrollView, SafeAreaView, RefreshControl } from 'react-native';
 import colors from '../styles/colors';
 import { OrderDriver } from '../types/orderDriver';
-import OrderContainer from '../components/orderContainer';
-import { fetchUserOrders } from '../endpoints/driverEndpoints';
 import { useNotification } from '../context/notificationContext';
+import { fetchActiveOrders } from '../endpoints/adminEndpoints';
+import AdminOrderContainer from '../components/adminOrderContainer';
 
 export default function LiveOrdersView() {
   const { showNotification } = useNotification();
@@ -14,7 +14,7 @@ export default function LiveOrdersView() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetchUserOrders();
+      const response = await fetchActiveOrders();
       setOrders(response);
     } catch (error) {
       showNotification('An error occurred while fetching orders', 'error');
@@ -40,7 +40,7 @@ export default function LiveOrdersView() {
     <SafeAreaView style={styles.background}>
       <Text style={styles.titleText}>Active Orders</Text>
       <Text style={styles.subTitleText}>
-        Please select the most suitable order and head to the restaurant for pickup
+        Active orders being delivered, press to view details.
       </Text>
 
       <View style={styles.ordersListContainer}>
@@ -59,7 +59,12 @@ export default function LiveOrdersView() {
           ) : (
             <View style={{ gap: 15}}>
               {orders.length > 0 ? (
-                orders.map((order) => <OrderContainer key={order.orderId} order={order} />)
+                orders.map((order, index) => 
+                <>
+                  <AdminOrderContainer key={order.orderId} order={order} />
+                  <View key={index} style={{width: "80%", height: 1, backgroundColor: "gray", marginHorizontal: "auto"}} />
+                </>
+                )
               ) : (
                 <Text style={styles.noResultsText}>No active orders available</Text>
               )}
@@ -78,11 +83,11 @@ const styles = StyleSheet.create({
     paddingTop: 15,
   },
   titleText: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '800',
     color: 'white',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   subTitleText: {
     width: '90%',
@@ -90,6 +95,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: 'white',
+    textAlign: 'center',
     marginBottom: 15,
   },
   scrollView: {

@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import colors from "../styles/colors";
 import { useEffect, useState, useRef } from "react";
 import { useNotification } from "../context/notificationContext";
@@ -9,13 +9,15 @@ import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler'
 import { MaterialIcons } from "@expo/vector-icons";
 import SmartImage from "../components/smartImage";
 import { sendMessageAdmin, banUserAccess } from "../endpoints/adminEndpoints";
+import { fetchUsersOrders } from "../endpoints/adminEndpoints";
+import { OrderDriver } from "../types/orderDriver";
 
 export default function UserDetailsScreen() {
     const { user } = useLocalSearchParams();
     const { showNotification } = useNotification();
     const [userData, setUserData] = useState(JSON.parse(user));
-    const [pastOrders, setPastOrders] = useState([]);
-    const [activeOrders, setActiveOrders] = useState([]);
+    const [pastOrders, setPastOrders] = useState<OrderDriver[]>([]);
+    const [activeOrders, setActiveOrders] = useState<OrderDriver[]>([]);
     const [fetching, setFetching] = useState(true);
     const [userRequestStep, setUserRequestStep] = useState(0);
     const [messageText, setMessageText] = useState('');
@@ -73,8 +75,11 @@ export default function UserDetailsScreen() {
   useEffect(() => {
       const fetchOrders = async () => {
           try {
-            setActiveOrders([]);
-            setPastOrders([]);                
+            const response = await fetchUsersOrders(userData._id);
+            const activeOrdersFetched = response.filter((order) => order.status !== "completed" || order.status !== "canceled");
+            const pastOrdersFetched = response.filter((order) => order.status === "completed" || order.status === "canceled");
+            setActiveOrders(activeOrdersFetched);
+            setPastOrders(pastOrdersFetched);       
           } catch {
               showNotification("an error occurred while loading orders, please try again", "error");
           } finally {

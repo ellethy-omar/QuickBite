@@ -16,6 +16,17 @@ export interface OrderDriver {
             isDefault: boolean;
         }[];
     };
+    driverId: {
+        _id: string;
+        name: string;
+        phone: string;
+        profilePicture: string;
+        vehicle: {
+            category: string;
+            model: string;
+            plateNumber: string;
+        };
+    }
     restaurantId: {
         _id: string;
         name: string;
