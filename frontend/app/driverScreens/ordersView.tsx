@@ -59,7 +59,12 @@ export default function OrdersView() {
           ) : (
             <View style={{ gap: 15}}>
               {orders.length > 0 ? (
-                orders.map((order) => <OrderContainer key={order.orderId} order={order} />)
+                orders.map((order, index) => 
+                  <>
+                    <OrderContainer key={order.orderId} order={order} />
+                    <View key={index} style={{width: "80%", height: 1, backgroundColor: "gray", marginVertical: 5, marginHorizontal: "auto"}} />
+                  </>
+              )
               ) : (
                 <Text style={styles.noResultsText}>No active orders available</Text>
               )}

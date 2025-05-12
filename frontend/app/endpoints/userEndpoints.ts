@@ -1,6 +1,5 @@
-// userEndpoints.ts
 import apiClient from "../apiclient";
-import { OrderDetails, RawOrder } from "../types/orders"; // 🔥 importing your real type
+import { RawOrder } from "../types/orders"; // Use RawOrder instead of OrderDetails
 
 // --- PUT: Update user profile ---
 export const UpdateUserProfile = async (profileData: {
@@ -82,18 +81,18 @@ export const UpdateUserProfilePhoto = async (photoData: {
 
 // --- POST: Create a new order ---
 export const CreateOrder = async (orderData: {
-  restaurantID: string,
-  items: { productId: string, quantity: number }[],
+  restaurantID: string;
+  items: { productId: string; quantity: number }[];
   address: {
-    label: string,
-    area: string,
-    street: string,
-    building: string,
-    floor: string,
-    apartment: string,
-    isDefault: boolean,
-  }
-}): Promise<OrderDetails> => {
+    label: string;
+    area: string;
+    street: string;
+    building: string;
+    floor: string;
+    apartment: string;
+    isDefault: boolean;
+  };
+}): Promise<RawOrder> => {
   try {
     const response = await apiClient.post('/api/user/createOrder', orderData);
     return response.data;

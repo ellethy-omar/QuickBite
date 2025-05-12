@@ -87,12 +87,12 @@ export const fetchAdminMail = async (type: string, status: string) => {
     }
 }
 
-export const replyToMail = async (id: string, message: string, type: string) => {
+export const replyToMail = async (id: string, message: string, status: string) => {
     try {
-        const response = await apiClient.post('/api/admin/sendNotification', {
-            receiverId: id,
-            description: message,
-            receiverModel: type
+        const response = await apiClient.put('/api/admin/processRequest', {
+            status: status,
+            requestId: id,
+            adminMessage: message
         });
         return response;
 
@@ -102,11 +102,13 @@ export const replyToMail = async (id: string, message: string, type: string) => 
     }
 };
 
-export const sendMessageUser = async (userId: string, message: string) => {
+export const sendMessageAdmin = async (userId: string, message: string, type: string) => {
     try {
-        const response = await apiClient.post('/api/admin/sendWarningToUser', {
-            userId: userId,
-            message: message
+        const response = await apiClient.post('/api/admin/sendNotification', {
+            receiverId: userId,
+            description: message,
+            data: {},
+            receiverModel: type
         });
         return response;
     } catch (error: any) {
@@ -118,10 +120,40 @@ export const sendMessageUser = async (userId: string, message: string) => {
 export const banUserAccess = async (userId: string, flag: boolean) => {
     try {
         if(!flag) {
-        const response = await apiClient.put(`/api/admin/banUser?userId=${userId}`);
-        return response;
+            const response = await apiClient.put(`/api/admin/banUser?userId=${userId}`);
+            return response;
         } else {
             const response = await apiClient.put(`/api/admin/unbanUser?userId=${userId}`);
+            return response;
+        }
+    } catch (error: any) {
+        console.error("error", error.response?.data || error.message);
+        throw error;
+    }
+}
+
+export const banDriverAccess = async (userId: string, flag: boolean) => {
+    try {
+        if(!flag) {
+            const response = await apiClient.put(`/api/admin/banDriver?driverId=${userId}`);
+            return response;
+        } else {
+            const response = await apiClient.put(`/api/admin/unbanDriver?driverId=${userId}`);
+            return response;
+        }
+    } catch (error: any) {
+        console.error("error", error.response?.data || error.message);
+        throw error;
+    }
+}
+
+export const banRestaurantAccess = async (userId: string, flag: boolean) => {
+    try {
+        if(!flag) {
+            const response = await apiClient.put(`/api/admin/banRestaurant?restaurantId=${userId}`);
+            return response;
+        } else {
+            const response = await apiClient.put(`/api/admin/unbanRestaurant?restaurantId=${userId}`);
             return response;
         }
     } catch (error: any) {

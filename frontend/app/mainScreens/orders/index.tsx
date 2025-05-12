@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import colors from '@/app/styles/colors';
@@ -23,25 +23,31 @@ export default function OrdersScreen() {
   const [orders, setOrders] = useState<RawOrder[]>([]);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'active', 'past'
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await GetMyOrders();
+      console.log('📦 Orders fetched:', response.data);
+      setOrders(response.data);
+    } catch (error) {
+      console.error('❌ Failed to fetch orders:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
-      const fetchOrders = async () => {
-        try {
-          const response = await GetMyOrders();
-          console.log('📦 Orders fetched (on focus):', response.data);
-          setOrders(response.data);
-        } catch (error) {
-          console.error('❌ Failed to fetch orders:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-  
       fetchOrders();
     }, [])
   );
-  
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchOrders();
+  }, []);
 
   const filteredOrders = orders.filter(order => {
     if (activeTab === 'all') return true;
@@ -49,10 +55,22 @@ export default function OrdersScreen() {
     if (activeTab === 'past') return ['Delivered', 'cancelled'].includes(order.status);
     return true;
   });
-  
 
   const navigateToOrderDetail = (id: string) => {
     (router as any).push(`mainScreens/orders/${id}`);
+  };
+
+  const navigateToChat = () => {
+    const chatParams = {
+      id: 'chat-anas-123', // Fake chat ID
+      messages: [], // No initial messages
+      receiverId: '68134265dcd931f93ef915b9', // Anas alaa's ID
+    };
+    console.log('💬 Navigating to chat with Anas alaa:', chatParams);
+    router.push({
+      pathname: '/_chatutils/userDriverChat',
+      params: { chat: JSON.stringify(chatParams) },
+    });
   };
 
   const renderOrderItem = ({ item }: { item: RawOrder }) => (
@@ -88,7 +106,6 @@ export default function OrdersScreen() {
               : styles.deliveredText
           ]}>{item.status}</Text>
         </View>
-
       </View>
       
       <View style={styles.divider} />
@@ -106,6 +123,16 @@ export default function OrdersScreen() {
 
   return (
     <View style={styles.container}>
+      {/* <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.chatButton}
+          onPress={navigateToChat}
+        >
+          <FontAwesome name="comment" size={20} color="#fff" />
+          <Text style={styles.chatButtonText}>Chat with Anas alaa</Text>
+        </TouchableOpacity>
+      </View> */}
+
       <View style={styles.tabContainer}>
         <TouchableOpacity 
           style={[styles.tab, activeTab === 'all' && styles.activeTab]}
@@ -136,6 +163,14 @@ export default function OrdersScreen() {
           keyExtractor={item => item._id}
           contentContainerStyle={styles.ordersList}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
         />
       ) : (
         <View style={styles.emptyContainer}>
@@ -150,6 +185,25 @@ export default function OrdersScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
+  headerContainer: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  chatButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    padding: 12,
+    borderRadius: 8,
+  },
+  chatButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
   tabContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -188,9 +242,11 @@ const styles = StyleSheet.create({
   statusContainer: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   deliveredStatus: { backgroundColor: '#E8F5E9' },
   processingStatus: { backgroundColor: '#FFF8E1' },
+  cancelledStatus: { backgroundColor: '#fdecea' },
   statusText: { fontSize: 12, fontWeight: '500' },
   deliveredText: { color: '#388E3C' },
   processingText: { color: '#FFA000' },
+  cancelledText: { color: '#d9534f' },
   divider: { height: 1, backgroundColor: '#eee', marginVertical: 12 },
   orderFooter: { flexDirection: 'row', justifyContent: 'space-between' },
   itemsText: { fontSize: 14, color: '#666' },
@@ -204,11 +260,4 @@ const styles = StyleSheet.create({
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 60 },
   emptyText: { fontSize: 18, fontWeight: '500', color: '#555', marginTop: 16 },
   emptySubtext: { fontSize: 14, color: '#888', marginTop: 8 },
-  cancelledStatus: {
-    backgroundColor: '#fdecea',
-  },
-  cancelledText: {
-    color: '#d9534f',
-  },
-  
 });

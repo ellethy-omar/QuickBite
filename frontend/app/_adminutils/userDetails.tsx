@@ -8,7 +8,7 @@ import { Modalize } from "react-native-modalize";
 import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler';
 import { MaterialIcons } from "@expo/vector-icons";
 import SmartImage from "../components/smartImage";
-import { sendMessageUser, banUserAccess } from "../endpoints/adminEndpoints";
+import { sendMessageAdmin, banUserAccess } from "../endpoints/adminEndpoints";
 
 export default function UserDetailsScreen() {
     const { user } = useLocalSearchParams();
@@ -39,6 +39,7 @@ export default function UserDetailsScreen() {
     try {
       await banUserAccess(userData._id, userData.banned);
       showNotification(`User ${userData.banned ? "unbanned" : "banned"} successfully!`, "success");
+      setUserData({...userData, banned: !userData.banned})
     } catch {
       showNotification(`An error occurred while ${userData.banned ? "unbanning" : "banning"} user, please try again`, "error");
     } finally {
@@ -56,9 +57,8 @@ export default function UserDetailsScreen() {
         return;
       }
       try {
-        await sendMessageUser(userData._id, messageText);
+        await sendMessageAdmin(userData._id, messageText, "User");
         showNotification("message sent successfully to user!", "success");
-        setUserData({...userData, banned: !userData.banned})
       } catch {
         showNotification("an error occurred while sending message, please try again", "error");
       } finally {
@@ -169,36 +169,35 @@ export default function UserDetailsScreen() {
                 </View>
               </View>
             </ScrollView>
-
-            <Modalize ref={userActionModalRef} adjustToContentHeight modalStyle={styles.modalStyle}>
-              <View style={styles.modalContent}>
-                {userRequestStep == 0 ? (
-                  <>
-                    <Text style={styles.modalTitle}>User Actions</Text>
-                    <TouchableOpacity onPress={() => handleUserBan()} style={styles.sortOption}>
-                      <Text>{userData.banned === true ? "Unban User" : "Ban User"}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setUserRequestStep(1)} style={styles.sortOption}>
-                      <Text>Send Notification To User</Text>
-                    </TouchableOpacity>
-                  </>
-                ) : (
-                  <>
-                    <Text style={styles.modalTitle}>Send Message To User</Text>
-                    <TextInput multiline numberOfLines={14} value={messageText} onChangeText={setMessageText} placeholder='Type your message here...' style={{borderWidth: 1, height: 140, borderColor: colors.secondary, borderRadius: 10, paddingHorizontal: 10, textAlignVertical: "top", backgroundColor: colors.secondaryText, fontSize: 13}} />
-                    <View style={{flexDirection: "row", marginTop: 20, justifyContent: "center", gap: 10}}>
-                      <TouchableOpacity onPress={() => setUserRequestStep(2)} style={{backgroundColor: colors.primary, paddingVertical: 6, paddingHorizontal: 15, borderRadius: 50}}>
-                          <Text style={{color: "white", fontWeight: "500", fontSize: 12}}>Submit</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => setUserRequestStep(0)} style={{backgroundColor: colors.secondary, paddingVertical: 6, paddingHorizontal: 15, borderRadius: 50}}>
-                          <Text style={{fontWeight: "500", fontSize: 12}}>Back</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </>
-                )}
-              </View>
-            </Modalize>
           </SafeAreaView>
+          <Modalize ref={userActionModalRef} adjustToContentHeight modalStyle={styles.modalStyle}>
+            <View style={styles.modalContent}>
+              {userRequestStep == 0 ? (
+                <>
+                  <Text style={styles.modalTitle}>User Actions</Text>
+                  <TouchableOpacity onPress={() => handleUserBan()} style={styles.sortOption}>
+                    <Text>{userData.banned === true ? "Unban User" : "Ban User"}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setUserRequestStep(1)} style={styles.sortOption}>
+                    <Text>Send Notification To User</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.modalTitle}>Send Message To User</Text>
+                  <TextInput multiline numberOfLines={14} value={messageText} onChangeText={setMessageText} placeholder='Type your message here...' style={{borderWidth: 1, height: 140, borderColor: colors.secondary, borderRadius: 10, paddingHorizontal: 10, textAlignVertical: "top", backgroundColor: colors.secondaryText, fontSize: 13}} />
+                  <View style={{flexDirection: "row", marginTop: 20, justifyContent: "center", gap: 10}}>
+                    <TouchableOpacity onPress={() => setUserRequestStep(2)} style={{backgroundColor: colors.primary, paddingVertical: 6, paddingHorizontal: 15, borderRadius: 50}}>
+                        <Text style={{color: "white", fontWeight: "500", fontSize: 12}}>Submit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setUserRequestStep(0)} style={{backgroundColor: colors.secondary, paddingVertical: 6, paddingHorizontal: 15, borderRadius: 50}}>
+                        <Text style={{fontWeight: "500", fontSize: 12}}>Back</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
+            </View>
+          </Modalize>
         </GestureHandlerRootView>
     )
 }

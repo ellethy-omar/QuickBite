@@ -12,8 +12,8 @@ const ItemSchema = new Schema({
 const OrderSchema = new Schema({
     status: {
       type: String,
-      enum: ['pending', 'processing', 'delivered', 'cancelled'],
-      default: 'pending'
+      enum: ['called', 'pending', 'processing', 'delivered', 'cancelled'],
+      default: 'called'
     },
     userID: {
       type: Schema.Types.ObjectId,
@@ -84,7 +84,6 @@ OrderSchema.statics.validateOrder = async function(orderData) {
         available: product.stockAvailable
       });
     }
-
     
     totalAmount += product.price * (item.quantity || 1);
   
@@ -146,7 +145,7 @@ OrderSchema.statics.createOrder = async function(orderData) {
 OrderSchema.statics.findOrdersNeedingDelivery = async function() {
   return this.find({
     deliveryDriverID: {  $in: [null, undefined] },
-    status: { $ne: 'cancelled' }
+    status: { $eq: 'pending' }
   })
   .populate('restaurantID', 'name address logo contact.phone')
   .populate('userID', 'name phone addresses')

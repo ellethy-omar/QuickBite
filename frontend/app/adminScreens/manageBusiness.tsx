@@ -76,7 +76,7 @@ export default function ManageBusinessScreen() {
         break;
     }
     setFilteredRestaurants(sortedRestaurants);
-    modalizeRef.current?.close(); // Close the modal after sorting
+    modalizeRef.current?.close();
   };
 
   return (
@@ -101,7 +101,7 @@ export default function ManageBusinessScreen() {
         {loading ? (
           <Text style={styles.noResultsText}>Loading...</Text>
         ) : (
-          <>
+          <View style={{ paddingBottom: 30, gap: 10}}>
           {filteredRestaurants.length === 0 ? (
           <Text style={styles.noResultsText}>No Restaurants Found</Text>
         ) : (
@@ -109,11 +109,11 @@ export default function ManageBusinessScreen() {
             <RestaurantContainer key={item.id} restaurantData={item} />
           ))
         )}
-          </>
+          </View>
         )}
       </ScrollView>
 
-      <Modalize ref={modalizeRef} modalHeight={280} snapPoint={280} modalStyle={styles.modalStyle}>
+      <Modalize ref={modalizeRef} adjustToContentHeight modalStyle={styles.modalStyle}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Sort Options</Text>
           <TouchableOpacity onPress={() => handleSort('alphabetical-asc')} style={styles.sortOption}>
@@ -127,12 +127,6 @@ export default function ManageBusinessScreen() {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleSort('rating-desc')} style={styles.sortOption}>
             <Text>Rating (High to Low)</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleSort('orders-asc')} style={styles.sortOption}>
-            <Text>Orders Done (Low to High)</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleSort('orders-desc')} style={styles.sortOption}>
-            <Text>Orders Done (High to Low)</Text>
           </TouchableOpacity>
         </View>
       </Modalize>
@@ -209,6 +203,7 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     padding: 20,
+    paddingBottom: 10,
   },
   modalTitle: {
     fontSize: 18,

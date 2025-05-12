@@ -93,7 +93,7 @@ export default function DriversManageScreen() {
             {loading ? (
               <Text style={styles.noResultsText}>Loading...</Text>
             ) : (
-              <>
+              <View style={{ gap: 10, paddingBottom: 30 }}>
               {filteredDrivers.length === 0 ? (
               <Text style={styles.noResultsText}>No Restaurants Found</Text>
             ) : (
@@ -101,7 +101,7 @@ export default function DriversManageScreen() {
                 <DriverContainer key={item._id} driverData={item}/>
               ))
             )}
-              </>
+              </View>
             )}
           </ScrollView>
     

@@ -3,7 +3,7 @@ import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import colors from '../styles/colors';
 import { DriverMailData } from '../types/admin';
 
-export default function DriverMail({driverData, setMailData}: {driverData: DriverMailData, setMailData: React.Dispatch<React.SetStateAction<DriverMailData | null>>}) {
+export default function DriverMail({driverData, setMailData, onIgnore}: {driverData: DriverMailData, setMailData: React.Dispatch<React.SetStateAction<DriverMailData | null>>, onIgnore: (driverData) => void}) {
 
     return (
         <View style={styles.background}>
@@ -11,7 +11,7 @@ export default function DriverMail({driverData, setMailData}: {driverData: Drive
             <Text style={styles.infoText}>{driverData.description}</Text>
             <Text style={styles.infoText}>Since: {new Date(driverData.createdAt).toLocaleString()}</Text>
             <View style={{display: 'flex', flexDirection: 'row', gap: 10, marginTop: 10}}>
-            <TouchableOpacity style={{paddingHorizontal: 15, paddingVertical: 6, backgroundColor: colors.secondary, borderRadius: 50}} onPress={() => console.log('Accept Request')}>
+            <TouchableOpacity onPress={() => onIgnore(driverData)} style={{paddingHorizontal: 15, paddingVertical: 6, backgroundColor: colors.secondary, borderRadius: 50}}>
                 <Text style={{fontSize: 14, fontWeight: '600'}}>Ignore</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setMailData(driverData)} style={{paddingHorizontal: 15, paddingVertical: 6, backgroundColor: colors.primary, borderRadius: 50}}>
