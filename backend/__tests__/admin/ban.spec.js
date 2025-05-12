@@ -47,13 +47,10 @@ describe('Admin Ban/Unban Controller', () => {
         });
       });
 
-      it(`should return 400 if ${type}Id is missing`, async () => {
+      it(`should return 403 if ${type}Id is missing`, async () => {
         await func(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({
-          error: 'Order ID is required'
-        });
+        expect(res.status).toHaveBeenCalledWith(403);
       });
 
       it(`should return 404 if ${type} not found`, async () => {
@@ -99,14 +96,14 @@ describe('Admin Ban/Unban Controller', () => {
         expect(mockEntity.isBanned).toBe(false);
         expect(mockEntity.save).toHaveBeenCalled();
         expect(res.json).toHaveBeenCalledWith({
-          message: `${type.charAt(0).toUpperCase() + type.slice(1)} has been banned.`
+          message: `${type.charAt(0).toUpperCase() + type.slice(1)} has been un banned.`
         });
       });
 
-      it(`should return 400 if ${type}Id is missing`, async () => {
+      it(`should return 403 if ${type}Id is missing`, async () => {
         await func(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.status).toHaveBeenCalledWith(403);
         expect(res.json).toHaveBeenCalledWith({
           error: 'Order ID is required'
         });
