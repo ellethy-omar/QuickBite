@@ -16,7 +16,7 @@ export default function RestaurantLayout() {
               iconName = focused ? 'house.fill' : 'house.fill';
               break;
             case 'orders':
-              iconName = focused ? 'cart.fill' : 'cart';
+              iconName = focused ? 'paperplane.fill' : 'paperplane.fill';
               break;
             case 'settings':
               iconName = focused ? 'chevron.left.forwardslash.chevron.right' : 'chevron.left.forwardslash.chevron.right';

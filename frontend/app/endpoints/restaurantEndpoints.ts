@@ -13,9 +13,9 @@ export const UpdateRestaurantProfile = async (profileData: {
   contact: {
     phone: string;
     email: string;
-    password?: string; // optional, unless you want to allow password update here
+    password?: string;
   };
-  openingHours: any; // you can refine the type if needed
+  openingHours: any;
   isActive: boolean;
 }): Promise<any> => {
   try {
@@ -27,6 +27,7 @@ export const UpdateRestaurantProfile = async (profileData: {
   }
 };
 
+// --- PUT: Update restaurant logo
 export const UpdateRestaurantLogo = async (payload: {
   imageBase64: string;
   tags: string[];
@@ -40,6 +41,7 @@ export const UpdateRestaurantLogo = async (payload: {
   }
 };
 
+// --- PUT: Update restaurant cover image
 export const UpdateRestaurantCover = async (payload: {
   imageBase64: string;
   tags: string[];
@@ -111,6 +113,7 @@ export const AddRestaurantProduct = async (productData: {
   price: number;
   category: string;
   isAvailable: boolean;
+  stockAvailable?: number;
 }): Promise<any> => {
   try {
     const response = await apiClient.post('/api/restaurant/addRestaurantProduct', productData);
@@ -135,6 +138,61 @@ export const EditRestaurantProduct = async (productData: {
     return response.data;
   } catch (error) {
     console.error('Error editing restaurant product:', error);
+    throw error;
+  }
+};
+
+// --- GET: Fetch new "called" orders
+export const RGetRestaurantAllCalledOrders = async (): Promise<any> => {
+  try {
+    const response = await apiClient.get('/api/restaurant/getRestaurantAllCalledOrders');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching restaurant called orders:', error);
+    throw error;
+  }
+};
+
+// --- GET: Fetch pending/processing orders
+export const RGetRestaurantAllRequiredOrders = async (): Promise<any> => {
+  try {
+    const response = await apiClient.get('/api/restaurant/getRestaurantAllRequiredOrders');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching restaurant required orders:', error);
+    throw error;
+  }
+};
+
+// --- GET: Fetch order history
+export const RGetOrdersHistory = async (): Promise<any> => {
+  try {
+    const response = await apiClient.get('/api/restaurant/getOrdersHistory');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching restaurant order history:', error);
+    throw error;
+  }
+};
+
+// --- PUT: Accept a "called" order
+export const RAcceptOrder = async (orderId: string): Promise<any> => {
+  try {
+    const response = await apiClient.put(`/api/restaurant/acceptOrder?orderID=${orderId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error accepting restaurant order:', error);
+    throw error;
+  }
+};
+
+// --- PUT: Reject a "called" order
+export const RRejectOrder = async (orderId: string): Promise<any> => {
+  try {
+    const response = await apiClient.put(`/api/restaurant/rejectOrder?orderID=${orderId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error rejecting restaurant order:', error);
     throw error;
   }
 };
