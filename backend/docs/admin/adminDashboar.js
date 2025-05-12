@@ -127,36 +127,41 @@
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
+
+
  /**
  * @swagger
- *
- * /api/admin/sendWarningToUser:
- *   post:
+ * /api/admin/getAllOrdersForCertainUser:
+ *   get:
  *     tags:
  *       - Admin (JWT required)
- *     summary: Send warning to a user
- *     description: Allows admin to issue a warning to a user.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *               message:
- *                 type: string
- *             required:
- *               - userId
- *               - message
+ *     summary: Get all orders for a specific user
+ *     description: |
+ *       Fetches every order placed by the user with the given `userId`.  
+ *       Returns detailed order information including restaurant and driver data.
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: objectId
+ *         description: ID of the user whose orders to fetch
  *     responses:
  *       200:
- *         description: Warning sent successfully
+ *         description: Successfully retrieved all orders for the user.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Message'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All orders fetched successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
  *       403:
  *         $ref: '#/components/responses/ParameterRequiredError'
  *       420:
@@ -165,77 +170,80 @@
  *         $ref: '#/components/responses/ForbiddenError'
  *       500:
  *         $ref: '#/components/responses/ServerError'
- *
- * /api/admin/sendWarningToDriver:
- *   post:
+ */
+
+
+ /**
+ * @swagger
+ * /api/admin/getDriverOrdersHistory:
+ *   get:
  *     tags:
  *       - Admin (JWT required)
- *     summary: Send warning to a driver
- *     description: Allows admin to issue a warning to a driver.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               driverId:
- *                 type: string
- *               message:
- *                 type: string
- *             required:
- *               - driverId
- *               - message
+ *     summary: Get order history for a specific driver
+ *     description: |
+ *       Retrieves all orders assigned to the driver with the given `driverId`,  
+ *       including populated restaurant, user, and item details.
+ *     parameters:
+ *       - in: query
+ *         name: driverId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: objectId
+ *         description: ID of the driver whose order history is requested
  *     responses:
- *       200:
- *         description: Warning sent successfully
+ *       '200':
+ *         description: Order history fetched successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Message'
- *       403:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Order found.
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
+ *       '403':
  *         $ref: '#/components/responses/ParameterRequiredError'
- *       420:
+ *       '420':
  *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
+ *       '469':
  *         $ref: '#/components/responses/ForbiddenError'
- *       500:
+ *       '500':
  *         $ref: '#/components/responses/ServerError'
- *
- * /api/admin/sendWarningToRestaurant:
- *   post:
+ */
+
+ /**
+ * @swagger
+ * /api/admin/getProcessingOrders:
+ *   get:
  *     tags:
  *       - Admin (JWT required)
- *     summary: Send warning to a restaurant
- *     description: Allows admin to issue a warning to a restaurant.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               restaurantId:
- *                 type: string
- *               message:
- *                 type: string
- *             required:
- *               - restaurantId
- *               - message
+ *     summary: Retrieve all orders (any status)
+ *     description: |
+ *       Fetches all orders in the system, including populated restaurant, user, and item details.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
- *       200:
- *         description: Warning sent successfully
+ *       '200':
+ *         description: Successfully retrieved all orders.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Message'
- *       403:
- *         $ref: '#/components/responses/ParameterRequiredError'
- *       420:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   description: Array of Order objects
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
+ *       '420':
  *         $ref: '#/components/responses/UnauthorizedError'
- *       469:
+ *       '469':
  *         $ref: '#/components/responses/ForbiddenError'
- *       500:
+ *       '500':
  *         $ref: '#/components/responses/ServerError'
- *
  */
