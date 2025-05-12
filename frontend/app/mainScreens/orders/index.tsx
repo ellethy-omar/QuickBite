@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import colors from '@/app/styles/colors';
@@ -23,24 +23,31 @@ export default function OrdersScreen() {
   const [orders, setOrders] = useState<RawOrder[]>([]);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'active', 'past'
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await GetMyOrders();
+      console.log('📦 Orders fetched:', response.data);
+      setOrders(response.data);
+    } catch (error) {
+      console.error('❌ Failed to fetch orders:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
-      const fetchOrders = async () => {
-        try {
-          const response = await GetMyOrders();
-          console.log('📦 Orders fetched (on focus):', response.data);
-          setOrders(response.data);
-        } catch (error) {
-          console.error('❌ Failed to fetch orders:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-  
       fetchOrders();
     }, [])
   );
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchOrders();
+  }, []);
 
   const filteredOrders = orders.filter(order => {
     if (activeTab === 'all') return true;
@@ -116,7 +123,7 @@ export default function OrdersScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
+      {/* <View style={styles.headerContainer}>
         <TouchableOpacity 
           style={styles.chatButton}
           onPress={navigateToChat}
@@ -124,7 +131,7 @@ export default function OrdersScreen() {
           <FontAwesome name="comment" size={20} color="#fff" />
           <Text style={styles.chatButtonText}>Chat with Anas alaa</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <View style={styles.tabContainer}>
         <TouchableOpacity 
@@ -156,6 +163,14 @@ export default function OrdersScreen() {
           keyExtractor={item => item._id}
           contentContainerStyle={styles.ordersList}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
         />
       ) : (
         <View style={styles.emptyContainer}>

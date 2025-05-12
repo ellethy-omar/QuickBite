@@ -6,8 +6,7 @@ const {
   getOrCreateChat,
   sendMessage,
   getMessages,
-  markMessagesAsRead,
-  getActiveChats
+  markMessagesAsRead
 } = require('../../services/chatService');
 
 const driverRoutes = async (ws, driver) => {
@@ -171,37 +170,6 @@ const driverRoutes = async (ws, driver) => {
             }));
           }
           break;
-          
-        case 'chatMarkRead':
-          try {
-            if (!data.chatId) {
-              throw new Error('Missing chatId');
-            }
-            
-            const chatId = new mongoose.Types.ObjectId(data.chatId);
-
-            if (!mongoose.Types.ObjectId.isValid(data.chatId)) {
-                throw new Error('Invalid chatId');
-            }
-            
-            const count = await markMessagesAsRead(chatId, driver._id);
-            
-            ws.send(JSON.stringify({
-              type: 'messagesMarkedRead',
-              data: {
-                chatId,
-                count
-              }
-            }));
-          } catch (err) {
-            console.log('Error marking messages as read:', err);
-            ws.send(JSON.stringify({
-              type: 'error',
-              data: `Failed to mark messages as read: ${err.message}`
-            }));
-          }
-          break;
-
         case 'ai':
             try {
               const aiResponse = await chatWithAI(data.prompt);

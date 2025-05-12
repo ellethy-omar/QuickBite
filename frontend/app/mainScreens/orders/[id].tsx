@@ -6,22 +6,23 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { GetMyOrders, CancelOrder } from '@/app/endpoints/userEndpoints';
 import colors from '@/app/styles/colors';
 import { useNotification } from '@/app/context/notificationContext';
+import { ChatDriver } from '@/app/types/chat';
 
 export default function OrderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { showNotification } = useNotification();
-
   const [order, setOrder] = useState<RawOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
+    console.log('🛠 OrderDetailScreen mounted');
     const fetchOrder = async () => {
       try {
         const response = await GetMyOrders();
         const found = response.data.find((o) => o._id === id);
-        console.log('Order found:', found);
+        console.log('📦 Order found:', found);
         setOrder(found || null);
       } catch (err) {
         console.error('❌ Failed to fetch orders:', err);
@@ -31,6 +32,10 @@ export default function OrderDetailScreen() {
     };
 
     if (id) fetchOrder();
+
+    return () => {
+      console.log('🛠 OrderDetailScreen unmounting');
+    };
   }, [id]);
 
   const handleCancel = async () => {
@@ -58,17 +63,18 @@ export default function OrderDetailScreen() {
   const handleChatWithDriver = () => {
     if (!order?.deliveryDriverID) return;
 
-    // Create ChatDriver object for UserDriverChat
-    const chatData = {
+    const chatData: ChatDriver = {
+      id: '1',
+      messages: [],
       receiverId: order.deliveryDriverID._id,
+      senderId: order.userID,
       orderId: order._id,
-      messages: [], // Start with empty messages; WebSocket will populate
     };
 
-    // Navigate to UserDriverChat with chat data
+    console.log('💬 Navigating to chat:', chatData);
     router.push({
       pathname: '/_chatutils/userDriverChat',
-      params: { chat: JSON.stringify(chatData) },
+      params: { chat: JSON.stringify(chatData), role: 'user' },
     });
   };
 

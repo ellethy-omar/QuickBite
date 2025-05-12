@@ -106,7 +106,7 @@ const userRoute = async (ws, userPayload) => {
                 timestamp: message.createdAt
               }
             }));
-            await markMessagesAsRead(chat._id, userPayload._id);
+            await markMessagesAsRead(chatId, userPayload._id);
 
             console.log("Responded with: ", message)
           } catch (err) {
@@ -142,7 +142,7 @@ const userRoute = async (ws, userPayload) => {
                 hasMore: messages.length === limit
               }
             }));
-            await markMessagesAsRead(chat._id, userPayload._id);
+            await markMessagesAsRead(chatId, userPayload._id);
 
             console.log("Responded with: ", messages)
           } catch (err) {

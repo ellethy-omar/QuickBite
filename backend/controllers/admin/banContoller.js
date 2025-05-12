@@ -8,7 +8,7 @@ const banUser = async (req, res) => {
 
         if (!userId) {
             console.log('Order ID is required.');
-            return res.status(400).json({ error: 'Order ID is required' });
+            return res.status(403).json({ error: 'Order ID is required' });
         }
 
         const user = await User.findById(userId);
@@ -25,14 +25,13 @@ const banUser = async (req, res) => {
     }
 }
   
-// Ban a restaurant
 const banRestaurant = async (req, res) => {
     try {
         const { restaurantId } = req.query;
 
         if (!restaurantId) {
-            console.log('Order ID is required.');
-            return res.status(400).json({ error: 'Order ID is required' });
+            console.log('restaurantId is required.');
+            return res.status(403).json({ error: 'restaurantId is required' });
         }
 
       const restaurant = await Restaurant.findById(restaurantId)
@@ -48,14 +47,13 @@ const banRestaurant = async (req, res) => {
     }
 }
   
-// Ban a driver
 const banDriver = async (req, res) => {
     try {
         const { driverId } = req.query;
 
         if (!driverId) {
             console.log('Order ID is required.');
-            return res.status(400).json({ error: 'Order ID is required' });
+            return res.status(403).json({ error: 'Order ID is required' });
         }
 
       const driver = await Driver.findById(driverId)
@@ -71,14 +69,13 @@ const banDriver = async (req, res) => {
     }
 }
   
-// Unban a user
 const unBanUser = async (req, res) => {
     try {
         const { userId } = req.query;
 
         if (!userId) {
             console.log('Order ID is required.');
-            return res.status(400).json({ error: 'Order ID is required' });
+            return res.status(403).json({ error: 'Order ID is required' });
         }
 
         const user = await User.findById(userId);
@@ -88,21 +85,20 @@ const unBanUser = async (req, res) => {
       user.isBanned = false
       await user.save()
   
-      res.json({ message: 'User has been banned.' })
+      res.json({ message: 'User has been un banned.' })
     } catch (err) {
       console.log(err)
       res.status(500).json({ error: 'Server error while banning user.' })
     }
 }
   
-// Unban a driver
 const unBanDriver = async (req, res) => {
     try {
         const { driverId } = req.query;
 
         if (!driverId) {
             console.log('Order ID is required.');
-            return res.status(400).json({ error: 'Order ID is required' });
+            return res.status(403).json({ error: 'Order ID is required' });
         }
 
       const driver = await Driver.findById(driverId)
@@ -111,21 +107,20 @@ const unBanDriver = async (req, res) => {
       driver.isBanned = false
       await driver.save()
   
-      res.json({ message: 'Driver has been banned.' })
+      res.json({ message: 'Driver has been un banned.' })
     } catch (err) {
       console.log(err)
       res.status(500).json({ error: 'Server error while banning driver.' })
     }
 }
   
-// Unban a restaurant
 const unBanRestaurant = async (req, res) => {
     try {
         const { restaurantId } = req.query;
 
         if (!restaurantId) {
             console.log('Order ID is required.');
-            return res.status(400).json({ error: 'Order ID is required' });
+            return res.status(403).json({ error: 'Order ID is required' });
         }
 
       const restaurant = await Restaurant.findById(restaurantId)
@@ -134,7 +129,7 @@ const unBanRestaurant = async (req, res) => {
       restaurant.isBanned = false
       await restaurant.save()
   
-      res.json({ message: 'Restaurant has been banned.' })
+      res.json({ message: 'Restaurant has been un banned.' })
     } catch (err) {
       console.log(err)
       res.status(500).json({ error: 'Server error while banning restaurant.' })
