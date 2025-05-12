@@ -3,7 +3,7 @@ const { getDefaultConfig } = require('expo/metro-config');
 const config = getDefaultConfig(__dirname);
 
 const { transformer, resolver } = config;
-n
+
 config.transformer = {
   ...transformer,
   babelTransformerPath: require.resolve('react-native-svg-transformer'),
