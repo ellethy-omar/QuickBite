@@ -16,10 +16,23 @@ import colors from '@/app/styles/colors';
 interface Order {
   _id: string;
   status: string;
-  userID: { _id: string; name: string; phone: string; addresses: { street: string; city: string; area: string }[] };
+  userID: {
+    _id: string;
+    name: string;
+    phone: string;
+    addresses: {
+      label?: string;
+      area?: string;
+      street?: string;
+      building?: string;
+      floor?: string;
+      apartment?: string;
+      isDefault?: boolean;
+    }[];
+  };
   restaurantID: string;
   deliveryDriverID?: string;
-  items: { productId: string; quantity: number }[];
+  items: { productId: { _id: string; name?: string }; quantity: number }[];
   totalAmount: number;
   createdAt: string;
   updatedAt?: string;
@@ -107,15 +120,13 @@ export default function ROrdersScreen() {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     console.log('🔄 Refreshing restaurant orders...');
-    fetchOrders();
-    fetchProducts();
+    fetchProducts().then(fetchOrders);
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      console.log('🛠 ROrdersScreen focused, fetching orders and products...');
-      fetchOrders();
-      fetchProducts();
+      console.log('🛠 ROrdersScreen focused, fetching products and orders...');
+      fetchProducts().then(fetchOrders);
     }, [])
   );
 
@@ -191,14 +202,28 @@ export default function ROrdersScreen() {
     }
   }, [filter, calledOrders, requiredOrders, historyOrders]);
 
-  const getProductName = (productId: string) => {
-    const product = products.find(p => p._id === productId);
+  const getProductName = (productId: { _id: string; name?: string }) => {
+    const product = products.find(p => p._id === productId._id);
+    console.log('🔗 Mapping product:', { productId: productId._id, productName: product?.name || 'Unknown Product' });
     return product ? product.name : 'Unknown Product';
+  };
+
+  const formatAddress = (address: Order['userID']['addresses'][0]) => {
+    const parts = [
+      address.street || 'N/A',
+      address.building || 'N/A',
+      address.floor ? `Floor ${address.floor}` : 'N/A',
+      address.apartment ? `Apt ${address.apartment}` : 'N/A',
+      address.area || 'N/A',
+    ].filter(part => part !== 'N/A');
+    return parts.length > 0 ? parts.join(', ') : 'Address not provided';
   };
 
   const renderOrderCard = ({ item }: { item: Order }) => {
     console.log('📄 Rendering restaurant order card:', item._id);
-    const address = item.userID.addresses[0] || { street: 'N/A', city: 'N/A', area: 'N/A' };
+    const address = Array.isArray(item.userID.addresses) && item.userID.addresses[0] ? item.userID.addresses[0] : {};
+    console.log('📍 Order address:', { orderId: item._id, address });
+    console.log('📋 Items:', item.items.map(i => ({ quantity: i.quantity, productName: getProductName(i.productId) })));
     return (
       <View style={styles.orderCard}>
         <View style={styles.orderDetails}>
@@ -213,7 +238,7 @@ export default function ROrdersScreen() {
           <Text style={styles.orderCustomer}>Customer: {item.userID.name}</Text>
           <Text style={styles.orderPhone}>Phone: {item.userID.phone}</Text>
           <Text style={styles.orderAddress}>
-            Address: {`${address.street}, ${address.city}, ${address.area}`}
+            Address: {formatAddress(address)}
           </Text>
           <Text style={styles.orderItems}>
             Items: {item.items.map(i => `${i.quantity}x ${getProductName(i.productId)}`).join(', ')}
@@ -241,7 +266,9 @@ export default function ROrdersScreen() {
 
   const renderModal = () => {
     if (!selectedOrder || !modalAction) return null;
-    const address = selectedOrder.userID.addresses[0] || { street: 'N/A', city: 'N/A', area: 'N/A' };
+    const address = Array.isArray(selectedOrder.userID.addresses) && selectedOrder.userID.addresses[0] ? selectedOrder.userID.addresses[0] : {};
+    console.log('📍 Modal address:', { orderId: selectedOrder._id, address });
+    console.log('📋 Modal items:', selectedOrder.items.map(i => ({ quantity: i.quantity, productName: getProductName(i.productId) })));
     return (
       <Modal
         visible={modalVisible}
@@ -259,7 +286,7 @@ export default function ROrdersScreen() {
               <Text style={styles.modalOrderCustomer}>Customer: {selectedOrder.userID.name}</Text>
               <Text style={styles.modalOrderPhone}>Phone: {selectedOrder.userID.phone}</Text>
               <Text style={styles.modalOrderAddress}>
-                Address: {`${address.street}, ${address.city}, ${address.area}`}
+                Address: {formatAddress(address)}
               </Text>
               <Text style={styles.modalOrderItems}>
                 Items: {selectedOrder.items.map(i => `${i.quantity}x ${getProductName(i.productId)}`).join(', ')}
