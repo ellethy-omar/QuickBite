@@ -61,7 +61,6 @@ export default function DriverDetailsScreen() {
       try {
         await sendMessageAdmin(driverData._id, messageText, "Driver");
         showNotification("message sent successfully to driver!", "success");
-        setDriverData({...driverData, banned: !driverData.banned})
       } catch {
         showNotification("an error occurred while sending message, please try again", "error");
       } finally {

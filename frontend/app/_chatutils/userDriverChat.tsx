@@ -8,6 +8,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import colors from '@/app/styles/colors';
 import useChatWebSocket from '@/hooks/useChatWebsocket';
+import { ChatDriver } from '../types/chat';
 
 export default function UserDriverChat() {
   const { chat, role } = useLocalSearchParams();

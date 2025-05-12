@@ -47,10 +47,19 @@ export default function RestaurantDetails() {
 
   const handleSendNotification = async () => {
     try {
-      await sendMessageAdmin(restaurantData._id, requestText, 'Restaurant');
+      if(requestText.trim() === "") {
+        showNotification("Please provide a message to send.", "info");
+        return;
+      }
+
+      await sendMessageAdmin(restaurantData.id, requestText, 'Restaurant');
       showNotification('Notification sent successfully!', 'success');
     } catch (error) {
       showNotification('Failed to send notification.', 'error');
+    } finally {
+      setRestaurantRequestStep(0);
+      setRequestText("");
+      restaurantActionsModalRef.current?.close();
     }
   };
 
