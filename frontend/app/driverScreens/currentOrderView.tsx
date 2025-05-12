@@ -129,6 +129,7 @@ export default function CurrentOrderView() {
                 id: "1",
                 messages: []
             };
+        console.log(chatData);
         navigator.navigate("_chatutils/userDriverChat", {chat: JSON.stringify(chatData)});
     }
 
