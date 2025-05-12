@@ -246,7 +246,14 @@ const getProductsForRestaurant = async (req, res) => {
 
     console.log('restaurant:', restaurant);
 
-    const products = await Product.find({ restaurantId: restraurantID });
+    const products = await Product.find({
+    restaurantId: restaurantID,
+    $or: [
+        { isBanned: null },
+        { isBanned: false }
+        ]
+    });
+
     if (!products) {
         console.log("No products found for this restaurant");
         return res.status(200).json({

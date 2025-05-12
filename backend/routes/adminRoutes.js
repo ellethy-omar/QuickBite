@@ -9,6 +9,8 @@ const {
     banUser,
     banDriver,
     banRestaurant,
+    banProduct,
+    unBanProduct,
     unBanUser,
     unBanDriver,
     unBanRestaurant
@@ -51,10 +53,12 @@ router.get('/getProcessingOrders', getProcessingOrders)
 router.put('/banUser', banUser)
 router.put('/banDriver', banDriver)
 router.put('/banRestaurant', banRestaurant)
+router.put('/banProduct', banProduct)
 
 router.put('/unBanUser', unBanUser)
 router.put('/unBanDriver', unBanDriver)
 router.put('/unBanRestaurant', unBanRestaurant)
+router.put('/unBanProduct', unBanProduct)
 
 // Notifcations_Requests routes
 router.get('/getAllRequests', getAllRequests)

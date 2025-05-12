@@ -1,6 +1,8 @@
 const Driver = require('../../models/Driver')
 const Restaurant = require('../../models/Restaurant')
 const User = require('../../models/User')
+const Product = require('../../models/Product')
+const Notification = require('../../models/Notification')
 
 const banUser = async (req, res) => { 
     try {
@@ -67,6 +69,80 @@ const banDriver = async (req, res) => {
       console.log(err)
       res.status(500).json({ error: 'Server error while banning driver.' })
     }
+}
+
+const banProduct = async (req, res) => {
+  try {
+    const { productId, reason } = req.body
+
+    if(!productId || !reason) {
+      console.log("Product Id & reason are required")
+      return res.status(403).json({ error: "Product ID are required "});
+    }
+
+    const product = await Product.findById(productId);
+    
+    if(!product) {
+      console.log("product not found")
+      return res.status(404).json({error: "Product not found"})
+    }
+
+    product.isBanned = true;
+
+    await product.save();
+
+    const notification = new Notification({
+      senderId: req.user._id,
+      receiverId: product.restaurantId,
+      receiverModel: 'Restaurant',
+      description: reason,
+      data: data || null,
+      createdAt: Date.now()
+    });
+            
+    await notification.save();
+
+    res.status(200).json({
+      message: "banned Product succesfully and sent notifcation to restaurant."
+    })
+
+    console.log("product & notification", product, notification);
+
+  } catch (error) {
+    console.log("Error banning product", error)
+    res.status(500).json({error: 'Server error while banning product', details: error.message})
+  }
+}
+
+const unBanProduct = async (req, res) => {
+  try {
+    const { productId } = req.query
+
+    if(!productId) {
+      console.log("Product Id is required")
+      return res.status(403).json({ error: "Product ID are required "});
+    }
+
+    const product = await Product.findById(productId);
+
+    if(!product) {
+      console.log("product not found")
+      return res.status(404).json({error: "Product not found"})
+    }
+
+    product.isBanned = false;
+
+    await product.save();
+    res.status(200).json({
+      message: "Unbanned Product succesfully."
+    })
+
+    console.log("product", product);
+
+  } catch (error) {
+    console.log("Error banning product", error)
+    res.status(500).json({error: 'Server error while banning product', details: error.message})
+  }
 }
   
 const unBanUser = async (req, res) => {
@@ -140,6 +216,8 @@ module.exports =  {
     banUser,
     banDriver,
     banRestaurant,
+    banProduct,
+    unBanProduct,
     unBanUser,
     unBanDriver,
     unBanRestaurant
