@@ -47,10 +47,15 @@ export default function OrderDetailScreen() {
           try {
             setCancelling(true);
             await CancelOrder(order!._id);
+            console.log('✅ Order canceled successfully:', order!._id);
             showNotification('Order successfully canceled', 'success');
             router.back();
-          } catch (err) {
-            console.error('❌ Error cancelling order:', err);
+          } catch (err: any) {
+            console.error('❌ Error cancelling order:', {
+              message: err.message,
+              response: err.response?.data,
+              status: err.response?.status,
+            });
             showNotification('Couldn’t cancel the order. Driver already accepted.', 'error');
           } finally {
             setCancelling(false);
@@ -79,6 +84,7 @@ export default function OrderDetailScreen() {
   };
 
   if (loading || !order) {
+    console.log('⏳ Rendering loading state');
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -103,6 +109,23 @@ export default function OrderDetailScreen() {
     : null;
 
   const isCancelable = !order.deliveryDriverID && ['called', 'pending'].includes(order.status);
+  const cancelButtonText = cancelling
+    ? 'Cancelling...'
+    : order.status === 'cancelled'
+    ? 'Order canceled by you or the restaurant'
+    : order.deliveryDriverID
+    ? 'Driver has accepted order'
+    : 'Order cannot be canceled';
+
+  console.log(
+    isCancelable ? '✅ Cancel button enabled' : `❌ Cancel button disabled: ${cancelButtonText}`,
+    {
+      orderId: order._id,
+      status: order.status,
+      hasDriver: !!order.deliveryDriverID,
+    }
+  );
+
   const canChat = order.deliveryDriverID && order.status !== 'delivered' && order.status !== 'cancelled';
 
   return (
@@ -191,29 +214,14 @@ export default function OrderDetailScreen() {
           </View>
         )}
 
-        {(isCancelable) ? (
-          <TouchableOpacity
-            style={[styles.cancelButton, cancelling && { opacity: 0.6 }]}
-            onPress={handleCancel}
-            disabled={cancelling}
-          >
-            <Ionicons name="close-circle" size={18} color="#fff" style={{ marginRight: 6 }} />
-            <Text style={styles.cancelText}>{cancelling ? 'Cancelling...' : 'Cancel Order'}</Text>
-          </TouchableOpacity>
-        ):(
-          <TouchableOpacity
-            style={[styles.cancelButton, { opacity: 0.5 }]}
-            disabled={true}
-          >
-            <Ionicons name="close-circle" size={18} color="#fff" style={{ marginRight: 6 }} />
-            <Text style={styles.cancelText}>{cancelling ? 'Cancelling...' : 'Driver Accepted, cannot cancel'}</Text>
-          </TouchableOpacity>
-        )}
-
-        {/* <TouchableOpacity style={styles.supportButton}>
-          <Ionicons name="help-circle-outline" size={16} color={colors.primary} />
-          <Text style={styles.supportText}>Got issues with this order?</Text>
-        </TouchableOpacity> */}
+        <TouchableOpacity
+          style={[styles.cancelButton, !isCancelable && { opacity: 0.5 }]}
+          onPress={isCancelable ? handleCancel : undefined}
+          disabled={!isCancelable}
+        >
+          <Ionicons name="close-circle" size={18} color="#fff" style={{ marginRight: 6 }} />
+          <Text style={styles.cancelText}>{cancelButtonText}</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -256,8 +264,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   cancelText: { color: '#fff', fontWeight: '600' },
-  supportButton: { flexDirection: 'row', alignItems: 'center', marginTop: 16 },
-  supportText: { marginLeft: 6, color: colors.primary, fontWeight: '500' },
   statusLabel: {
     alignSelf: 'flex-start',
     paddingHorizontal: 10,
