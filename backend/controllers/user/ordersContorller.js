@@ -247,7 +247,7 @@ const getProductsForRestaurant = async (req, res) => {
     console.log('restaurant:', restaurant);
 
     const products = await Product.find({
-    restaurantId: restaurantID,
+    restaurantId: restraurantID,
     $or: [
         { isBanned: null },
         { isBanned: false }
