@@ -1,4 +1,37 @@
 import apiClient from '../apiclient';
+import { OrderDriver } from '../types/orderDriver';
+
+
+export const updateProfileInformation = async (profileData: {name: string, phone: string, email: string}) => {
+    try {
+        const response = await apiClient.put('/api/admin/updateAdminProfile', {
+            name: profileData.name,
+            phone: profileData.phone,
+            email: profileData.email
+        });
+
+        return response;
+    } catch (error: any) {
+        console.error("error", error.response?.data || error.message);
+        throw error;
+    }
+}
+
+export const updateProfilePicture = async (image: string) => {
+    try {
+        if(image === "")
+            throw new Error("can't upload nothing");
+        const response = await apiClient.put('/api/admin/updateAdminProfilePhoto', {
+            imageBase64: image,
+            tags: []
+        });
+
+        return response;
+    } catch (error: any) {
+        console.error("error", error.response?.data || error.message);
+        throw error;
+    }
+}
 
 export const fetchAllUsers = async () => {
     try {
@@ -156,6 +189,102 @@ export const banRestaurantAccess = async (userId: string, flag: boolean) => {
             const response = await apiClient.put(`/api/admin/unbanRestaurant?restaurantId=${userId}`);
             return response;
         }
+    } catch (error: any) {
+        console.error("error", error.response?.data || error.message);
+        throw error;
+    }
+}
+
+export const fetchActiveOrders = async () => {
+    try {
+        const driversData = await fetchAllDrivers();
+        const response = await apiClient.get('/api/admin/getProcessingOrders');
+        const orders: OrderDriver[] = response.data.data
+            .filter((order: any) => order.status !== 'pending')
+            .map((order: any) => ({
+            orderId: order._id,
+            deliveryAddress: order.userID.addresses.find((address: any) => address.isDefault == true),
+            userId: order.userID == null ? {name: "Guest", phone: "333", email: "none", _id: "fmfnjnwdoi"} : order.userID,
+            totalAmount: order.totalAmount,
+            driverId: driversData.find((driver: any) => driver._id === order.deliveryDriverID) || {
+                _id: "none",
+                name: "Guest",
+                phone: "333",
+                profilePicture: "none",
+                vehicle: {
+                    category: "none",
+                    model: "none",
+                    plateNumber: "none"
+                }
+            },
+            restaurantId: {...order.restaurantID, logo: order.restaurantID.logo, phone: order.restaurantID.contact.phone},
+            items: order.items.map((item: any) => ({
+                itemId: item.productId._id,
+                itemPrice: item.productId.price,
+                itemName: item.productId.name,
+                itemQuantity: item.quantity,
+                itemDescription: item.productId.description,
+            })),
+            createdOn: order.createdAt,
+            }));
+      
+        return orders;
+    } catch (error: any) {
+        console.error("error", error.response?.data || error.message);
+        throw error;
+    }
+}
+
+export const fetchUsersOrders = async (userId: string) => {
+    try {
+        const response = await apiClient.get(`/api/admin/getAllOrdersForCetainUser?userId=${userId}`);
+        const orders: OrderDriver[] = response.data.data.map((order: any) => ({
+            orderId: order._id,
+            deliveryAddress: order.userID.addresses.find((address: any) => address.isDefault == true),
+            userId: order.userID,
+            totalAmount: order.totalAmount,
+            driverId: order.deliveryDriverID,
+            restaurantId: {...order.restaurantID, logo: order.restaurantID.logo, phone: order.restaurantID.contact.phone},
+            items: order.items.map((item: any) => ({
+                itemId: item.productId._id,
+                itemPrice: item.productId.price,
+                itemName: item.productId.name,
+                itemQuantity: item.quantity,
+                itemDescription: item.productId.description,
+            })),
+            createdOn: order.createdAt,
+            status: order.status,
+        }));
+
+        return orders;
+    } catch (error: any) {
+        console.error("error", error.response?.data || error.message);
+        throw error;
+    }
+}
+
+export const fetchDriversOrders = async (driverId: string) => {
+    try {
+        const response = await apiClient.get(`/api/admin/getDriverOrdersHistory?driverId=${driverId}`);
+        const orders: OrderDriver[] = response.data.data.map((order: any) => ({
+            orderId: order._id,
+            deliveryAddress: order.userID.addresses.find((address: any) => address.isDefault == true),
+            userId: order.userID,
+            totalAmount: order.totalAmount,
+            driverId: order.deliveryDriverID,
+            restaurantId: {...order.restaurantID, logo: order.restaurantID.logo, phone: order.restaurantID.contact.phone},
+            items: order.items.map((item: any) => ({
+                itemId: item.productId._id,
+                itemPrice: item.productId.price,
+                itemName: item.productId.name,
+                itemQuantity: item.quantity,
+                itemDescription: item.productId.description,
+            })),
+            createdOn: order.createdAt,
+            status: order.status,
+        }));
+
+        return orders;
     } catch (error: any) {
         console.error("error", error.response?.data || error.message);
         throw error;
