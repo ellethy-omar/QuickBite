@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { AddRestaurantProduct, EditRestaurantProduct, GetRestaurantProducts, EditRestaurantProductImage } from '@/app/endpoints/restaurantEndpoints';
+import { GetRestaurantProducts, AddRestaurantProduct, EditRestaurantProduct, EditRestaurantProductImage } from '@/app/endpoints/restaurantEndpoints';
 import { useNotification } from '@/app/context/notificationContext';
 import * as ImagePicker from 'expo-image-picker';
 import { Switch } from 'react-native';
 import colors from '@/app/styles/colors';
 
 export default function AddOrEditProductScreen() {
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  console.log('🛠 AddOrEditProductScreen mounted');
+  const params = useLocalSearchParams();
+  const productId = params.productId as string | undefined;
   const router = useRouter();
   const { showNotification } = useNotification();
 
@@ -18,6 +20,7 @@ export default function AddOrEditProductScreen() {
     description: '',
     price: '',
     category: '',
+    stockAvailable: '',
     isAvailable: true,
     image: '',
   });
@@ -25,29 +28,32 @@ export default function AddOrEditProductScreen() {
   const [saving, setSaving] = useState(false);
   const [newImageBase64, setNewImageBase64] = useState<string | null>(null);
 
-  const isFormValid = formData.name.trim() && formData.price.trim() && formData.category.trim();
+  const isFormValid = formData.name.trim() && formData.price.trim() && formData.category.trim() && formData.stockAvailable.trim();
 
   useEffect(() => {
-    if (id) {
+    console.log('📋 All params:', params);
+    if (productId) {
       const fetchProduct = async () => {
         try {
           setLoading(true);
+          console.log('📡 Fetching products to find product:', productId);
           const response = await GetRestaurantProducts();
           console.log('📦 Fetched products:', response.data);
-          const product = response.data.find((p: any) => p._id === id);
+          const product = response.data.find((p: any) => p._id === productId);
           if (product) {
             setFormData({
               _id: product._id,
-              name: product.name,
-              description: product.description,
-              price: product.price.toString(),
-              category: product.category,
-              isAvailable: product.isAvailable,
+              name: product.name || '',
+              description: product.description || '',
+              price: product.price ? product.price.toString() : '',
+              category: product.category || '',
+              stockAvailable: product.stockAvailable ? product.stockAvailable.toString() : '',
+              isAvailable: product.isAvailable ?? true,
               image: product.image || '',
             });
             console.log('✅ Product loaded:', product);
           } else {
-            console.warn('⚠️ Product not found for id:', id);
+            console.warn('⚠️ Product not found for id:', productId);
             showNotification('Product not found.', 'error');
           }
         } catch (error: any) {
@@ -63,7 +69,7 @@ export default function AddOrEditProductScreen() {
       };
       fetchProduct();
     }
-  }, [id]);
+  }, [productId, showNotification]);
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -82,7 +88,6 @@ export default function AddOrEditProductScreen() {
     });
 
     if (!result.canceled && result.assets?.[0]?.base64) {
-      // Clean Base64 by removing data URI prefix (if present)
       const base64 = result.assets[0].base64.replace(/^data:image\/[a-z]+;base64,/, '');
       setNewImageBase64(base64);
       console.log('✅ Image selected, cleaned Base64 length:', base64.length);
@@ -98,51 +103,50 @@ export default function AddOrEditProductScreen() {
         name: formData.name.trim(),
         price: formData.price.trim(),
         category: formData.category.trim(),
+        stockAvailable: formData.stockAvailable.trim(),
       });
       return;
     }
-  
+
     try {
       setSaving(true);
-  
+
       const payload = {
         _id: formData._id,
         name: formData.name.trim(),
         description: formData.description.trim(),
         price: parseFloat(formData.price),
         category: formData.category.trim(),
+        stockAvailable: parseInt(formData.stockAvailable),
         isAvailable: formData.isAvailable,
       };
-  
+
       console.log('📤 Sending product payload:', payload);
-  
-      let productId = formData._id;
-  
-      if (id) {
+
+      let savedProductId = formData._id;
+
+      if (productId) {
         // ✅ EDIT
         const response = await EditRestaurantProduct(payload);
         console.log('✅ Product updated successfully:', response);
         showNotification('Product updated successfully!', 'success');
       } else {
         // ✅ ADD
-        const response = await AddRestaurantProduct({
-          ...payload,
-          stockAvailable: 99, // only needed in Add
-        });
-        productId = response._id;
+        const response = await AddRestaurantProduct(payload);
+        savedProductId = response._id;
         console.log('✅ Product added successfully:', response);
         showNotification('Product added successfully!', 'success');
       }
-  
+
       // ✅ Upload image if selected
-      if (newImageBase64 && productId) {
+      if (newImageBase64 && savedProductId) {
         const imagePayload = {
-          _id: productId,
+          _id: savedProductId,
           imageBase64: newImageBase64,
           tags: ['product'],
         };
         console.log('📸 Sending image upload:', {
-          productId,
+          productId: savedProductId,
           imageBase64Length: newImageBase64.length,
           tags: imagePayload.tags,
         });
@@ -158,10 +162,10 @@ export default function AddOrEditProductScreen() {
           });
           showNotification('Failed to update product image.', 'error');
         }
-      } else if (newImageBase64 && !productId) {
+      } else if (newImageBase64 && !savedProductId) {
         console.warn('⚠️ Skipping image upload: missing productId');
       }
-  
+
       router.back();
     } catch (error: any) {
       console.error('❌ Error saving product:', {
@@ -174,8 +178,8 @@ export default function AddOrEditProductScreen() {
       setSaving(false);
     }
   };
-  
-  if (id && loading) {
+
+  if (productId && loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -198,45 +202,55 @@ export default function AddOrEditProductScreen() {
       </TouchableOpacity>
 
       <Text style={styles.label}>Product Name</Text>
-      <TextInput 
-        style={styles.input} 
-        value={formData.name} 
-        onChangeText={(text) => setFormData({ ...formData, name: text })} 
-        placeholder="Enter product name" 
+      <TextInput
+        style={styles.input}
+        value={formData.name}
+        onChangeText={(text) => setFormData({ ...formData, name: text })}
+        placeholder="Enter product name"
       />
 
       <Text style={styles.label}>Description</Text>
-      <TextInput 
-        style={[styles.input, { height: 80 }]} 
-        value={formData.description} 
-        multiline 
-        onChangeText={(text) => setFormData({ ...formData, description: text })} 
-        placeholder="Enter description" 
+      <TextInput
+        style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
+        value={formData.description}
+        multiline
+        onChangeText={(text) => setFormData({ ...formData, description: text })}
+        placeholder="Enter description"
       />
 
       <Text style={styles.label}>Price</Text>
-      <TextInput 
-        style={styles.input} 
-        value={formData.price} 
-        keyboardType="decimal-pad" 
-        onChangeText={(text) => setFormData({ ...formData, price: text })} 
-        placeholder="Enter price" 
+      <TextInput
+        style={styles.input}
+        value={formData.price}
+        keyboardType="decimal-pad"
+        onChangeText={(text) => setFormData({ ...formData, price: text })}
+        placeholder="Enter price"
       />
 
       <Text style={styles.label}>Category</Text>
-      <TextInput 
-        style={styles.input} 
-        value={formData.category} 
-        onChangeText={(text) => setFormData({ ...formData, category: text })} 
-        placeholder="Enter category" 
+      <TextInput
+        style={styles.input}
+        value={formData.category}
+        onChangeText={(text) => setFormData({ ...formData, category: text })}
+        placeholder="Enter category"
       />
-      {/* <View style={styles.switchContainer}>
-  <Text style={styles.label}>Available:</Text>
-  <Switch
-    value={formData.isAvailable}
-    onValueChange={(value) => setFormData({ ...formData, isAvailable: value })}
-  />
-</View> */}
+
+      <Text style={styles.label}>Stock Available</Text>
+      <TextInput
+        style={styles.input}
+        value={formData.stockAvailable}
+        keyboardType="numeric"
+        onChangeText={(text) => setFormData({ ...formData, stockAvailable: text })}
+        placeholder="Enter stock available"
+      />
+
+      <View style={styles.switchContainer}>
+        <Text style={styles.label}>Available</Text>
+        <Switch
+          value={formData.isAvailable}
+          onValueChange={(value) => setFormData({ ...formData, isAvailable: value })}
+        />
+      </View>
 
       <TouchableOpacity
         style={[
@@ -250,7 +264,7 @@ export default function AddOrEditProductScreen() {
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={styles.saveButtonText}>
-            {id ? 'Update Product' : 'Add Product'}
+            {productId ? 'Update Product' : 'Add Product'}
           </Text>
         )}
       </TouchableOpacity>
@@ -272,5 +286,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 10,
+    marginBottom: 10,
   },
 });

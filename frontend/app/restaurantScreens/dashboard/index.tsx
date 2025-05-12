@@ -76,7 +76,7 @@ export default function DashboardScreen() {
               await DeleteRestaurantProduct(productId);
               console.log('✅ Product deleted successfully:', productId);
               showNotification('Product deleted successfully!', 'success');
-              fetchProducts(); // Refresh products
+              fetchProducts();
             } catch (error: any) {
               console.error('❌ Error deleting product:', {
                 productId,
@@ -116,7 +116,8 @@ export default function DashboardScreen() {
           </Text>
           <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
           <Text style={styles.productStock}>
-            Stock: {item.stockAvailable} {item.isAvailable ? '(Available)' : '(Unavailable)'}
+            Stock: x{item.stockAvailable} 
+            {/* {item.isAvailable ? '(Available)' : '(Unavailable)'} */}
           </Text>
         </View>
         <View style={styles.productActions}>
