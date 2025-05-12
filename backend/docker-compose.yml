@@ -21,6 +21,7 @@ services:
       - HUGGINGFACE_API_KEY=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
       - EMAIL=omarg1020304@gmail.com
       - EMAIL_PASS=zapetrlqncynjuqm
+      - GROQ_API_KEY=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
 
     depends_on:
       - mongo_db
