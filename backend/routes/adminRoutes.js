@@ -19,9 +19,9 @@ const {
     getAllDrivers,
     getAllRestaurants,
     getAllProductsOfCertainRestaurant,
-    sendWarningToUser,
-    sendWarningToDriver,
-    sendWarningToRestaurant
+    getAllOrdersForCetainUser,
+    getDriverOrdersHistory,
+    getProcessingOrders
 } = require('../controllers/admin/dashboardController')
 
 const {
@@ -43,11 +43,9 @@ router.get('/getAllUsers', getAllUsers);
 router.get('/getAllDrivers', getAllDrivers);
 router.get('/getAllRestaurants', getAllRestaurants);
 router.get('/getAllProductsOfCertainRestaurant', getAllProductsOfCertainRestaurant)
-
-router.post('/sendWarningToUser', sendWarningToUser);
-router.post('/sendWarningToDriver', sendWarningToDriver)
-router.post('/sendWarningToRestaurant', sendWarningToRestaurant)
-
+router.get('/getAllOrdersForCetainUser', getAllOrdersForCetainUser)
+router.get('/getDriverOrdersHistory', getDriverOrdersHistory)
+router.get('/getProcessingOrders', getProcessingOrders)
 
 // ban routes
 router.put('/banUser', banUser)
