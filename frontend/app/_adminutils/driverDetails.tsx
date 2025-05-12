@@ -11,6 +11,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import SmartImage from "../components/smartImage";
 import { sendMessageAdmin, banDriverAccess } from "../endpoints/adminEndpoints";
 import { Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { fetchDriversOrders } from "../endpoints/adminEndpoints";
 
 export default function DriverDetailsScreen() {
     const { driver } = useLocalSearchParams();
@@ -75,7 +76,12 @@ export default function DriverDetailsScreen() {
   useEffect(() => {
       const fetchOrders = async () => {
           try {
-
+              const response = await fetchDriversOrders(driverData._id);
+              if(response.length > 0) {
+                  setDriverData({...driverData, orders: response});
+              } else {
+                  showNotification("No orders available for this driver", "info");
+              }
           } catch {
               showNotification("an error occurred while loading orders, please try again", "error");
           } finally {
@@ -138,6 +144,29 @@ export default function DriverDetailsScreen() {
                             <Text style={styles.infoText}>Vehicle Type:  <Text style={{color:"gray"}}>{driverData.vehicle.category}</Text></Text>
                             <Text style={styles.infoText}>Vehicle Model:  <Text style={{color:"gray"}}>{driverData.vehicle.model}</Text></Text>
                             <Text style={styles.infoText}>Vehicle Plate:  <Text style={{color:"gray"}}>{driverData.vehicle.plateNumber}</Text></Text>
+                        </View>
+                        <View style={{gap: 5}}>
+                            <Text style={styles.subtitle}>Orders</Text>
+                            {fetching ? (
+                                <Text style={{ fontSize: 20, fontWeight: "500", color: colors.primary, textAlign: 'center', marginTop: 100 }}>
+                                    Loading orders...
+                                </Text>
+                            ) : driverData.orders.length > 0 ? (
+                                driverData.orders.map((order, index: number) => (
+                                    <View key={index} style={{gap: 5}}>
+                                        <Text style={styles.infoText}>Delivered to:  <Text style={{color:"gray"}}>{order.userId.name}</Text></Text>
+                                        <Text style={styles.infoText}>Delivery Address:  <Text style={{color:"gray"}}>{order.deliveryAddress.area}, {order.deliveryAddress.street}, {order.deliveryAddress.building}, {order.deliveryAddress.apartment}, {order.deliveryAddress.floor}</Text></Text>
+                                        <Text style={styles.infoText}>Restaurant:  <Text style={{color:"gray"}}>{order.restaurantId.name}</Text></Text>
+                                        <Text style={styles.infoText}>Order Amount:  <Text style={{color:"gray"}}>{order.totalAmount} EGP</Text></Text>
+                                        <Text style={styles.infoText}>Order Status:  <Text style={{color:"gray"}}>{order.status}</Text></Text>
+                                        <View style={{width: "80%", height: 1, backgroundColor: "gray", marginHorizontal: "auto", marginVertical: 10}} />
+                                    </View>
+                                ))
+                            ) : (
+                                <Text style={{ fontSize: 20, fontWeight: "500", color: colors.primary, textAlign: 'center', marginTop: 100 }}>
+                                    No current orders available
+                                </Text>
+                            )}
                         </View>
                     </View>
                     </ScrollView>
