@@ -210,10 +210,10 @@ export default function OrderDetailScreen() {
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={styles.supportButton}>
+        {/* <TouchableOpacity style={styles.supportButton}>
           <Ionicons name="help-circle-outline" size={16} color={colors.primary} />
           <Text style={styles.supportText}>Got issues with this order?</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </ScrollView>
   );
