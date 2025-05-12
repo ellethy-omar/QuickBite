@@ -5,9 +5,9 @@ export default function ChatBoxBot({flag, message}: {flag: boolean, message: str
     console.log('ChatBoxBot - flag:', flag, 'message:', message);
     return (
         <View style={{ flexDirection: 'row', justifyContent: flag? 'flex-start' : 'flex-end', padding: 10 }}>
-        <View style={flag ? styles.containerOriginal : styles.containerOther}>
-            <View style={flag ? styles.senderMessage : styles.receiverMessage}>
-                <Text style={flag ? styles.senderText : styles.receiverText}>{message}</Text>
+        <View style={!flag ? styles.containerOriginal : styles.containerOther}>
+            <View style={!flag ? styles.senderMessage : styles.receiverMessage}>
+                <Text style={!flag ? styles.senderText : styles.receiverText}>{message}</Text>
             </View>
         </View>
         </View>
