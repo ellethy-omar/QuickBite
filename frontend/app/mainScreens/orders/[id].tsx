@@ -102,7 +102,7 @@ export default function OrderDetailScreen() {
       })
     : null;
 
-  const isCancelable = !order.deliveryDriverID && order.status === 'pending';
+  const isCancelable = !order.deliveryDriverID && ['called', 'pending'].includes(order.status);
   const canChat = order.deliveryDriverID && order.status !== 'delivered' && order.status !== 'cancelled';
 
   return (
@@ -112,11 +112,10 @@ export default function OrderDetailScreen() {
         <Text
           style={[
             styles.statusLabel,
-            order.status === 'cancelled'
-              ? styles.statusCancelled
-              : order.status === 'delivered'
-              ? styles.statusDelivered
-              : styles.statusProcessing,
+            order.status === 'called' ? styles.statusCalled :
+            order.status === 'cancelled' ? styles.statusCancelled :
+            order.status === 'delivered' ? styles.statusDelivered :
+            styles.statusProcessing,
           ]}
         >
           {order.status.toUpperCase()}
@@ -192,14 +191,22 @@ export default function OrderDetailScreen() {
           </View>
         )}
 
-        {(isCancelable || true) && (
+        {(isCancelable) ? (
           <TouchableOpacity
             style={[styles.cancelButton, cancelling && { opacity: 0.6 }]}
             onPress={handleCancel}
-            disabled={cancelling || !isCancelable}
+            disabled={cancelling}
           >
             <Ionicons name="close-circle" size={18} color="#fff" style={{ marginRight: 6 }} />
             <Text style={styles.cancelText}>{cancelling ? 'Cancelling...' : 'Cancel Order'}</Text>
+          </TouchableOpacity>
+        ):(
+          <TouchableOpacity
+            style={[styles.cancelButton, { opacity: 0.5 }]}
+            disabled={true}
+          >
+            <Ionicons name="close-circle" size={18} color="#fff" style={{ marginRight: 6 }} />
+            <Text style={styles.cancelText}>{cancelling ? 'Cancelling...' : 'Driver Accepted, cannot cancel'}</Text>
           </TouchableOpacity>
         )}
 
@@ -261,6 +268,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 12,
     textTransform: 'uppercase',
+  },
+  statusCalled: {
+    backgroundColor: '#E0F7FA',
+    color: '#0288D1',
   },
   statusDelivered: {
     backgroundColor: '#E8F5E9',
