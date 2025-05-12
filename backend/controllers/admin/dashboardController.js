@@ -136,7 +136,7 @@ const getDriverOrdersHistory = async (req, res) => {
 
 const getProcessingOrders = async (req, res) => {
     try {
-        const orders = await Order.find()
+        const orders = await Order.find({status: ['processing', 'pending']})
         .populate('restaurantID', 'name address logo contact.phone')
         .populate('userID', 'name phone addresses')
         .populate('items.productId', 'name price category description image')
