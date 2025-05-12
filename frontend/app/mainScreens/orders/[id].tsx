@@ -114,8 +114,8 @@ export default function OrderDetailScreen() {
     : order.status === 'cancelled'
     ? 'Order canceled by you or the restaurant'
     : order.deliveryDriverID
-    ? 'Driver has accepted order'
-    : 'Order cannot be canceled';
+    ? 'Order cannot be canceled, Driver already accepted'
+    : 'Cancel Order';
 
   console.log(
     isCancelable ? '✅ Cancel button enabled' : `❌ Cancel button disabled: ${cancelButtonText}`,
