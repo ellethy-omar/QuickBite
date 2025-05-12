@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView, RefreshControl, SafeAreaView
 import { useSelector } from 'react-redux';
 import { DriverData } from '../types/driver';
 import colors from '../styles/colors';
-import { fetchDriverProfile, fetchDriverHistory, sendAdminRequest } from '../endpoints/driverEndpoints';
+import { fetchDriverProfile, fetchDriverHistory, sendAdminRequest, fetchAllNotifications } from '../endpoints/driverEndpoints';
 import { OrderDriver } from "../types/orderDriver"
 import { Modalize } from 'react-native-modalize';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -21,6 +21,8 @@ export default function ProfileView() {
     const requestModalRef = useRef<Modalize>(null);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [requestContent, setRequestContent] = useState("");
+    const [notificationMode, setNotificationMode] = useState(false);
+
     const handleLogout = useHandleLogout();
 
     const openRequestModal = () => {
@@ -67,9 +69,19 @@ export default function ProfileView() {
         }
     }
 
+    const fetchNotifications = async () => {
+        try {
+            const response = await fetchAllNotifications();
+            setNotifications(response);
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        }
+    }
+
     useEffect(() => {
         if(!fetching) return;
 
+        fetchNotifications();
         fetchOrderLog();
         fetchProfile()
     }, [])
@@ -102,14 +114,14 @@ export default function ProfileView() {
                 ) : (
                     <View style={{gap: 25}}>
                     <View style={styles.utilSection}>
-                        <View style={{position: "relative"}}>
+                        <TouchableOpacity onPress={() => setNotificationMode(!notificationMode)} style={{position: "relative", zIndex: 20}}>
                             {notifications.length > 0 && (
                                 <View style={{position: "absolute", top: -1, right: -5, zIndex: 100, backgroundColor: "red", width: 15, height: 15, borderRadius: 50, justifyContent: "center", alignItems: "center"}}>
                                     <Text style={{color: "white", fontSize: 10, fontWeight: "700"}}>{notifications.length}</Text>
                                 </View>
                             )}
-                            <MaterialIcons name="notifications" size={23} color={colors.primary} onPress={() => navigation.navigate("EditProfile")} />
-                        </View>
+                            <MaterialIcons name="notifications" size={23} color={colors.primary}/>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={openRequestModal} style={styles.utilButton}>
                             <Text style={{color: "white", fontWeight: "500", fontSize: 12}}>Submit a Request</Text>
                         </TouchableOpacity>
@@ -123,26 +135,47 @@ export default function ProfileView() {
                             <MaterialIcons name="star" size={20} color={colors.primary} />
                         </View>
                     </View>
-                    <View style={{gap: 5}}>
-                        <Text style={{fontSize: 24, marginBottom: 2, fontWeight: '700', color: colors.primary}}>Order History</Text>
-                        {orderLog.length == 0 ? (
-                            <Text style={{fontSize: 13, fontWeight: '500'}}>No orders delivered yet</Text>
-                        ) : (
-                            <View style={{gap: 10, borderWidth: 0.8, borderColor: colors.primary, padding: 10, borderRadius: 15}}>
-                            {orderLog.map((order, index) => (
-                                <>
-                                    <View key={order.orderId} style={{gap: 5}}>
-                                        <Text style={{fontSize: 13, fontWeight: '500'}}>Restaurant Name: <Text style={{color: colors.primary}}>{order.restaurantId.name}</Text></Text>
-                                        <Text style={{fontSize: 13, fontWeight: '500'}}>Customer Name: <Text style={{color: colors.primary}}>{order.userId.name}</Text></Text>
-                                        <Text style={{fontSize: 13, fontWeight: '500'}}>Delivery Address: <Text style={{color: colors.primary}}>{order.deliveryAddress.area}, {order.deliveryAddress.street}, {order.deliveryAddress.building}, {order.deliveryAddress.apartment}, {order.deliveryAddress.floor}</Text></Text>
-                                        <Text style={{fontSize: 13, fontWeight: '500'}}>Total Amount: <Text style={{color: colors.primary}}>{order.totalAmount} EGP</Text></Text>
+                        {!notificationMode ? (
+                            <View style={{gap: 5}}>
+                                <Text style={{fontSize: 24, marginBottom: 2, fontWeight: '700', color: colors.primary}}>Order History</Text>
+                                {orderLog.length == 0 ? (
+                                    <Text style={{fontSize: 13, fontWeight: '500'}}>No orders delivered yet</Text>
+                                ) : (
+                                    <View style={{gap: 10, borderWidth: 0.8, borderColor: colors.primary, padding: 10, borderRadius: 15}}>
+                                    {orderLog.map((order, index) => (
+                                        <>
+                                            <View key={order.orderId} style={{gap: 5}}>
+                                                <Text style={{fontSize: 13, fontWeight: '500'}}>Restaurant Name: <Text style={{color: colors.primary}}>{order.restaurantId.name}</Text></Text>
+                                                <Text style={{fontSize: 13, fontWeight: '500'}}>Customer Name: <Text style={{color: colors.primary}}>{order.userId.name}</Text></Text>
+                                                <Text style={{fontSize: 13, fontWeight: '500'}}>Delivery Address: <Text style={{color: colors.primary}}>{order.deliveryAddress.area}, {order.deliveryAddress.street}, {order.deliveryAddress.building}, {order.deliveryAddress.apartment}, {order.deliveryAddress.floor}</Text></Text>
+                                                <Text style={{fontSize: 13, fontWeight: '500'}}>Total Amount: <Text style={{color: colors.primary}}>{order.totalAmount} EGP</Text></Text>
+                                            </View>
+                                            <View key={index} style={{width: "80%", height: 1, backgroundColor: "gray", marginVertical: 10, marginHorizontal: "auto"}} />
+                                        </>
+                                    ))}
                                     </View>
-                                    <View key={index} style={{width: "80%", height: 1, backgroundColor: "gray", marginVertical: 10, marginHorizontal: "auto"}} />
-                                </>
-                            ))}
+                                )}
+                            </View>
+                        ) : (
+                            <View style={{gap: 5}}>
+                                <Text style={{fontSize: 24, marginBottom: 2, fontWeight: '700', color: colors.primary}}>Notifications</Text>
+                                {notifications.length == 0 ? (
+                                    <Text style={{fontSize: 13, fontWeight: '500'}}>No notifications yet</Text>
+                                ) : (
+                                    <View style={{gap: 15, borderWidth: 0.8, borderColor: colors.primary, padding: 10, borderRadius: 15}}>
+                                        {notifications.map((notification, index) => (
+                                            <>
+                                                <View key={notification.id} style={{gap: 10}}>
+                                                    <Text style={{fontSize: 18, fontWeight: '500'}}>{notification.adminName}</Text>
+                                                    <Text style={{fontSize: 13, fontWeight: '400'}}>{notification.description}</Text>
+                                                </View>
+                                                <View key={index} style={{width: "80%", height: 1, backgroundColor: "gray", marginTop: 10, marginHorizontal: "auto"}} />
+                                            </>
+                                        ))}
+                                    </View>
+                                )}
                             </View>
                         )}
-                    </View>
                     </View>
                 )}
                 </ScrollView>

@@ -9,6 +9,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import useHandleLogout from '@/hooks/useHandleLogout';
 import ConfirmActionModal from '../components/modals/confirmActionModal';
 import { fetchAdminMail, replyToMail } from '../endpoints/adminEndpoints';
+import { useNotification } from '../context/notificationContext';
 
 export default function DashboardScreen() {
     const adminData = useSelector((state: { admin: AdminData }) => state.admin);
@@ -81,6 +82,7 @@ export default function DashboardScreen() {
     const handleLogout = useHandleLogout();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [replyMessage, setReplyMessage] = useState("");
+    const { showNotification } = useNotification();
 
     useEffect(() => {
         const fetchMails = async () => {
@@ -105,17 +107,33 @@ export default function DashboardScreen() {
         }
     }, [modalData]);
 
+    const handleMailIgnore = async (toIgnoreData) => {
+        try {
+            await replyToMail(toIgnoreData?.id, "ignored", "rejected");
+            setModalData(null);
+            showNotification("Mail ignored successfully!", "success");
+        } catch (error) {
+            console.error("Error ignoring mail:", error);
+            showNotification("An error occurred while ignoring the mail, please try again", "error");
+        } finally {
+            setReplyMessage("");
+            setModalData(null);
+        }
+    }
+
     const handleMailReply = async () => {
         if (replyMessage === "") {
-            console.log("Reply message cannot be empty");
+            showNotification("Can't send an empty message", "info");
             return;
         }
         try {
-            await replyToMail(modalData?.senderId, replyMessage, "Driver");
+            await replyToMail(modalData?.id, replyMessage, "accepted");
+            showNotification("Mail sent successfully!", "success");
             setModalData(null);
             setReplyMessage("");
         } catch (error) {
             console.error("Error sending reply:", error);
+            showNotification("An error occurred while sending the reply, please try again", "error");
         }
     };
 
@@ -153,7 +171,7 @@ export default function DashboardScreen() {
             {filteredMails.length == 0 ? (
                 <Text style={{color: colors.primary, fontSize: 16, fontWeight: '700', textAlign: 'center', marginTop: 50}}>No Mails Found</Text>
             ):(
-                <FlatList data={filteredMails} keyExtractor={(item) => item.id} renderItem={({ item }) => <DriverMail driverData={item} setMailData={setModalData} />} contentContainerStyle={{ gap: 10 }} />)}
+                <FlatList data={filteredMails} keyExtractor={(item) => item.id} renderItem={({ item }) => <DriverMail onIgnore={handleMailIgnore} driverData={item} setMailData={setModalData} />} contentContainerStyle={{ gap: 10 }} />)}
             </View>
             
             <Modalize ref={mailReplyModalRef} adjustToContentHeight modalStyle={styles.modalStyle}>

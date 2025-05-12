@@ -88,7 +88,7 @@ export default function UsersManageScreen() {
             {loading ? (
               <Text style={styles.noResultsText}>Loading...</Text>
             ) : (
-              <>
+              <View style={{ gap: 10, paddingBottom: 30 }}>
               {filteredUsers.length === 0 ? (
               <Text style={styles.noResultsText}>No Restaurants Found</Text>
             ) : (
@@ -96,7 +96,7 @@ export default function UsersManageScreen() {
                 <UserContainer key={item._id} userData={item}/>
               ))
             )}
-              </>
+              </View >
             )}
           </ScrollView>
     

@@ -16,11 +16,7 @@ export default function useChatWebSocket({ chatData, setChatData, lastMessageRef
   useEffect(() => {
     const connectWebSocket = async () => {
       try {
-        let token: string;
-        if (role === 'user') {
-          token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODEzNDc0ODM4NmZiYzBlOWEwY2NlMWQiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0NzAwMjEzNCwiZXhwIjoxNzQ3NjA2OTM0fQ.QWt2uH1bDoQqcJefgaGZgBSr4oLCglIXIFfVhh5GHfY';
-          console.log('🔑 Using hardcoded user token:', `${token.slice(0, 20)}... (length: ${token.length})`);
-        } else {
+          let token = "";
           token = await SecureStore.getItemAsync('jwtToken') || '';
           console.log('🔑 JWT token:', token ? `${token.slice(0, 20)}... (length: ${token.length})` : 'Missing');
           if (!token) throw new Error('No token found');
@@ -29,7 +25,6 @@ export default function useChatWebSocket({ chatData, setChatData, lastMessageRef
             token = await refreshAuthToken() || '';
             console.log('🔑 Refreshed token:', token ? `${token.slice(0, 20)}... (length: ${token.length})` : 'Failed');
           }
-        }
 
         const endpoint = role === 'user' ? 'user' : 'driver';
         ws.current = new WebSocket(`wss://quickbite.zapto.org/${endpoint}?token=${token}`);

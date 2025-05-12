@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TextInput } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { ChatDriver, ChatMessage } from '@/app/types/chat';
-import ChatBox from '@/app/components/chatBox';
+import { ChatMessage } from '../types/chat';
+import ChatBox from '../components/chatBox';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import colors from '@/app/styles/colors';
 import useChatWebSocket from '@/hooks/useChatWebsocket';
+import { ChatDriver } from '../types/chat';
 
 export default function UserDriverChat() {
   const { chat, role } = useLocalSearchParams();
