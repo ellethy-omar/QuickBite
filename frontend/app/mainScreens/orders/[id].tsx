@@ -39,19 +39,19 @@ export default function OrderDetailScreen() {
   }, [id]);
 
   const handleCancel = async () => {
-    Alert.alert('Cancel Order', 'You sure you wanna bail on this order?', [
-      { text: 'Nah', style: 'cancel' },
+    Alert.alert('Cancel Order', 'Are you sure you want to cancel this order?', [
+      { text: 'No', style: 'cancel' },
       {
-        text: 'Yup',
+        text: 'Yes',
         onPress: async () => {
           try {
             setCancelling(true);
             await CancelOrder(order!._id);
-            showNotification('Order canned like a pro!', 'success');
+            showNotification('Order successfully canceled', 'success');
             router.back();
           } catch (err) {
             console.error('❌ Error cancelling order:', err);
-            showNotification('Whoops, couldn’t cancel the order.', 'error');
+            showNotification('Couldn’t cancel the order. Driver already accepted.', 'error');
           } finally {
             setCancelling(false);
           }
@@ -102,7 +102,7 @@ export default function OrderDetailScreen() {
       })
     : null;
 
-  const isCancelable = !order.deliveryDriverID && order.status === 'pending';
+  const isCancelable = !order.deliveryDriverID && ['called', 'pending'].includes(order.status);
   const canChat = order.deliveryDriverID && order.status !== 'delivered' && order.status !== 'cancelled';
 
   return (
@@ -112,11 +112,10 @@ export default function OrderDetailScreen() {
         <Text
           style={[
             styles.statusLabel,
-            order.status === 'cancelled'
-              ? styles.statusCancelled
-              : order.status === 'delivered'
-              ? styles.statusDelivered
-              : styles.statusProcessing,
+            order.status === 'called' ? styles.statusCalled :
+            order.status === 'cancelled' ? styles.statusCancelled :
+            order.status === 'delivered' ? styles.statusDelivered :
+            styles.statusProcessing,
           ]}
         >
           {order.status.toUpperCase()}
@@ -192,21 +191,29 @@ export default function OrderDetailScreen() {
           </View>
         )}
 
-        {(isCancelable || true) && (
+        {(isCancelable) ? (
           <TouchableOpacity
             style={[styles.cancelButton, cancelling && { opacity: 0.6 }]}
             onPress={handleCancel}
-            disabled={cancelling || !isCancelable}
+            disabled={cancelling}
           >
             <Ionicons name="close-circle" size={18} color="#fff" style={{ marginRight: 6 }} />
             <Text style={styles.cancelText}>{cancelling ? 'Cancelling...' : 'Cancel Order'}</Text>
           </TouchableOpacity>
+        ):(
+          <TouchableOpacity
+            style={[styles.cancelButton, { opacity: 0.5 }]}
+            disabled={true}
+          >
+            <Ionicons name="close-circle" size={18} color="#fff" style={{ marginRight: 6 }} />
+            <Text style={styles.cancelText}>{cancelling ? 'Cancelling...' : 'Driver Accepted, cannot cancel'}</Text>
+          </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={styles.supportButton}>
+        {/* <TouchableOpacity style={styles.supportButton}>
           <Ionicons name="help-circle-outline" size={16} color={colors.primary} />
           <Text style={styles.supportText}>Got issues with this order?</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </ScrollView>
   );
@@ -261,6 +268,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 12,
     textTransform: 'uppercase',
+  },
+  statusCalled: {
+    backgroundColor: '#E0F7FA',
+    color: '#0288D1',
   },
   statusDelivered: {
     backgroundColor: '#E8F5E9',

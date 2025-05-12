@@ -51,26 +51,13 @@ export default function OrdersScreen() {
 
   const filteredOrders = orders.filter(order => {
     if (activeTab === 'all') return true;
-    if (activeTab === 'active') return ['Processing', 'Preparing', 'On the way', 'pending'].includes(order.status);
-    if (activeTab === 'past') return ['Delivered', 'cancelled'].includes(order.status);
+    if (activeTab === 'active') return ['called', 'pending', 'processing', 'Preparing', 'On the way'].includes(order.status);
+    if (activeTab === 'past') return ['delivered', 'cancelled'].includes(order.status);
     return true;
   });
 
   const navigateToOrderDetail = (id: string) => {
-    (router as any).push(`mainScreens/orders/${id}`);
-  };
-
-  const navigateToChat = () => {
-    const chatParams = {
-      id: 'chat-anas-123', // Fake chat ID
-      messages: [], // No initial messages
-      receiverId: '68134265dcd931f93ef915b9', // Anas alaa's ID
-    };
-    console.log('💬 Navigating to chat with Anas alaa:', chatParams);
-    router.push({
-      pathname: '/_chatutils/userDriverChat',
-      params: { chat: JSON.stringify(chatParams) },
-    });
+    router.push(`mainScreens/orders/${id}`);
   };
 
   const renderOrderItem = ({ item }: { item: RawOrder }) => (
@@ -91,19 +78,17 @@ export default function OrdersScreen() {
         </View>
         <View style={[
           styles.statusContainer,
-          item.status === 'cancelled'
-            ? styles.cancelledStatus
-            : item.status === 'processing' || item.status === 'pending'
-            ? styles.processingStatus
-            : styles.deliveredStatus
+          item.status === 'called' ? styles.calledStatus :
+          item.status === 'cancelled' ? styles.cancelledStatus :
+          item.status === 'processing' || item.status === 'pending' ? styles.processingStatus :
+          styles.deliveredStatus
         ]}>
           <Text style={[
             styles.statusText,
-            item.status === 'cancelled'
-              ? styles.cancelledText
-              : item.status === 'processing' || item.status === 'pending'
-              ? styles.processingText
-              : styles.deliveredText
+            item.status === 'called' ? styles.calledText :
+            item.status === 'cancelled' ? styles.cancelledText :
+            item.status === 'processing' || item.status === 'pending' ? styles.processingText :
+            styles.deliveredText
           ]}>{item.status}</Text>
         </View>
       </View>
@@ -123,16 +108,6 @@ export default function OrdersScreen() {
 
   return (
     <View style={styles.container}>
-      {/* <View style={styles.headerContainer}>
-        <TouchableOpacity 
-          style={styles.chatButton}
-          onPress={navigateToChat}
-        >
-          <FontAwesome name="comment" size={20} color="#fff" />
-          <Text style={styles.chatButtonText}>Chat with Anas alaa</Text>
-        </TouchableOpacity>
-      </View> */}
-
       <View style={styles.tabContainer}>
         <TouchableOpacity 
           style={[styles.tab, activeTab === 'all' && styles.activeTab]}
@@ -185,25 +160,6 @@ export default function OrdersScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  headerContainer: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  chatButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    padding: 12,
-    borderRadius: 8,
-  },
-  chatButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
   tabContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -240,10 +196,12 @@ const styles = StyleSheet.create({
   restaurantName: { fontSize: 16, fontWeight: '600', color: colors.text },
   orderDate: { fontSize: 13, color: '#888', marginTop: 2 },
   statusContainer: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  calledStatus: { backgroundColor: '#E0F7FA' },
   deliveredStatus: { backgroundColor: '#E8F5E9' },
   processingStatus: { backgroundColor: '#FFF8E1' },
   cancelledStatus: { backgroundColor: '#fdecea' },
   statusText: { fontSize: 12, fontWeight: '500' },
+  calledText: { color: '#0288D1' },
   deliveredText: { color: '#388E3C' },
   processingText: { color: '#FFA000' },
   cancelledText: { color: '#d9534f' },

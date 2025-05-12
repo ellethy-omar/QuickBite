@@ -33,6 +33,7 @@ export default function AddOrEditProductScreen() {
         try {
           setLoading(true);
           const response = await GetRestaurantProducts();
+          console.log('📦 Fetched products:', response.data);
           const product = response.data.find((p: any) => p._id === id);
           if (product) {
             setFormData({
@@ -44,9 +45,17 @@ export default function AddOrEditProductScreen() {
               isAvailable: product.isAvailable,
               image: product.image || '',
             });
+            console.log('✅ Product loaded:', product);
+          } else {
+            console.warn('⚠️ Product not found for id:', id);
+            showNotification('Product not found.', 'error');
           }
-        } catch (error) {
-          console.error('Error fetching product:', error);
+        } catch (error: any) {
+          console.error('❌ Error fetching product:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status,
+          });
           showNotification('Failed to load product.', 'error');
         } finally {
           setLoading(false);
@@ -64,14 +73,32 @@ export default function AddOrEditProductScreen() {
       base64: true,
     });
 
+    console.log('📷 Image picker result:', {
+      canceled: result.canceled,
+      assets: result.assets ? result.assets.map(a => ({
+        uri: a.uri,
+        base64Length: a.base64?.length,
+      })) : null,
+    });
+
     if (!result.canceled && result.assets?.[0]?.base64) {
-      setNewImageBase64(result.assets[0].base64);
+      // Clean Base64 by removing data URI prefix (if present)
+      const base64 = result.assets[0].base64.replace(/^data:image\/[a-z]+;base64,/, '');
+      setNewImageBase64(base64);
+      console.log('✅ Image selected, cleaned Base64 length:', base64.length);
+    } else {
+      console.warn('⚠️ Image selection canceled or no Base64 data');
     }
   };
 
   const handleSave = async () => {
     if (!isFormValid) {
       Alert.alert('Error', 'Please fill in all required fields.');
+      console.warn('⚠️ Form invalid, missing required fields:', {
+        name: formData.name.trim(),
+        price: formData.price.trim(),
+        category: formData.category.trim(),
+      });
       return;
     }
   
@@ -87,11 +114,14 @@ export default function AddOrEditProductScreen() {
         isAvailable: formData.isAvailable,
       };
   
+      console.log('📤 Sending product payload:', payload);
+  
       let productId = formData._id;
   
       if (id) {
         // ✅ EDIT
-        await EditRestaurantProduct(payload);
+        const response = await EditRestaurantProduct(payload);
+        console.log('✅ Product updated successfully:', response);
         showNotification('Product updated successfully!', 'success');
       } else {
         // ✅ ADD
@@ -100,30 +130,51 @@ export default function AddOrEditProductScreen() {
           stockAvailable: 99, // only needed in Add
         });
         productId = response._id;
+        console.log('✅ Product added successfully:', response);
         showNotification('Product added successfully!', 'success');
       }
   
       // ✅ Upload image if selected
       if (newImageBase64 && productId) {
-        await EditRestaurantProductImage({
+        const imagePayload = {
           _id: productId,
           imageBase64: newImageBase64,
           tags: ['product'],
+        };
+        console.log('📸 Sending image upload:', {
+          productId,
+          imageBase64Length: newImageBase64.length,
+          tags: imagePayload.tags,
         });
-        showNotification('Product image updated!', 'success');
+        try {
+          const imageResponse = await EditRestaurantProductImage(imagePayload);
+          console.log('✅ Product image updated successfully:', imageResponse);
+          showNotification('Product image updated!', 'success');
+        } catch (imageError: any) {
+          console.error('❌ Detailed error updating product image:', {
+            message: imageError.message,
+            response: imageError.response?.data,
+            status: imageError.response?.status,
+          });
+          showNotification('Failed to update product image.', 'error');
+        }
+      } else if (newImageBase64 && !productId) {
+        console.warn('⚠️ Skipping image upload: missing productId');
       }
   
       router.back();
-    } catch (error) {
-      console.error('❌ Error saving product:', error);
+    } catch (error: any) {
+      console.error('❌ Error saving product:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
       showNotification('Failed to save product.', 'error');
     } finally {
       setSaving(false);
     }
   };
   
-  
-
   if (id && loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -222,5 +273,4 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 10,
   },
-  
 });
