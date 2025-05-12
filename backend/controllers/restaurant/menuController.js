@@ -143,9 +143,44 @@ const editRestaurantProductImage = async (req, res) => {
 };
 
 
+const deleteProduct = async (req, res) => {
+  try {
+    const { productId } = req.query;
+
+    if (!productId) {
+      console.log("Product ID is required");
+      return res.status(403).json({ error: "Product ID is required" });
+    }
+
+    const deleted = await Product.findOneAndDelete({
+      _id: productId,
+      restaurantId: req.user._id
+    });
+
+    if (!deleted) {
+      console.log("Product not found or not owned by restaurant");
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.status(200).json({
+      message: "Product deleted successfully",
+      data: deleted
+    });
+    console.log("Deleted product:", deleted);
+
+  } catch (err) {
+    console.log("Error deleting product:", err);
+    res.status(500).json({
+      error: "Failed to delete product",
+      details: err.message
+    });
+  }
+};
+
 module.exports = {
     getRestaurantProducts,
     addRestaurantProduct,
     editRestaurantProduct,
     editRestaurantProductImage,
+    deleteProduct
 }

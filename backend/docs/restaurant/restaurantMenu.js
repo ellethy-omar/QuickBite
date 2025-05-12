@@ -191,3 +191,38 @@
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
+
+/**
+ * @swagger
+ *
+ * /api/restaurant/deleteProduct:
+ *   delete:
+ *     tags:
+ *       - Restaurant (JWT required)
+ *     summary: Delete a product
+ *     description: Allows a restaurant to delete one of its own products via query string.
+ *     parameters:
+ *       - in: query
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the product to delete.
+ *     responses:
+ *       200:
+ *         description: Product has been deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Message'
+ *       400:
+ *         $ref: '#/components/responses/ParameterRequiredError'
+ *       420:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       469:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
