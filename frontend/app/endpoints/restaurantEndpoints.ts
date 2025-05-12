@@ -142,6 +142,17 @@ export const EditRestaurantProduct = async (productData: {
   }
 };
 
+// --- DELETE: Delete a product
+export const DeleteRestaurantProduct = async (productId: string): Promise<any> => {
+  try {
+    const response = await apiClient.delete(`/api/restaurant/deleteProduct?productId=${productId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting restaurant product:', error);
+    throw error;
+  }
+};
+
 // --- GET: Fetch new "called" orders
 export const RGetRestaurantAllCalledOrders = async (): Promise<any> => {
   try {

@@ -1,28 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image, StyleSheet, RefreshControl } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
-import { useRouter } from 'expo-router';
-import { GetRestaurantProducts } from '@/app/endpoints/restaurantEndpoints';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, RefreshControl } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { GetRestaurantProducts, DeleteRestaurantProduct } from '@/app/endpoints/restaurantEndpoints';
 import { useNotification } from '@/app/context/notificationContext';
 import colors from '@/app/styles/colors';
+import { Ionicons } from '@expo/vector-icons';
+
+interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image?: string;
+  stockAvailable: number;
+  isAvailable: boolean;
+}
 
 export default function DashboardScreen() {
+  console.log('🛠 DashboardScreen component mounted');
   const router = useRouter();
   const { showNotification } = useNotification();
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchProducts = async () => {
     try {
-      setLoading(true);
+      console.log('📡 Fetching restaurant products...');
       const response = await GetRestaurantProducts();
       console.log('📦 Fetched products:', response.data);
       setProducts(response.data || []);
       console.log('✅ Products fetched successfully:', {
         count: response.data.length,
-        productIds: response.data.map((p: any) => p._id),
+        productIds: response.data.map((p: Product) => p._id),
       });
     } catch (error: any) {
       console.error('❌ Error fetching products:', {
@@ -50,14 +61,80 @@ export default function DashboardScreen() {
     }, [])
   );
 
-  const handleAddProduct = () => {
-    console.log('➕ Navigating to add new product');
-    router.push('/restaurantScreens/dashboard/addOrEditProduct');
+  const handleDeleteProduct = async (productId: string, productName: string) => {
+    Alert.alert(
+      'Delete Product',
+      `Are you sure you want to delete "${productName}"? This cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              console.log('🗑 Deleting product:', productId);
+              await DeleteRestaurantProduct(productId);
+              console.log('✅ Product deleted successfully:', productId);
+              showNotification('Product deleted successfully!', 'success');
+              fetchProducts(); // Refresh products
+            } catch (error: any) {
+              console.error('❌ Error deleting product:', {
+                productId,
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+              });
+              showNotification(
+                error.response?.status === 404
+                  ? 'Product not found.'
+                  : error.response?.status === 420
+                  ? 'Authorization token invalid.'
+                  : error.response?.status === 469
+                  ? 'Not authorized to delete product.'
+                  : 'Failed to delete product.',
+                'error'
+              );
+            }
+          },
+        },
+      ]
+    );
   };
 
-  const handleEditProduct = (productId: string) => {
-    console.log('✏️ Navigating to edit product:', productId);
-    router.push(`/restaurantScreens/dashboard/addOrEditProduct?id=${productId}`);
+  const renderProductCard = ({ item }: { item: Product }) => {
+    console.log('📄 Rendering product card:', item._id);
+    return (
+      <View style={styles.productCard}>
+        <Image
+          source={{ uri: item.image || 'https://via.placeholder.com/150' }}
+          style={styles.productImage}
+        />
+        <View style={styles.productDetails}>
+          <Text style={styles.productName}>{item.name}</Text>
+          <Text style={styles.productDescription} numberOfLines={2}>
+            {item.description}
+          </Text>
+          <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+          <Text style={styles.productStock}>
+            Stock: {item.stockAvailable} {item.isAvailable ? '(Available)' : '(Unavailable)'}
+          </Text>
+        </View>
+        <View style={styles.productActions}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => router.push(`/restaurantScreens/dashboard/addOrEditProduct?productId=${item._id}`)}
+          >
+            <Ionicons name="pencil" size={20} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => handleDeleteProduct(item._id, item.name)}
+          >
+            <Ionicons name="trash" size={20} color="#d9534f" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
   };
 
   if (loading) {
@@ -70,57 +147,12 @@ export default function DashboardScreen() {
     );
   }
 
-  if (!loading && products.length === 0) {
-    console.log('📭 Rendering empty state');
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.emptyText}>No products yet. Add your first one!</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddProduct}>
-          <Text style={styles.addButtonText}>+ Add New Product</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  console.log('📋 Rendering product list:', { count: products.length });
   return (
     <View style={styles.container}>
       <FlatList
         data={products}
         keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.productCard}
-            onPress={() => handleEditProduct(item._id)}
-          >
-            {/* --- Product Image --- */}
-            <Image
-              source={{ uri: item.image || 'https://via.placeholder.com/150' }}
-              style={styles.productImage}
-              resizeMode="cover"
-            />
-            {/* --- Product Details --- */}
-            <View style={styles.productDetails}>
-              <Text style={styles.productName}>{item.name}</Text>
-              <Text style={styles.productCategory}>{item.category}</Text>
-              <Text style={styles.productDescription} numberOfLines={2}>
-                {item.description}
-              </Text>
-              <View style={styles.priceAvailabilityRow}>
-                <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
-                {/* Optional: Uncomment to show availability */}
-                {/* <Text
-                  style={[
-                    styles.availability,
-                    { color: item.isAvailable ? '#4CAF50' : '#F44336' },
-                  ]}
-                >
-                  {item.isAvailable ? 'Available' : 'Unavailable'}
-                </Text> */}
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
+        renderItem={renderProductCard}
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
           <RefreshControl
@@ -130,39 +162,47 @@ export default function DashboardScreen() {
             tintColor={colors.primary}
           />
         }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No products yet.</Text>
+          </View>
+        }
       />
-      <TouchableOpacity style={styles.floatingAddButton} onPress={handleAddProduct}>
-        <Text style={styles.floatingAddButtonText}>+</Text>
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => router.push('/restaurantScreens/dashboard/addOrEditProduct')}
+      >
+        <Ionicons name="add" size={30} color="#fff" />
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, padding: 16 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background, padding: 16 },
+  container: { flex: 1, backgroundColor: colors.background },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
   loadingText: { fontSize: 16, color: '#666', marginTop: 12 },
-  emptyText: { fontSize: 16, color: '#666', marginBottom: 20, textAlign: 'center' },
-  addButton: { backgroundColor: colors.primary, padding: 14, borderRadius: 8, alignItems: 'center', width: '80%' },
-  addButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  emptyText: { fontSize: 16, color: '#666', textAlign: 'center' },
   productCard: {
     flexDirection: 'row',
     backgroundColor: '#fff',
     padding: 12,
+    marginHorizontal: 16,
     marginBottom: 12,
     borderRadius: 8,
     borderColor: '#ddd',
     borderWidth: 1,
   },
   productImage: { width: 80, height: 80, borderRadius: 8, marginRight: 12 },
-  productDetails: { flex: 1, justifyContent: 'center' },
-  productName: { fontWeight: 'bold', fontSize: 16, color: colors.primary },
-  productCategory: { fontSize: 12, color: '#999', marginTop: 2 },
-  productDescription: { fontSize: 12, color: '#666', marginTop: 4 },
-  priceAvailabilityRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
-  productPrice: { fontWeight: 'bold', color: '#000', fontSize: 14 },
-  availability: { fontWeight: 'bold', fontSize: 12 },
-  floatingAddButton: {
+  productDetails: { flex: 1 },
+  productName: { fontSize: 16, fontWeight: 'bold', color: colors.text },
+  productDescription: { fontSize: 14, color: '#666', marginTop: 4 },
+  productPrice: { fontSize: 14, fontWeight: 'bold', color: colors.primary, marginTop: 4 },
+  productStock: { fontSize: 12, color: '#666', marginTop: 4 },
+  productActions: { justifyContent: 'space-between', alignItems: 'center' },
+  actionButton: { padding: 8 },
+  floatingButton: {
     position: 'absolute',
     bottom: 20,
     right: 20,
@@ -170,13 +210,8 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    alignItems: 'center',
     elevation: 5,
   },
-  floatingAddButtonText: { color: 'white', fontSize: 32, fontWeight: 'bold' },
 });
