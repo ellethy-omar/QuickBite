@@ -12,7 +12,8 @@ const {
     getRestaurantProducts,
     addRestaurantProduct,
     editRestaurantProduct,
-    editRestaurantProductImage
+    editRestaurantProductImage,
+    deleteProduct
 } = require('../controllers/restaurant/menuController')
 
 const {
@@ -40,6 +41,7 @@ router.get("/getRestaurantProducts", getRestaurantProducts)
 router.post("/addRestaurantProduct", addRestaurantProduct)
 router.put("/editRestaurantProduct", editRestaurantProduct)
 router.put("/editRestaurantProductImage", editRestaurantProductImage)
+router.delete('/deleteProduct', deleteProduct)
 
 // order routes
 router.get("/getRestaurantAllRequiredOrders", getRestaurantAllRequiredOrders);
