@@ -39,19 +39,19 @@ export default function OrderDetailScreen() {
   }, [id]);
 
   const handleCancel = async () => {
-    Alert.alert('Cancel Order', 'You sure you wanna bail on this order?', [
-      { text: 'Nah', style: 'cancel' },
+    Alert.alert('Cancel Order', 'Are you sure you want to cancel this order?', [
+      { text: 'No', style: 'cancel' },
       {
-        text: 'Yup',
+        text: 'Yes',
         onPress: async () => {
           try {
             setCancelling(true);
             await CancelOrder(order!._id);
-            showNotification('Order canned like a pro!', 'success');
+            showNotification('Order successfully canceled', 'success');
             router.back();
           } catch (err) {
             console.error('❌ Error cancelling order:', err);
-            showNotification('Whoops, couldn’t cancel the order.', 'error');
+            showNotification('Couldn’t cancel the order. Driver already accepted.', 'error');
           } finally {
             setCancelling(false);
           }
